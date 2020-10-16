@@ -1,11 +1,18 @@
+[diff "sopsdiffer"]
+	textconv = sops -d
 [user]
     email = adam.sunderland@zapier.com
     name = iterion
-[alias]
-    cleanup = "!git remote prune origin && git gc && git clean -df && git stash clear"
 
-    # find commits by source code
-    fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+[alias]
+	cleanup = "!git remote prune origin && git gc && git clean -df && git stash clear"
+	# find commits by source code
+	fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+[alias]
+	st = status
+	co = checkout
+	po = pull origin
+	amend = commit --amend
 
 [apply]
     # Detect whitespace errors when applying a patch

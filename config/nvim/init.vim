@@ -1,91 +1,64 @@
-" *********************************
-" VimPlug
-" *********************************
-call plug#begin('~/.config/nvim/bundle')
-" *************************
-" General Enhancements
-" *************************
-" Copies text to system clipboard as well as buffer
-set mouse=c
-" Lets you use the mouse to click around
-if has('mouse')
-    set mouse+=a
-endif
+set clipboard=unnamed
+let mapleader = ',' 
+set number
+set tabstop=4
+set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
+set list
+syntax enable
+filetype plugin indent on
 
-" Jump to ay definition and references https://github.com/pechorin/any-jump.vim
-Plug 'pechorin/any-jump.vim'
+nnoremap <silent> <leader>s :Rg<CR>
 
-" Fancy start screen. Lets you open empty buffers, multiple files, etc
-Plug 'mhinz/vim-startify'
 
-" editorconfig support https://github.com/sgur/vim-editorconfig
-Plug 'sgur/vim-editorconfig'
+call plug#begin('~/.vim/plugged')
 
-" Don't change to directory when selecting a file
-let g:startify_files_number = 5
-let g:startify_change_to_dir = 0
-let g:startify_custom_header = [ ]
-let g:startify_relative_path = 1
-let g:startify_use_env = 1
+" Collection of common configurations for the Nvim LSP client
+Plug 'neovim/nvim-lspconfig'
 
-" Custom startup list, only show MRU from current directory/project
-let g:startify_lists = [
-\  { 'type': 'dir',       'header': [ 'Files '. getcwd() ] },
-\  { 'type': 'sessions',  'header': [ 'Sessions' ]       },
-\  { 'type': 'bookmarks', 'header': [ 'Bookmarks' ]      },
-\  { 'type': 'commands',  'header': [ 'Commands' ]       },
-\ ]
-" \  { 'type': function('helpers#startify#listcommits'), 'header': [ 'Recent Commits' ] },
-"
-let g:startify_commands = [
-\   { 'uc': [ 'Clean Plugins', ':PlugClean' ] },
-\   { 'up': [ 'Update Plugins', ':PlugUpdate' ] },
-\   { 'ug': [ 'Upgrade Plugin Manager', ':PlugUpgrade' ] },
-\ ]
+" Extensions to built-in LSP, for example, providing type inlay hints
+Plug 'tjdevries/lsp_extensions.nvim'
 
-let g:startify_bookmarks = [
-  \ { 'c': '~/dotfiles/config/nvim/init.vim' },
-  \ { 'g': '~/.gitconfig' },
-  \ { 'z': '~/.zshrc' },
-  \ { 'a': '~/alias' },
-  \ { 'd': '~/dotfiles' }
-\ ]
-""\ { 'd': '~/dotfiles' },
-""\ { 'h': '/Volumes/config' },
+" Autocompletion framework for built-in LSP
+Plug 'nvim-lua/completion-nvim'
 
-" :MarkdownPreview[Stop] https://github.com/iamcco/markdown-preview.nvim
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  } 
+" Diagnostic navigation and settings for built-in LSP
+Plug 'nvim-lua/diagnostic-nvim'
 
-" set to 1, the vim will refresh markdown when save the buffer or
-" leave from insert mode, default 0 is auto refresh markdown as you edit or
-" move the cursor
-" default: 0
-let g:mkdp_refresh_slow = 1
+Plug 'hashivim/vim-terraform'
+Plug 'leafgarland/typescript-vim'
+Plug 'mbbill/undotree'
+Plug 'mxw/vim-jsx'
+Plug 'pangloss/vim-javascript'
+Plug 'peitalin/vim-jsx-typescript'
+Plug 'stephpy/vim-yaml'
+Plug 'tomtom/tcomment_vim'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-sensible'
+Plug 'vim-airline/vim-airline'
+Plug 'tsandall/vim-rego'
+Plug 'google/vim-jsonnet'
 
-" Helps with writing Markdown (auto-formatting) https://github.com/reedes/vim-pencil
-Plug 'reedes/vim-pencil'
 
-augroup pencil
-  autocmd!
-  autocmd FileType markdown call pencil#init({'wrap': 'hard', 'autoformat': 1})
-  autocmd FileType text     call pencil#init({'wrap': 'hard', 'autoformat': 0})
-augroup END
-" Markdown-related stuff https://github.com/plasticboy/vim-markdown --- Not sure
-" about the use here
-"Plug 'godlygeek/tabular'
-"Plug 'plasticboy/vim-markdown'
+" fuzzy finder
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
 
-" Allow for the TOC window to auto-fit when it's possible for it to 
-" shrink. It never increases its default size (half screen), it only shrinks.
-" let g:vim_markdown_toc_autofit = 1
-
-" Focused editing :Goyo https://github.com/junegunn/goyo.vim
-Plug 'junegunn/goyo.vim'
 
 " directory tree
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+" Initialize plugin system
+call plug#end()
+
+set backupdir=~/.vim/backup//
+set directory=~/.vim/swap//
+set undodir=~/.vim/undo//
+set undofile
+
+let g:terraform_fmt_on_save=1
+
+set hidden
 
 nnoremap <leader>d :NERDTreeToggle<CR>
 nnoremap <leader>f :NERDTreeFind<CR>
@@ -116,31 +89,6 @@ let g:NERDTreeIndicatorMapCustom = {
 
 let NERDTreeShowHidden=1
 
-" " autocomplete stuff
-" if has('nvim')
-"   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-" else
-"   Plug 'Shougo/deoplete.nvim'
-"   Plug 'roxma/nvim-yarp'
-"   Plug 'roxma/vim-hug-neovim-rpc'
-" endif
-
-" let g:deoplete#enable_at_startup = 1
-
-" multi-line commenting https://github.com/preservim/nerdcommenter
-"Plug 'preservim/nerdcommenter'
-
-" Comments using gcc / gcgc
-Plug 'git://github.com/tpope/vim-commentary.git'
-
-" multiple-cursors
-Plug 'terryma/vim-multiple-cursors'
-" surround/place end tags
-Plug 'tpope/vim-surround'
-" fuzzy finder
-Plug '/usr/local/opt/fzf'
-Plug 'junegunn/fzf.vim'
-
 " Using floating windows of Neovim to start fzf
 if has('nvim')
   let $FZF_DEFAULT_OPTS .= ' --border --margin=0,2'
@@ -161,366 +109,13 @@ if has('nvim')
   let g:fzf_layout = { 'window': 'call FloatingFZF()' }
 endif
 
-" bottom status line
-Plug 'itchyny/lightline.vim'
-let g:lightline = {
-  \ 'colorscheme': 'base16_black_metal_bathory',
-  \ 'active': {
-  \   'left': [ [ 'mode', 'paste' ],
-  \             [ 'gitbranch', 'readonly', 'filename', 'modified' ] ],
-  \   'right': [ [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ] ]
-  \ },
-  \ 'component_function': {
-  \   'gitbranch': 'FugitiveHead'
-  \ }
-  \ }
-\
-
-let g:lightline.component_expand = {
-  \  'linter_checking': 'lightline#ale#checking',
-  \  'linter_warnings': 'lightline#ale#warnings',
-  \  'linter_errors': 'lightline#ale#errors',
-  \  'linter_ok': 'lightline#ale#ok',
-  \ }
-
-let g:lightline.component_type = {
-  \ 'linter_checking': 'left',
-  \ 'linter_warnings': 'warning',
-  \  'linter_errors': 'error',
-  \  'linter_ok': 'left',
-  \ }
-
-" indentation 
-Plug 'Yggdroot/indentLine'
-" Colors hex values
-Plug 'norcalli/nvim-colorizer.lua'
-" Json highlighting
-Plug 'elzr/vim-json' , { 'for': 'json' }
-" Alignment
-Plug 'austintaylor/vim-indentobject'
-Plug 'junegunn/vim-easy-align'
-" Start menu
-Plug 'mhinz/vim-startify'
-" snapWindows
-Plug 'https://github.com/wesQ3/vim-windowswap'
-" closes { and others automatically
-Plug 'Raimondi/delimitMate'
-
-" Prettier
-" Plug 'prettier/vim-prettier', {
-"	\ 'do': 'yarn install',
-"	\ 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html']}
-" SAVE ON FORMAT
-"autocmd BufWritePre * call LanguageClient#textDocument_formatting_sync()
-
-" Git
-Plug 'tpope/vim-git'
-" Git wrapper https://github.com/tpope/vim-fugitive
-Plug 'tpope/vim-fugitive'
-" Shows a git diff in the 'gutter' https://github.com/airblade/vim-gitgutter 
-Plug 'airblade/vim-gitgutter'
-" Loads decorates and sorts git branches into an interactive buffer https://github.com/sodapopcan/vim-twiggy 
-" Plug 'sodapopcan/vim-twiggy'
-
-"nmap <silent> <leader>gst :Gstatus<cr>
-"nmap <leader>ge :Gedit<cr>
-"nmap <silent><leader>gr :Gread<cr>
-"nmap <silent><leader>gbl :Gblame<cr>
-
-" *************************
-" Language Server Related
-" *************************
-autocmd BufRead *.js set filetype=javascript
-autocmd BufRead *.es6 set filetype=javascript
-autocmd BufRead *.jsx set filetype=javascript 
-autocmd BufRead *.tsx set filetype=typescript 
-autocmd BufRead *.ts set filetype=typescript
-autocmd BufRead,BufNewFile *.re set filetype=reason
-autocmd BufRead,BufNewFile *.rei set filetype=reason
-autocmd BufRead,BufNewFile *.fdoc set filetype=yaml
-autocmd BufRead,BufNewFile *.md set filetype=markdown
-autocmd BufRead,BufNewFile *.md set spell
-autocmd BufRead,BufNewFile *.ml set filetype=ocaml
-autocmd BufRead,BufNewFile *.mli set filetype=ocaml
-
-" *************************
-" LanguageClient
-" *************************
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-" Install/uninstall the following with :CocInstall/:CocUninstall
-" coc-json
-" coc-tsserver
-" coc-css
-" coc-tailwindcss
-" coc-yaml
-" View all extensions with :CocList extensions
-
-" Async linting ALE
-Plug 'dense-analysis/ale'
-
-command! ALEToggleFixer execute "let g:ale_fix_on_save = get(g:, 'ale_fix_on_save', 0) ? 0 : 1"
-
-
-set hidden
-
-set cmdheight=2
-
-
-" GoTo code navigation.
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Use K to show documentation in preview window.
-nnoremap <silent> <cr> :call <SID>show_documentation()<CR>
-
-" Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-
-" Symbol renaming.
-nmap <leader>rn <Plug>(coc-rename)
-
-" Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-nnoremap <silent> gn :ALENext<CR>
-
-let g:ale_ocaml_ocamlformat_options = "--enable-outside-detected-project"
-
-let g:ale_completion_enabled = 0
-let g:ale_fix_on_save = 1
-let g:ale_linters = {
-  \ 'javascript': ['eslint'],
-  \ 'typescript': ['tsserver'],
-  \ 'reason': ['ocaml-lsp'],
-  \ 'ocaml': ['ocaml-lsp'],
-  \}
-let g:ale_linters_ignore = {
-  \ 'typescript': ['tslint'],
-  \}
-let g:ale_fixers = {
-  \ 'html': ['prettier'],
-  \ 'javascript': ['prettier'],
-  \ 'ocaml': ['ocamlformat'],
-  \ 'json': ['prettier'],
-  \ 'markdown': ['prettier'],
-  \ 'typescript': ['prettier', 'eslint'],
-  \}
-
-" OCaml/Reason specific stuff
-
-
-" Note, you need to open vim in the root directory of a project (where the
-" .bsconfig is) in order to get refmt to work properly.
-function! s:fix_refmt(buffer) abort
-  let ext = expand('#' . a:buffer . ':e')
-  if ext ==# 'rei'
-    return {
-    \   'command': 'esy refmt --interface true'
-    \}
-  else
-    return {
-    \   'command': 'esy refmt'
-    \}
-  endif
-endfunction
-
-if filereadable("./node_modules/.bin/bsrefmt")
-  " We're in a BuckleScript project
-  let g:ale_reasonml_refmt_executable = "./node_modules/.bin/bsrefmt"
-  let g:ale_fixers.reason = ['refmt']
-else
-  " We're in a native project
-  let g:ale_fixers.reason = [function('s:fix_refmt')] 
-endif
-
-let g:ale_set_balloons = 1
-
-" be explicit about whats running
-let g:ale_linters_explicit = 1
-
-" keep side gutter open https://github.com/dense-analysis/ale#5ii-how-can-i-keep-the-sign-gutter-open
-let g:ale_sign_column_always = 1
-
-" enable fix/lint on save (prettier,refmt) https://www.rockyourcode.com/reason-ml-development-with-vim/
-let g:ale_sign_error                  = '✘'
-let g:ale_sign_warning                = '⚠'
-highlight ALEErrorSign ctermbg        =NONE ctermfg=red
-highlight ALEWarningSign ctermbg      =NONE ctermfg=yellow
-let g:ale_lint_on_save                = 1
-
-"Move between linting errors
-nmap ]r <plug>(ale_next_wrap)
-nmap [r <plug>(ale_previous_wrap)
-
-highlight ALEWarning ctermbg=DarkMagenta
-
-" ***************************
-" Themes
-" ***************************
-Plug 'chriskempson/base16-vim'
-Plug 'mike-hearn/base16-vim-lightline'
-
-" **************************
-" Language-Related
-" **************************
-
-" ReasonML https://github.com/reasonml-editor/vim-reason-plus
-Plug 'reasonml-editor/vim-reason-plus'
-
-" Typescript
-" https://github.com/leafgarland/typescript-vim
-Plug 'leafgarland/typescript-vim', { 'for': ['typescript'] }
-Plug 'HerringtonDarkholme/yats.vim'
-Plug 'Quramy/tsuquyomi', { 'do': 'npm -g install typescript' }
-  
-" neovim or not vim8
-Plug 'Shougo/vimproc.vim', { 'do': 'make' }
-" Plug 'ianks/vim-tsx'
-
-let g:typescript_indent_disable = 1
-
-" Javascript
-Plug 'https://github.com/othree/javascript-libraries-syntax.vim', { 'for': [ 'javascript', 'js', 'jsx' ]}
-Plug 'thinca/vim-textobj-function-javascript',    { 'for': [ 'javascript', 'js', 'jsx' ]}
-Plug '1995eaton/vim-better-javascript-completion', { 'for': [ 'javascript', 'js', 'jsx' ]}
-Plug 'chemzqm/vim-jsx-improve', { 'for': [ 'javascript', 'js', 'jsx' ]}
-Plug 'gavocanov/vim-js-indent', { 'for': [ 'javascript', 'js', 'jsx' ]}
-
-
-" graphql
-Plug 'jparise/vim-graphql'
-
-" devicons https://github.com/ryanoasis/vim-devicons
-" always load as last one!
-" Plug 'ryanoasis/vim-devicons'
-call plug#end()
-
-" https://github.com/nicknisi/dotfiles/blob/master/config/nvim/init.vim
-" Colorscheme and final setup {{{
-    " This call must happen after the plug#end() call to ensure
-    " that the colorschemes have been loaded
-    if filereadable(expand("~/.vimrc_background"))
-        let base16colorspace=256
-        source ~/.vimrc_background
-    else
-        let g:onedark_termcolors=256
-        let g:onedark_terminal_italics=1
-        colorscheme base16-black-metal-bathory
-    endif
-    " make the highlighting of tabs and other non-text less annoying
-    highlight SpecialKey ctermfg=19 guifg=#333333
-    highlight NonText ctermfg=19 guifg=#333333
-
-    " make comments and HTML attributes italic
-    highlight Comment cterm=italic term=italic gui=italic
-    highlight htmlArg cterm=italic term=italic gui=italic
-    highlight xmlAttrib cterm=italic term=italic gui=italic
-    " highlight Type cterm=italic term=italic gui=italic
-    highlight Normal ctermbg=none
-" }}}
-"
-" automatically rebalance windows on vim resize
-autocmd VimResized * :wincmd =
-
-" basics
-set number
-set nohlsearch
-
-filetype plugin indent on
-syntax on 
-syntax enable
-
-set conceallevel=1 "show quotes on json files
-
-set autoindent
-set autoread " reload files when changed on disk, i.e. via `git checkout`
-set textwidth=80
-
-set backspace=indent,eol,start " make backspace behave in a sane manner
-set clipboard=unnamed
-
-set directory-=.    " don't store swapfiles in the current directory
-set expandtab       " expand tabs to spaces
-set encoding=utf-8
-
-set ignorecase  " case-insensitive search
-set smartcase   " case-sensitive search if any caps
-set hlsearch    " highlight search results
-set incsearch   " search as you type
-set nolazyredraw "don't redraw while executing macros
-
-set magic " magic for regex"
-
-" error bells
-set noerrorbells
-set visualbell
-set t_vb=
-set tm=500
-
-set laststatus=2                                             " always show statusline
-set list                                                     " show trailing whitespace
-set listchars=space:·,tab:▸\ ,trail:▫,extends:>,precedes:<,nbsp:+,eol:¬
-set number                                                   " show line numbers
-set ruler                                                    " show where you are
-set scrolloff=3                                              " show context above/below cursorline
-set shiftwidth=2                                             " normal mode indentation commands use 2 spaces
-set showcmd
-set softtabstop=2                                            " insert mode tab and backspace use 2 spaces
-set smarttab " tab respects 'tabstop', 'shiftwidth', and 'softtabstop'
-set tabstop=4                                                " actual tabs occupy 8 characters
-set lazyredraw
-set synmaxcol=200
-set updatetime=250
-set nowb
-set nobackup
-set noswapfile
-set nowrap
-set linebreak
-"set undofile " Enable persistent undo so that history persists across vim sessions
-"set undodir = ~/./undo
-
-" automatically rebalance windows on vim resize
-autocmd VimResized * :wincmd =
-"
-"" enable 24 bit color support if supported
-if (has("termguicolors"))
- set termguicolors
-endif
-
-if &term =~ '256color'
-  " disable background color erase
-  set t_ut=
-endif
-
-" Override vim's italic codes
-" https://www.reddit.com/r/vim/comments/24g8r8/italics_in_terminal_vim_and_tmux/
-set t_ZH=^[[3m
-set t_ZR=^[[23m
-
-set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors
-set guifont=Iosevka:h16
-
-let mapleader = ','
 noremap <C-h> <C-w>h
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
-"nnoremap <leader>a :Ag<space>
 
 nnoremap <leader>d :NERDTreeToggle<CR>
 nnoremap <leader>f :NERDTreeFind<CR>
-nmap <silent> <leader>b :Buffers<cr>
 
 " fuzzy finder
 if isdirectory(".git")
@@ -529,7 +124,7 @@ if isdirectory(".git")
 else
     " otherwise, use :FZF
     nmap <silent> <leader>t :FZF<cr>
-  endif
+endif
 
 " disable preview buffer for Reason autocomplete
 " set completeopt-=preview
@@ -558,13 +153,86 @@ let g:fzf_files_options = '--preview "bat --theme="OneHalfDark" --style=numbers,
  "   \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(), <bang>0)
 
 command! LS call fzf#run(fzf#wrap({'source': 'ls'}))
-let g:airline_theme='one'
-" Terminal mode remaps
-tnoremap <Esc> <C-\><C-n>
 
-" start autoComplete at startup
-let g:python3_host_prog = "/usr/local/bin/python3"
-" start nerdtree on startup
-" autocmd vimenter * NERDTree
-" close vim sesh if nerdtree is last window open
-" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+" Set completeopt to have a better completion experience
+" :help completeopt
+" menuone: popup even when there's only one match
+" noinsert: Do not insert text until a selection is made
+" noselect: Do not select, force user to select one from the menu
+set completeopt=menuone,noinsert,noselect
+
+" Avoid showing extra messages when using completion
+set shortmess+=c
+
+" Some servers have issues with backup files, see #649
+set nobackup
+set nowritebackup
+
+" Better display for messages
+set cmdheight=2
+
+" always show signcolumns
+set signcolumn=yes
+
+" Configure LSP
+" https://github.com/neovim/nvim-lspconfig#rust_analyzer
+lua <<EOF
+
+-- nvim_lsp object
+local nvim_lsp = require'nvim_lsp'
+
+-- function to attach completion and diagnostics
+-- when setting up lsp
+local on_attach = function(client)
+    require'completion'.on_attach(client)
+    require'diagnostic'.on_attach(client)
+end
+
+-- Enable rust_analyzer
+nvim_lsp.rust_analyzer.setup({ on_attach=on_attach })
+-- Enable terraform ls
+nvim_lsp.terraformls.setup({ on_attach=on_attach })
+
+EOF
+
+" Trigger completion with <Tab>
+inoremap <silent><expr> <TAB>
+  \ pumvisible() ? "\<C-n>" :
+  \ <SID>check_back_space() ? "\<TAB>" :
+  \ completion#trigger_completion()
+
+function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+" Code navigation shortcuts
+nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
+nnoremap <silent> <c+]> <cmd>lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
+inoremap <silent> <c+k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> gT    <cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> rn    <cmd>lua vim.lsp.buf.rename()<CR>
+nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+
+" Visualize diagnostics
+let g:diagnostic_enable_virtual_text = 1
+let g:diagnostic_trimmed_virtual_text = '40'
+" Don't show diagnostics while in insert mode
+let g:diagnostic_insert_delay = 1
+
+" Set updatetime for CursorHold
+" 300ms of no cursor movement to trigger CursorHold
+set updatetime=300
+" Show diagnostic popup on cursor hold
+autocmd CursorHold * lua vim.lsp.util.show_line_diagnostics()
+
+" Goto previous/next diagnostic warning/error
+nnoremap <silent> g[ <cmd>PrevDiagnosticCycle<cr>
+nnoremap <silent> g] <cmd>NextDiagnosticCycle<cr>
+
+autocmd CursorMoved,InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *
+\ lua require'lsp_extensions'.inlay_hints{ prefix = '', highlight = "Comment" }
