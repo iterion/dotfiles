@@ -104,5 +104,7 @@
     showPatch = true
 
 [log]
-    date = relative
+	date = relative
 
+[pull]
+	ff = only
