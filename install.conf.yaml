@@ -4,6 +4,11 @@
 
 - clean: ['~']
 
+- create:
+    - ~/.aws
+    - ~/downloads
+    - ~/.vim/undo-history
+
 - link:
     ~/.dotfiles: ''
     ~/.config/nvim: config/nvim
@@ -12,10 +17,7 @@
     ~/.config/kitty: config/kitty
     ~/.gitconfig: gitconfig
     ~/.aws/config: aws-config
-
-- create:
-    - ~/downloads
-    - ~/.vim/undo-history
+    ~/.alias: alias
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]

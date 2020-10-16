@@ -76,8 +76,13 @@ brew install ripgrep
 brew install Schniz/tap/fnm # Fast Node Manager - https://github.com/Schniz/fnm
 brew install yarn
 brew install aws-vault
-# brew install neovim
+brew install --HEAD neovim
 
+###############################################################################
+# Vim Plug Setup
+###############################################################################
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 
 ###############################################################################
 # Run Homebrew cleanup to remove installation/cached files
@@ -98,18 +103,6 @@ brew cask install slack
 brew cask install spotify
 brew cask install visual-studio-code
 brew cask install zoomus
-
-
-echo "Go to https://github.com/Hammerspoon/hammerspoon/releases/tag/0.9.78 to
-download Hammerspoon"
-while true; do
-    read -p "Have you installed Hammerspoon?" yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) continue;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
 
 
 ###############################################################################
