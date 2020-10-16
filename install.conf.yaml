@@ -17,6 +17,7 @@
     ~/.config/kitty: config/kitty
     ~/.gitconfig: gitconfig
     ~/.aws/config: aws-config
+    ~/.kube/config: kube-config
     ~/.alias: alias
 
 - shell:
