@@ -3,3 +3,5 @@ alias vi="nvim"
 alias vim="nvim"
 alias y="yarn"
 alias pr="hub pull-request -b master -p -d -o"
+alias k='aws-vault exec admin -- kubectl'
+alias aws-login='aws-vault login admin --no-session --assume-role-ttl=12h'
