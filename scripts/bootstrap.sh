@@ -77,6 +77,8 @@ brew install Schniz/tap/fnm # Fast Node Manager - https://github.com/Schniz/fnm
 brew install yarn
 brew install aws-vault
 brew install --HEAD neovim
+brew install kubectx aws-iam-authenticator
+brew install pyenv rbenv direnv
 
 ###############################################################################
 # Vim Plug Setup
@@ -103,6 +105,9 @@ brew cask install slack
 brew cask install spotify
 brew cask install visual-studio-code
 brew cask install zoomus
+
+brew tap homebrew/cask-fonts
+brew cask install font-fira-code
 
 
 ###############################################################################
