@@ -1,6 +1,6 @@
 [user]
-	email = dylanirlbeck@gmail.com
-	name = dylanirlbeck
+    email = adam.sunderland@zapier.com
+    name = iterion
 [alias]
     cleanup = "!git remote prune origin && git gc && git clean -df && git stash clear"
 
