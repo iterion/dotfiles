@@ -1,0 +1,35 @@
+[profile work]
+region = us-east-1
+
+[profile k8s]
+source_profile = work
+region = us-east-1
+role_arn = arn:aws:iam::996097627176:role/kubernetes-read-only
+mfa_serial = arn:aws:iam::996097627176:mfa/adam.sunderland
+
+[profile admin]
+source_profile = work
+region = us-east-1
+role_arn = arn:aws:iam::996097627176:role/administrator
+mfa_serial = arn:aws:iam::996097627176:mfa/adam.sunderland
+
+[profile foundations]
+source_profile = work
+region = us-east-1
+role_arn = arn:aws:iam::996097627176:role/k8s-foundations
+mfa_serial = arn:aws:iam::996097627176:mfa/adam.sunderland
+
+[profile re]
+source_profile = work
+region = us-east-1
+role_arn = arn:aws:iam::996097627176:role/release-engineering
+mfa_serial = arn:aws:iam::996097627176:mfa/adam.sunderland
+
+[profile atlantis]
+source_profile = work
+region = us-east-1
+role_arn = arn:aws:iam::996097627176:role/tooling-k8s-atlantis
+mfa_serial = arn:aws:iam::996097627176:mfa/adam.sunderland
+
+[default]
+region = us-west-1

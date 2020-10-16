@@ -11,6 +11,7 @@
     ~/.zshrc: zshrc
     ~/.config/kitty: config/kitty
     ~/.gitconfig: gitconfig
+    ~/.aws/config: aws-config
 
 - create:
     - ~/downloads
