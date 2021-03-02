@@ -3,6 +3,10 @@ local application = require "hs.application"
 local hotkey = require "hs.hotkey"
 local Grid = require "grid"
 
+local zoomMeetingTitle = 'Zoom Meeting'
+
+local log = hs.logger.new('iterion','debug')
+
 local mashApps = {
   'cmd',
   'option'
@@ -29,11 +33,18 @@ hotkey.bind(mashGeneral, 'I', Grid.topright)
 hotkey.bind(mashGeneral, 'M', Grid.bottomright)
 
 -- Spotify
-hotkey.bind(mashGeneral, 'P', hs.spotify.play)
-hotkey.bind(mashGeneral, 'Y', hs.spotify.pause)
-hotkey.bind(mashGeneral, 'T', hs.spotify.displayCurrentTrack)
+-- hotkey.bind(mashGeneral, 'P', hs.spotify.play)
+-- hotkey.bind(mashGeneral, 'Y', hs.spotify.pause)
+-- hotkey.bind(mashGeneral, 'T', hs.spotify.displayCurrentTrack)
+--
+function lgMonitor()
+  return hs.screen.find('LG UltraFine')
+end
 
--- Slack-specific app launcher (since I keep it "peeked" to the side by default)
+function builtInDisplay()
+  return hs.screen.find('Color LCD')
+end
+
 function showSlack()
   local appName = 'Slack'
   local app = application.find(appName)
@@ -43,10 +54,62 @@ function showSlack()
     Grid.topleft()
   end
 end
+
+function showZoom()
+  local appName = 'zoom.us'
+  local app = application.find(appName)
+  application.launchOrFocus(appName)
+
+  if (app and app:isRunning()) then
+    local lgScreen = lgMonitor()
+    local builtInScreen = builtInDisplay()
+    local win = app:getWindow('Zoom')
+    log.i('before')
+    if win then
+      log.i('here')
+	  -- log.i(builtInScreen:id())
+      win:moveToScreen(builtInScreen)
+      win:focus()
+      Grid.topleft()
+    end
+    local win = app:getWindow(zoomMeetingTitle)
+    if win then
+      log.i('there')
+      win:moveToScreen(lgScreen)
+      win:focus()
+      Grid.fullscreen()
+    end
+  end
+end
+
+function showPritunl()
+  local appName = 'Pritunl'
+  local app = application.find(appName)
+  application.launchOrFocus(appName)
+
+  if (app and app:isRunning()) then
+    Grid.topright()
+  end
+end
+
+function identifyFrontmost()
+  local app = application.frontmostApplication()
+  local appElement = hs.axuielement.applicationElement(app)
+  hs.alert(app:name())
+  hs.alert(appElement:attributeNames())
+  for i,line in ipairs(appElement:attributeNames()) do
+    hs.alert(line)
+  end
+end
+
 -- App Shortcuts
 hotkey.bind(mashApps, '1', function() application.launchOrFocus('kitty') end)
 hotkey.bind(mashApps, '2', function() application.launchOrFocus('Firefox') end)
-hotkey.bind(mashApps, '3', showSlack)
+hotkey.bind(mashApps, 'S', showSlack)
+hotkey.bind(mashApps, 'Z', showZoom)
+hotkey.bind(mashApps, 'V', showPritunl)
+hotkey.bind(mashApps, '9', identifyFrontmost)
+
 
 -- Reload automatically on config changes
 hs.pathwatcher.new(os.getenv('HOME') .. '/.hammerspoon/', hs.reload):start()

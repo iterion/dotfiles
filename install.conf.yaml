@@ -19,6 +19,8 @@
     ~/.aws/config: aws-config
     ~/.kube/config: kube-config
     ~/.alias: alias
+    ~/.tmux.conf: tmux.conf
+    ~/.config/alacritty.yml: config/alacritty.yml
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
