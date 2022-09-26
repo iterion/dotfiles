@@ -3,6 +3,6 @@ alias vi="nvim"
 alias vim="nvim"
 alias y="yarn"
 alias pr="hub pull-request -b master -p -d -o"
-alias k='aws-vault exec admin -- kubectl'
-alias aws-login='aws-vault login admin --no-session --duration=12h'
-alias ecr-login='aws-vault exec admin -- aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 996097627176.dkr.ecr.us-east-1.amazonaws.com'
+alias k='aws-vault exec sso_mono-prod_admin -- kubectl'
+alias aws-login='aws-vault login sso_mono-prod_admin --no-session --duration=12h'
+alias ecr-login='aws-vault exec sso_mono-prod_admin -- aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 996097627176.dkr.ecr.us-east-1.amazonaws.com'

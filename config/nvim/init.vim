@@ -1,3 +1,7 @@
+let g:do_filetype_lua = 1
+let g:did_load_filetypes = 0
+
+set laststatus=3
 set clipboard=unnamed
 let mapleader = ',' 
 set number
@@ -5,49 +9,58 @@ set tabstop=4
 set listchars=eol:¬,tab:>·,trail:~,extends:>,precedes:<,space:␣
 set list
 syntax enable
-filetype plugin indent on
+" filetype plugin indent on
 
 nnoremap <silent> <leader>s :Rg<CR>
 
 
 call plug#begin('~/.vim/plugged')
 
+" Snippet plugin
+Plug 'hrsh7th/vim-vsnip'
+
 " Collection of common configurations for the Nvim LSP client
 Plug 'neovim/nvim-lspconfig'
+Plug 'simrat39/rust-tools.nvim'
 
-" Extensions to built-in LSP, for example, providing type inlay hints
-Plug 'tjdevries/lsp_extensions.nvim'
+" Completion framework
+Plug 'hrsh7th/nvim-cmp'
 
-" Autocompletion framework for built-in LSP
-Plug 'nvim-lua/completion-nvim'
+" LSP completion source for nvim-cmp
+Plug 'hrsh7th/cmp-nvim-lsp'
 
-" Diagnostic navigation and settings for built-in LSP
-Plug 'nvim-lua/diagnostic-nvim'
+" Snippet completion source for nvim-cmp
+Plug 'hrsh7th/cmp-vsnip'
+
+" Other usefull completion sources
+Plug 'hrsh7th/cmp-path'
+Plug 'hrsh7th/cmp-buffer'
+
 
 Plug 'hashivim/vim-terraform'
-Plug 'leafgarland/typescript-vim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'mbbill/undotree'
-Plug 'mxw/vim-jsx'
 Plug 'pangloss/vim-javascript'
 Plug 'peitalin/vim-jsx-typescript'
 Plug 'stephpy/vim-yaml'
 Plug 'tomtom/tcomment_vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-sensible'
-Plug 'vim-airline/vim-airline'
+Plug 'nvim-lualine/lualine.nvim'
+" If you want to have icons in your statusline choose one of these
+Plug 'kyazdani42/nvim-web-devicons'
 Plug 'tsandall/vim-rego'
 Plug 'google/vim-jsonnet'
 
 
 " fuzzy finder
-Plug '/usr/local/opt/fzf'
-Plug 'junegunn/fzf.vim'
+" Plug '/usr/local/opt/fzf'
+" Plug 'junegunn/fzf.vim'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
 
 
-" directory tree
-Plug 'scrooloose/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 " Initialize plugin system
 call plug#end()
 
@@ -60,106 +73,44 @@ let g:terraform_fmt_on_save=1
 
 set hidden
 
-nnoremap <leader>d :NERDTreeToggle<CR>
-nnoremap <leader>f :NERDTreeFind<CR>
-nnoremap <leader>g :GitGutterToggle<CR>
-
-let NERDTreeDirArrowExpandable = "\u00a0" " make arrows invisible
-let NERDTreeDirArrowCollapsible = "\u00a0" " make arrows invisible
-let NERDTreeNodeDelimiter = "\u263a" " smiley face
-
-augroup nerdtree
-  autocmd!
-  autocmd FileType nerdtree setlocal nolist " turn off whitespace characters
-  autocmd FileType nerdtree setlocal nocursorline " turn off line highlighting for performance
-augroup END
-
-let g:NERDTreeIndicatorMapCustom = {
-  \ "Modified"  : "✹",
-  \ "Staged"    : "✚",
-  \ "Untracked" : "✭",
-  \ "Renamed"   : "➜",
-  \ "Unmerged"  : "═",
-  \ "Deleted"   : "✖",
-  \ "Dirty"     : "✗",
-  \ "Clean"     : "✔︎",
-  \ 'Ignored'   : '☒',
-  \ "Unknown"   : "?"
-  \ }
-
-let NERDTreeShowHidden=1
-
 " Using floating windows of Neovim to start fzf
-if has('nvim')
-  let $FZF_DEFAULT_OPTS .= ' --border --margin=0,2'
-
-  function! FloatingFZF()
-    let width = float2nr(&columns * 0.9)
-    let height = float2nr(&lines * 0.6)
-    let opts = { 'relative': 'editor',
-               \ 'row': (&lines - height) / 2,
-               \ 'col': (&columns - width) / 2,
-               \ 'width': width,
-               \ 'height': height }
-
-    let win = nvim_open_win(nvim_create_buf(v:false, v:true), v:true, opts)
-    call setwinvar(win, '&winhighlight', 'NormalFloat:Normal')
-  endfunction
-
-  let g:fzf_layout = { 'window': 'call FloatingFZF()' }
-endif
+" if has('nvim')
+"   let $FZF_DEFAULT_OPTS .= ' --border --margin=0,2'
+"
+"   function! FloatingFZF()
+"     let width = float2nr(&columns * 0.9)
+"     let height = float2nr(&lines * 0.6)
+"     let opts = { 'relative': 'editor',
+"                \ 'row': (&lines - height) / 2,
+"                \ 'col': (&columns - width) / 2,
+"                \ 'width': width,
+"                \ 'height': height }
+"
+"     let win = nvim_open_win(nvim_create_buf(v:false, v:true), v:true, opts)
+"     call setwinvar(win, '&winhighlight', 'NormalFloat:Normal')
+"   endfunction
+"
+"   let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+" endif
 
 noremap <C-h> <C-w>h
 noremap <C-j> <C-w>j
 noremap <C-k> <C-w>k
 noremap <C-l> <C-w>l
 
-nnoremap <leader>d :NERDTreeToggle<CR>
-nnoremap <leader>f :NERDTreeFind<CR>
-
-" fuzzy finder
-if isdirectory(".git")
-    " if in a git project, use :GFiles
-    nmap <silent> <leader>t :GitFiles --cached --others --exclude-standard<cr>
-else
-    " otherwise, use :FZF
-    nmap <silent> <leader>t :FZF<cr>
-endif
-
-" disable preview buffer for Reason autocomplete
-" set completeopt-=preview
-
-"Use ripgrep
-let g:ackprg = 'rg --vimgrep --no-heading'
-let g:grepprg='rg --vimgrep'
-
-let g:rg_find_command = 'rg --files --follow  -g "!{.config,etc,node_modules,.git,target,.reast,.d,.cm}/*"'
-" command! -bang -nargs=* Find call fzf#vim#grep(
-"  \ 'rg --column --line-number --no-heading --fixed-strings --ignore-case --no-ignore --hidden --follow --glob "!.git/*" --color always '
-"  \ .shellescape(<q-args>), 1, <bang>0)
-command! -bang -nargs=* Rg call fzf#vim#files('.', {'source': g:rg_find_command}, 0)
-
-command! -bang -nargs=* Find call fzf#vim#grep(
-  \ 'rg --column --line-number --no-heading --follow --ignore-case --color=always '.<q-args>, 1,
-  \ <bang>0 ? fzf#vim#with_preview('up:60%') : fzf#vim#with_preview('right:50%:hidden', '?'), <bang>0)
-
-" Always enable preview window on the right with 60% width
-let g:fzf_files_options = '--preview "bat --theme="OneHalfDark" --style=numbers,changes --color always {3..-1} | head -200" --expect=ctrl-v,ctrl-x'
-
- " command! -bang -nargs=? -complete=dir Files
- "   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
-
- " command! -bang -nargs=? -complete=dir GitFiles
- "   \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(), <bang>0)
-
-command! LS call fzf#run(fzf#wrap({'source': 'ls'}))
+nnoremap <leader>d <cmd>Telescope file_browser<cr>
+nnoremap <leader>t <cmd>Telescope find_files<cr>
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 " Set completeopt to have a better completion experience
 " :help completeopt
 " menuone: popup even when there's only one match
 " noinsert: Do not insert text until a selection is made
 " noselect: Do not select, force user to select one from the menu
-set completeopt=menuone,noinsert,noselect
+set completeopt=menu,menuone,noselect
 
 " Avoid showing extra messages when using completion
 set shortmess+=c
@@ -179,60 +130,150 @@ set signcolumn=yes
 lua <<EOF
 
 -- nvim_lsp object
-local nvim_lsp = require'nvim_lsp'
+-- local nvim_lsp = require'nvim_lsp'
 
 -- function to attach completion and diagnostics
 -- when setting up lsp
-local on_attach = function(client)
-    require'completion'.on_attach(client)
-    require'diagnostic'.on_attach(client)
-end
+-- local on_attach = function(client)
+-- require'completion'.on_attach(client)
+-- require'diagnostic'.on_attach(client)
+-- end
 
 -- Enable rust_analyzer
-nvim_lsp.rust_analyzer.setup({ on_attach=on_attach })
 -- Enable terraform ls
-nvim_lsp.terraformls.setup({ on_attach=on_attach })
+-- nvim_lsp.terraformls.setup({ on_attach=on_attach })
+
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  highlight = {
+    enable = true,              -- false will disable the whole extension
+  },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "gnn",
+      node_incremental = "grn",
+      scope_incremental = "grc",
+      node_decremental = "grm",
+    },
+  },
+  indent = {
+    enable = true
+  },
+  folds = {
+    enable = true
+  }
+}
+
+local nvim_lsp = require'lspconfig'
+
+local opts = {
+    tools = { -- rust-tools options
+        autoSetHints = true,
+        hover_with_actions = true,
+        inlay_hints = {
+            show_parameter_hints = false,
+            parameter_hints_prefix = "",
+            other_hints_prefix = "",
+        },
+    },
+
+    -- all the opts to send to nvim-lspconfig
+    -- these override the defaults set by rust-tools.nvim
+    -- see https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#rust_analyzer
+    server = {
+        -- on_attach is a callback called when the language server attachs to the buffer
+        -- on_attach = on_attach,
+        settings = {
+            -- to enable rust-analyzer settings visit:
+            -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
+            ["rust-analyzer"] = {
+                -- enable clippy on save
+                checkOnSave = {
+                    command = "clippy"
+                },
+            }
+        }
+    },
+}
+
+require('rust-tools').setup(opts)
+
+require('lualine').setup {
+  options = {
+    icons_enabled = true,
+    theme = 'auto',
+    component_separators = { left = '', right = ''},
+    section_separators = { left = '', right = ''},
+    disabled_filetypes = {},
+    always_divide_middle = true,
+    globalstatus = true,
+  },
+  sections = {
+    lualine_a = {'mode'},
+    lualine_b = {'branch', 'diff', 'diagnostics'},
+    lualine_c = {'filename'},
+    lualine_x = {'encoding', 'fileformat', 'filetype'},
+    lualine_y = {'progress'},
+    lualine_z = {'location'}
+  },
+  inactive_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = {'filename'},
+    lualine_x = {'location'},
+    lualine_y = {},
+    lualine_z = {}
+  },
+  tabline = {},
+  extensions = {}
+}
 
 EOF
 
-" Trigger completion with <Tab>
-inoremap <silent><expr> <TAB>
-  \ pumvisible() ? "\<C-n>" :
-  \ <SID>check_back_space() ? "\<TAB>" :
-  \ completion#trigger_completion()
+" Setup Completion
+" See https://github.com/hrsh7th/nvim-cmp#basic-configuration
+lua <<EOF
+local cmp = require'cmp'
+cmp.setup({
+  -- Enable LSP snippets
+  snippet = {
+    expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body)
+    end,
+  },
+  mapping = {
+    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<C-n>'] = cmp.mapping.select_next_item(),
+    -- Add tab support
+    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+    ['<Tab>'] = cmp.mapping.select_next_item(),
+    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.close(),
+    ['<CR>'] = cmp.mapping.confirm({
+      behavior = cmp.ConfirmBehavior.Insert,
+      select = true,
+    })
+  },
 
-function! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~ '\s'
-endfunction
-
-" Code navigation shortcuts
-nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
-nnoremap <silent> <c+]> <cmd>lua vim.lsp.buf.definition()<CR>
-nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
-inoremap <silent> <c+k> <cmd>lua vim.lsp.buf.signature_help()<CR>
-nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
-nnoremap <silent> gT    <cmd>lua vim.lsp.buf.type_definition()<CR>
-nnoremap <silent> rn    <cmd>lua vim.lsp.buf.rename()<CR>
-nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
-nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
-nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-
-" Visualize diagnostics
-let g:diagnostic_enable_virtual_text = 1
-let g:diagnostic_trimmed_virtual_text = '40'
-" Don't show diagnostics while in insert mode
-let g:diagnostic_insert_delay = 1
+  -- Installed sources
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'vsnip' },
+    { name = 'path' },
+    { name = 'buffer' },
+  },
+})
+EOF
 
 " Set updatetime for CursorHold
 " 300ms of no cursor movement to trigger CursorHold
 set updatetime=300
 " Show diagnostic popup on cursor hold
-autocmd CursorHold * lua vim.lsp.util.show_line_diagnostics()
+autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
 
 " Goto previous/next diagnostic warning/error
-nnoremap <silent> g[ <cmd>PrevDiagnosticCycle<cr>
-nnoremap <silent> g] <cmd>NextDiagnosticCycle<cr>
-
-autocmd CursorMoved,InsertLeave,BufEnter,BufWinEnter,TabEnter,BufWritePost *
-\ lua require'lsp_extensions'.inlay_hints{ prefix = '', highlight = "Comment" }
+nnoremap <silent> g[ <cmd>lua vim.diagnostic.goto_prev()<CR>
+nnoremap <silent> g] <cmd>lua vim.diagnostic.goto_next()<CR>

@@ -1,8 +1,8 @@
 [diff "sopsdiffer"]
 	textconv = sops -d
 [user]
-    email = adam.sunderland@zapier.com
-    name = iterion
+	email = iterion@gmail.com
+	name = iterion
 
 [alias]
 	cleanup = "!git remote prune origin && git gc && git clean -df && git stash clear"
@@ -110,3 +110,5 @@
 
 [pull]
 	ff = only
+[init]
+	defaultBranch = main
