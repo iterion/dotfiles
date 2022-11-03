@@ -28,11 +28,16 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 set -o vi
 
-source ~/.jira-creds
+# source ~/.jira-creds
+export KITTYCAD_TOKEN=$(security find-generic-password -a "$USER" -s "kittycad_token" -w)
+export KITTYCAD_DEV_TOKEN=$(security find-generic-password -a "$USER" -s "kittycad_dev_token" -w)
+export GITHUB_VAULT_TOKEN=$(security find-generic-password -a "$USER" -s "github_vault_token" -w)
+export CONSUL_ADDR=$(dig +short consul.kittycad.io.beta.tailscale.net. @100.100.100.100 | tail -n1)
+export NOMAD_ADDR="http://$(dig +short nomad.service.gcp.internal.kittycad.io A @$CONSUL_ADDR | tail -n1)"
+export VAULT_ADDR="http://$(dig +short active.vault.service.gcp.internal.kittycad.io A @$CONSUL_ADDR | tail -n1)"
 
-export PATH="$HOME/.poetry/bin:$PATH"
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/iterion/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/iterion/Downloads/google-cloud-sdk/path.zsh.inc'; fi
 
-function k8sssh {
-  cluster=$(aws eks list-clusters | jq -r .clusters[] | fzf)
-  ssm session -f "kubernetes.io/cluster/${cluster}=owned" -t Name
-}
+# The next line enables shell command completion for gcloud.
+if [ -f '/Users/iterion/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/iterion/Downloads/google-cloud-sdk/completion.zsh.inc'; fi

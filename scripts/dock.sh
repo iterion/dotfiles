@@ -8,7 +8,6 @@ main() {
 
       dockutil --no-restart \
           --remove 'Maps' \
-          --remove 'Notes' \
           --remove 'Photos' \
           --remove 'Contacts' \
           --remove 'FaceTime' \
@@ -23,9 +22,6 @@ main() {
           --remove 'Podcasts' \
           --remove 'TV' \
           --remove 'News' \
-          --add /Applications/kitty.app \
-          -- add /Applications/Visual Studio Code.app \
-          --add /Applications/Notion.app \
           --add /Applications/Slack.app \
           &>/dev/null
 

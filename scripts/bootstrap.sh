@@ -20,7 +20,7 @@ xcode-select --install
 echo "Checking for, or Installing Homebrew..."
 if [ -z `command -v brew` ]; then
     echo "Brew is missing! Installing it..."
-    ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi;
 
 
@@ -56,6 +56,9 @@ if [[ "$SHELL" != "$zsh_path" ]]; then
     chsh -s "$zsh_path"
     echo "default shell changed to $zsh_path"
 fi
+# Install ohmyzsh
+sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
 
 
 ###############################################################################
@@ -65,26 +68,21 @@ echo "Homebrew: installing binaries and other packages..."
 brew install bat
 brew install fzf
 brew install git
-brew install git-delta
-brew install httpie # https://httpie.org/
-brew install hub
-brew install kitty # https://formulae.brew.sh/cask/kitty
 brew install mas # https://github.com/mas-cli/mas
-brew install nginx
-brew install node
+brew install hub
 brew install ripgrep
-brew install Schniz/tap/fnm # Fast Node Manager - https://github.com/Schniz/fnm
-brew install yarn
 brew install aws-vault
 brew install --HEAD neovim
 brew install kubectx aws-iam-authenticator
-brew install pyenv rbenv direnv
+brew install direnv
+brew install tmux
+brew install asdf
 
-###############################################################################
-# Vim Plug Setup
-###############################################################################
 sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+# INSTALL TPM
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 ###############################################################################
 # Run Homebrew cleanup to remove installation/cached files
@@ -97,18 +95,16 @@ brew cleanup
 # Install applications with Homebrew Cask
 ###############################################################################
 echo "Homebrew Cask: installing apps..."
-brew cask install 1password
-brew cask install docker
-brew cask install firefox
-brew cask install github
-brew cask install slack
-brew cask install spotify
-brew cask install visual-studio-code
-brew cask install zoomus
-
 brew tap homebrew/cask-fonts
-brew cask install font-fira-code
+brew install --cask font-fira-code
+brew install --cask docker
+brew install slack
+brew install spotify
+brew install --cask zoomus
 
+
+## TODO RUSTUP
+brew install rust-analyzer
 
 ###############################################################################
 # Install applications with mas-cli (Mac App Store CLI)

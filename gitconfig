@@ -1,8 +1,8 @@
 [diff "sopsdiffer"]
 	textconv = sops -d
 [user]
-	email = iterion@gmail.com
-	name = iterion
+	email = adam@kittycad.io
+	name = Adam Sunderland
 
 [alias]
 	cleanup = "!git remote prune origin && git gc && git clean -df && git stash clear"
@@ -95,9 +95,10 @@
   followTags = true
 
 [filter "lfs"]
-    clean = git-lfs clean %f
-    smudge = git-lfs smudge %f
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
     required = true
+	process = git-lfs filter-process
 
 [fetch]
     prune = true # Remove stale refs to remote from, e.g., reflog and autocomplete
@@ -112,3 +113,5 @@
 	ff = only
 [init]
 	defaultBranch = main
+[commit]
+	gpgsign = true
