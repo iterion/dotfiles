@@ -101,6 +101,7 @@ brew install --cask docker
 brew install slack
 brew install spotify
 brew install --cask zoomus
+brew install --cask warp
 
 
 ## TODO RUSTUP
