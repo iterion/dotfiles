@@ -32,9 +32,10 @@ set -o vi
 export KITTYCAD_TOKEN=$(security find-generic-password -a "$USER" -s "kittycad_token" -w)
 export KITTYCAD_DEV_TOKEN=$(security find-generic-password -a "$USER" -s "kittycad_dev_token" -w)
 export GITHUB_VAULT_TOKEN=$(security find-generic-password -a "$USER" -s "github_vault_token" -w)
-export CONSUL_ADDR=$(dig +short consul.kittycad.io.beta.tailscale.net. @100.100.100.100 | tail -n1)
-export NOMAD_ADDR="http://$(dig +short nomad.service.gcp.internal.kittycad.io A @$CONSUL_ADDR | tail -n1)"
-export VAULT_ADDR="http://$(dig +short active.vault.service.gcp.internal.kittycad.io A @$CONSUL_ADDR | tail -n1)"
+export CONSUL_IP=$(dig +short consul.hawk-dinosaur.ts.net. @100.100.100.100 | tail -n1)
+export CONSUL_HTTP_ADDR="${CONSUL_IP}:80"
+export NOMAD_ADDR="http://$(dig +short nomad.service.azure.internal.kittycad.io A @$CONSUL_IP | tail -n1)"
+export VAULT_ADDR="http://$(dig +short active.vault.service.gcp.internal.kittycad.io A @$CONSUL_IP | tail -n1)"
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/Users/iterion/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/iterion/Downloads/google-cloud-sdk/path.zsh.inc'; fi

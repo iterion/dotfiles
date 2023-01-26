@@ -39,6 +39,7 @@ Plug 'hrsh7th/cmp-path'
 Plug 'hrsh7th/cmp-buffer'
 
 
+Plug 'jvirtanen/vim-hcl'
 Plug 'hashivim/vim-terraform'
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'mbbill/undotree'
@@ -131,7 +132,7 @@ set signcolumn=yes
 " https://github.com/neovim/nvim-lspconfig#rust_analyzer
 lua <<EOF
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = { "rust" },
+  ensure_installed = { "rust", "hcl" },
   highlight = {
     enable = true,              -- false will disable the whole extension
   },
@@ -204,12 +205,15 @@ require('lualine').setup {
     section_separators = { left = '', right = ''},
     disabled_filetypes = {},
     always_divide_middle = true,
-    globalstatus = true,
+    globalstatus = false,
   },
   sections = {
     lualine_a = {'mode'},
     lualine_b = {'branch', 'diff', 'diagnostics'},
-    lualine_c = {'filename'},
+    lualine_c = {{
+      'filename',
+      path = 1
+    }},
     lualine_x = {'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
     lualine_z = {'location'}
@@ -273,3 +277,6 @@ autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
 " Goto previous/next diagnostic warning/error
 nnoremap <silent> g[ <cmd>lua vim.diagnostic.goto_prev()<CR>
 nnoremap <silent> g] <cmd>lua vim.diagnostic.goto_next()<CR>
+set foldlevel=20
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
