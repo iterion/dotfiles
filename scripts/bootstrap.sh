@@ -68,18 +68,19 @@ echo "Homebrew: installing binaries and other packages..."
 brew install bat
 brew install fzf
 brew install git
+brew install git-lfs
 brew install mas # https://github.com/mas-cli/mas
 brew install hub
 brew install ripgrep
 brew install aws-vault
-brew install --HEAD neovim
+brew install neovim
 brew install kubectx aws-iam-authenticator
 brew install direnv
 brew install tmux
 brew install asdf
+brew install dockutils
 
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-       https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+git clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim
 
 # INSTALL TPM
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -90,6 +91,21 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 echo "Homebrew: cleaning up..."
 brew cleanup
 
+###############################################################################
+# asdf setup
+###############################################################################
+asdf plugin add nodejs
+asdf plugin add python
+asdf plugin add terraform
+
+
+###############################################################################
+# rustup setup
+###############################################################################
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+source "$HOME/.cargo/env"
+rustup install stable
 
 ###############################################################################
 # Install applications with Homebrew Cask
@@ -98,21 +114,19 @@ echo "Homebrew Cask: installing apps..."
 brew tap homebrew/cask-fonts
 brew install --cask font-fira-code
 brew install --cask docker
+brew install --cask 1password/tap/1password-cli
 brew install slack
 brew install spotify
-brew install --cask zoomus
+brew install zoom
 brew install --cask warp
-
-
-## TODO RUSTUP
-brew install rust-analyzer
+brew install --cask gpg-suite
 
 ###############################################################################
 # Install applications with mas-cli (Mac App Store CLI)
 ###############################################################################
 echo "mas-cli: installing Mac App Store apps..."
 
-mas install 
+mas install 1475387142
 
 echo "macOS Config, Dev Tools, Apps are Done Setup!"
 #
