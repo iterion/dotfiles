@@ -19,7 +19,6 @@
             home-manager.users.iterion = import ./home.nix;
           }
         ];
-
       };
     };
   };

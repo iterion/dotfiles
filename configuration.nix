@@ -56,7 +56,8 @@
     isNormalUser = true;
     description = "Adam Sunderland";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [];
+    shell = pkgs.zsh;
+    # packages = with pkgs; [];
   };
 
   # Allow unfree packages
@@ -65,16 +66,19 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  wget
+    wget
   ];
+  environment.shells = with pkgs; [ zsh ];
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
+  programs.zsh.enable = true;
   # programs.gnupg.agent = {
   #   enable = true;
   #   enableSSHSupport = true;
   # };
+  fonts.packages = with pkgs; [
+    font-awesome
+    nerdfonts
+  ];
 
   # List services that you want to enable:
 

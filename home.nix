@@ -26,18 +26,23 @@ in
   home.packages = with pkgs; [
     google-chrome
     alacritty
+    _1password
     _1password-gui
     htop
-    font-awesome
+
     xclip
     slack
+    fzf
+    rust-analyzer
+    cargo
+    rustc
+    nil
 
-    # # You can also create simple shell scripts directly inside your
-    # # configuration. For example, this adds a command 'my-hello' to your
-    # # environment:
-    # (pkgs.writeShellScriptBin "my-hello" ''
-    #   echo "Hello, ${config.home.username}!"
-    # '')
+    kubectl
+    kubectx
+
+    terraform
+    terraform-ls
   ];
 
   fonts.fontconfig.enable = true;
@@ -57,9 +62,7 @@ in
     # '';
   };
 
-  home.sessionVariables = {
-    EDITOR = "vim";
-  };
+  home.sessionVariables = {};
   home.pointerCursor = {
     package = pkgs.vanilla-dmz;
     name = "Vanilla-DMZ";
@@ -103,6 +106,11 @@ in
 	};
         bars = [
           {
+            fonts = {
+              names = [ "Font Awesome 6 Free" ];
+              style = "Bold";
+              size = 11.0;
+            };
             position = "top";
             statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ~/.config/i3status-rust/config-top.toml";
           }
@@ -113,6 +121,21 @@ in
 
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
+  programs.zsh = {
+    enable = true;
+    oh-my-zsh = {
+      enable = true;
+      plugins = [
+        "git"
+        "brew"
+        "kubectl" 
+      ];
+      theme = "robbyrussell";
+    };
+    shellAliases = {
+      k = "kubectl";
+    };
+  };
   programs.git = {
     enable = true;
     userName = "Adam Sunderland";
@@ -120,6 +143,8 @@ in
     aliases = {
       co = "checkout";
       amend = "commit -a --amend";
+      st = "status";
+      b = "branch";
     };
     extraConfig = {
       color = {
@@ -151,15 +176,86 @@ in
   };
   programs.neovim = {
     enable = true;
+    viAlias = true;
     vimAlias = true;
+    vimdiffAlias = true;
+    defaultEditor = true;
     plugins = with pkgs.vimPlugins; [
       nvim-treesitter.withAllGrammars
+      vim-nix
+      nvim-lspconfig
+      cmp-nvim-lsp
+      nvim-cmp
+      luasnip
     ];
+    extraLuaConfig = ''
+      vim.opt.relativenumber = false
+      vim.opt.number = true
+      vim.opt.spell = true
+      vim.opt.signcolumn = "auto"
+      vim.opt.wrap = false
+      local lspconfig = require('lspconfig')
+      local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
+      lspconfig.nil_ls.setup{}
+      lspconfig.terraform_ls.setup{}
+      lspconfig.rust_analyzer.setup {
+        settings = {
+          ['rust-analyzer'] = {},
+        },
+      }
+      
+      vim.api.nvim_create_autocmd('LspAttach', {
+        desc = 'LSP actions',
+        callback = function(event)
+          local opts = {buffer = event.buf}
+      
+          vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
+          vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
+          vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
+          vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
+          vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
+          vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
+          vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+          vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+          vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
+          vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+      
+          vim.keymap.set('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>', opts)
+          vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
+          vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts) 
+        end
+      })
+      
+      local default_setup = function(server)
+        lspconfig[server].setup({
+          capabilities = lsp_capabilities,
+        })
+      end
+      local cmp = require('cmp')
+
+      cmp.setup({
+        sources = {
+          {name = 'nvim_lsp'},
+        },
+        mapping = cmp.mapping.preset.insert({
+          -- Enter key confirms completion item
+          ['<CR>'] = cmp.mapping.confirm({select = false}),
+      
+          -- Ctrl + space triggers completion menu
+          ['<C-Space>'] = cmp.mapping.complete(),
+        }),
+        snippet = {
+          expand = function(args)
+            require('luasnip').lsp_expand(args.body)
+          end,
+        },
+      })
+    '';
   };
   programs.awscli = {
     enable = true;
     settings = {
-      "default" = {
+      "profile default" = {
         "output" = "json";
         "region" = "us-east-1";
         "sso_account_id" = "950941903565";
@@ -167,7 +263,7 @@ in
         "sso_role_name" = "admin";
         "sso_start_url" = "https://kittycad.awsapps.com/start#";
       };
-      "admin-management" = {
+      "profile admin-management" = {
         "output" = "json";
         "region" = "us-east-1";
         "sso_account_id" = "950941903565";
@@ -175,7 +271,7 @@ in
         "sso_role_name" = "admin";
         "sso_start_url" = "https://kittycad.awsapps.com/start#";
       };
-      "admin-prod" = {
+      "profile admin-prod" = {
         "output" = "json";
         "region" = "us-east-1";
         "sso_account_id" = "598082278656";
@@ -183,7 +279,7 @@ in
         "sso_role_name" = "admin";
         "sso_start_url" = "https://kittycad.awsapps.com/start#";
       };
-      "admin-dev" = {
+      "profile admin-dev" = {
         "output" = "json";
         "region" = "us-east-1";
         "sso_account_id" = "795424409989";
@@ -191,7 +287,7 @@ in
         "sso_role_name" = "admin";
         "sso_start_url" = "https://kittycad.awsapps.com/start#";
       };
-      "admin-corp" = {
+      "profile admin-corp" = {
         "output" = "json";
         "region" = "us-east-1";
         "sso_account_id" = "704705872864";
@@ -199,7 +295,7 @@ in
         "sso_role_name" = "admin";
         "sso_start_url" = "https://kittycad.awsapps.com/start#";
       };
-      "admin-executor" = {
+      "profile admin-executor" = {
         "output" = "json";
         "region" = "us-east-1";
         "sso_account_id" = "211360623297";

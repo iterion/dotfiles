@@ -34,10 +34,6 @@ export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCA
 export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
 export GITHUB_VAULT_TOKEN=$(op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields token)
 
-export TF_VAR_azure_subscription_id=$(op --account kittycadinc.1password.com item get TerraformCreds --fields azure_subscription_id)
-export TF_VAR_azure_client_id=$(op --account kittycadinc.1password.com item get TerraformCreds --fields azure_client_id)
-export TF_VAR_azure_client_secret=$(op --account kittycadinc.1password.com item get TerraformCreds --fields azure_client_secret)
-export TF_VAR_azure_tenant_id=$(op --account kittycadinc.1password.com item get TerraformCreds --fields azure_tenant_id)
 export TF_VAR_axiom_api_token=$(op --account kittycadinc.1password.com item get TerraformCreds --fields axiom_api_token)
 export TF_VAR_github_token=$(op --account kittycadinc.1password.com item get TerraformCreds --fields github_token)
 export TF_VAR_actions_github_app_key_base64=$(op --account kittycadinc.1password.com item get TerraformCreds --fields actions_github_app_key_base64)
