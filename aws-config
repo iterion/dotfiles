@@ -1,54 +1,82 @@
-[profile work]
-region = us-east-1
-
-[profile sso_mono-prod_admin]
-sso_role_name = monolith-production-admin
-sso_start_url = https://d-906767f49e.awsapps.com/start
-sso_region = us-east-1
-sso_account_id = 996097627176
-region = us-east-1
-
-[profile zapier]
-sso_role_name = monolith-production-developer
-sso_start_url = https://d-906767f49e.awsapps.com/start
-sso_region = us-east-1
-sso_account_id = 996097627176
-region = us-east-1
-
-[profile sso_mono-prod_developer]
-sso_role_name = monolith-production-developer
-sso_start_url = https://d-906767f49e.awsapps.com/start
-sso_region = us-east-1
-sso_account_id = 996097627176
-region = us-east-1
-
-[profile pe-dev-admin]
-sso_role_name = prod-eng-development-admin
-sso_start_url = https://d-906767f49e.awsapps.com/start
-sso_region = us-east-1
-sso_account_id = 762127954425
-region = us-east-1
-
-[profile pe-dev-ro]
-sso_role_name = prod-eng-development-human-ro
-sso_start_url = https://d-906767f49e.awsapps.com/start
-sso_region = us-east-1
-sso_account_id = 762127954425
-region = us-east-1
-
-[profile sso-hq-ro]
-sso_role_name = hq-human-read-only
-sso_start_url = https://d-906767f49e.awsapps.com/start
-sso_region = us-east-1
-sso_account_id = 282834616081
-region = us-east-1
-
-[profile sso_hq_admin]
-sso_role_name = hq-admin
-sso_start_url = https://d-906767f49e.awsapps.com/start
-sso_region = us-east-1
-sso_account_id = 282834616081
-region = us-east-1
-
 [default]
-region = us-west-1
+region = us-east-1
+
+[profile admin-management]
+sso_account_id = 950941903565
+sso_role_name = admin
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+region = us-east-1
+output = json
+
+[profile admin-prod]
+sso_account_id = 598082278656
+sso_role_name = admin
+region = us-east-1
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+output = json
+
+[profile admin-dev]
+sso_account_id = 795424409989
+sso_role_name = admin
+region = us-east-1
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+output = json
+
+[profile admin-corp]
+sso_account_id = 704705872864
+sso_role_name = admin
+region = us-east-1
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+output = json
+
+[profile admin-executor]
+sso_account_id = 211360623297
+sso_role_name = admin
+region = us-east-1
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+output = json
+
+[profile developer-management]
+sso_account_id = 950941903565
+sso_role_name = developer
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+region = us-east-1
+output = json
+
+[profile developer-prod]
+sso_account_id = 598082278656
+sso_role_name = developer
+region = us-east-1
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+output = json
+
+[profile developer-dev]
+sso_account_id = 795424409989
+sso_role_name = developer
+region = us-east-1
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+output = json
+
+[profile developer-corp]
+sso_account_id = 704705872864
+sso_role_name = developer
+region = us-east-1
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+output = json
+
+[profile developer-executor]
+sso_account_id = 211360623297
+sso_role_name = developer
+region = us-east-1
+sso_start_url = https://kittycad.awsapps.com/start#
+sso_region = us-east-1
+output = json

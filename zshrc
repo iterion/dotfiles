@@ -1,5 +1,7 @@
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/iterion/.oh-my-zsh"
+eval "$(ssh-agent -s)"
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 
 ZSH_THEME="robbyrussell"
 COMPLETION_WAITING_DOTS="true"
@@ -40,12 +42,13 @@ export TF_VAR_axiom_api_token=$(op --account kittycadinc.1password.com item get 
 export TF_VAR_github_token=$(op --account kittycadinc.1password.com item get TerraformCreds --fields github_token)
 export TF_VAR_actions_github_app_key_base64=$(op --account kittycadinc.1password.com item get TerraformCreds --fields actions_github_app_key_base64)
 export TF_VAR_actions_github_app_id=$(op --account kittycadinc.1password.com item get TerraformCreds --fields actions_github_app_id)
-
-export CONSUL_IP=$(dig +short consul.hawk-dinosaur.ts.net. @100.100.100.100 | tail -n1)
-export CONSUL_HTTP_ADDR="${CONSUL_IP}:80"
-export NOMAD_ADDR="http://$(dig +short nomad.service.azure.internal.kittycad.io A @$CONSUL_IP | tail -n1)"
-export VAULT_ADDR="http://$(dig +short active.vault.service.gcp.internal.kittycad.io A @$CONSUL_IP | tail -n1)"
+export VAULT_ADDR="http://vault.hawk-dinosaur.ts.net"
 
 function decode_aws_auth() {
   aws sts decode-authorization-message --encoded-message $1 | jq -r .DecodedMessage | jq .
+}
+
+function ssh-k8s() {
+  INSTANCE_ID=$(kubectl get node $1 -ojson | jq -r ".spec.providerID" | cut -d \/ -f5)
+  aws ssm start-session --target $INSTANCE_ID
 }

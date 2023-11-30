@@ -29,12 +29,6 @@ hotkey.bind(mashGeneral, 'N', Grid.bottomleft)
 hotkey.bind(mashGeneral, 'I', Grid.topright)
 hotkey.bind(mashGeneral, 'M', Grid.bottomright)
 
--- Spotify
--- hotkey.bind(mashGeneral, 'P', hs.spotify.play)
--- hotkey.bind(mashGeneral, 'Y', hs.spotify.pause)
--- hotkey.bind(mashGeneral, 'T', hs.spotify.displayCurrentTrack)
---
-
 function showSlack()
   local appName = 'Slack'
   local app = application.find(appName)
@@ -85,16 +79,6 @@ function showZoom()
   end
 end
 
-function showPritunl()
-  local appName = 'Pritunl'
-  local app = application.find(appName)
-  application.launchOrFocus(appName)
-
-  if (app and app:isRunning()) then
-    Grid.topright()
-  end
-end
-
 function identifyFrontmost()
   local app = application.frontmostApplication()
   local appElement = hs.axuielement.applicationElement(app)
@@ -106,8 +90,6 @@ function identifyFrontmost()
 end
 
 -- App Shortcuts
-hotkey.bind(mashApps, '1', function() application.launchOrFocus('kitty') end)
-hotkey.bind(mashApps, '2', function() application.launchOrFocus('Firefox') end)
 hotkey.bind(mashApps, 'S', showSlack)
 hotkey.bind(mashApps, 'Z', showZoom)
 hotkey.bind(mashApps, 'V', showPritunl)
