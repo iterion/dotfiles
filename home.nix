@@ -4,6 +4,11 @@ let
   mod = "Mod4";
   ws-web = "1: Web";
   ws-slack = "2: Slack";
+  primaryUiFont = {
+    names = [ "FiraCode Nerd Font" ];
+    style = "Regular";
+    size = 14.0;
+  };
 
 in 
 {
@@ -30,6 +35,7 @@ in
     _1password-gui
     htop
 
+    ripgrep
     xclip
     slack
     fzf
@@ -104,13 +110,10 @@ in
 
 	  "${mod}+Shift+r" = "restart";
 	};
+        fonts = primaryUiFont;
         bars = [
           {
-            fonts = {
-              names = [ "Font Awesome 6 Free" ];
-              style = "Bold";
-              size = 11.0;
-            };
+            fonts = primaryUiFont;
             position = "top";
             statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ~/.config/i3status-rust/config-top.toml";
           }

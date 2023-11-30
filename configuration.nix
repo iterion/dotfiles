@@ -67,6 +67,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     wget
+    tailscale
   ];
   environment.shells = with pkgs; [ zsh ];
 
@@ -84,6 +85,7 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+  services.tailscale.enable = true;
 
   services.xserver = {
     enable = true;
