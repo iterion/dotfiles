@@ -194,8 +194,12 @@ in
       cmp-nvim-lsp
       nvim-cmp
       luasnip
+      fzf-vim
+      fzf-lsp-nvim
+      telescope-nvim
     ];
     extraLuaConfig = ''
+      vim.g.mapleader = ","
       vim.opt.relativenumber = false
       vim.opt.number = true
       vim.opt.spell = true
@@ -204,13 +208,14 @@ in
       local lspconfig = require('lspconfig')
       local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
       lspconfig.nil_ls.setup{}
-      lspconfig.terraform_ls.setup{}
+      lspconfig.terraformls.setup{}
       lspconfig.rust_analyzer.setup {
         settings = {
           ['rust-analyzer'] = {},
         },
       }
       
+      vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
       vim.api.nvim_create_autocmd('LspAttach', {
         desc = 'LSP actions',
         callback = function(event)
@@ -257,6 +262,11 @@ in
           end,
         },
       })
+      local builtin = require('telescope.builtin')
+      vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+      vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
     '';
   };
   programs.awscli = {

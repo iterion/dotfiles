@@ -74,10 +74,6 @@
   environment.shells = with pkgs; [ zsh ];
 
   programs.zsh.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
   fonts.packages = with pkgs; [
     font-awesome
     nerdfonts
