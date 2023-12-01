@@ -46,6 +46,7 @@
   services.xserver = {
     layout = "us";
     xkbVariant = "dvorak";
+    dpi = 128;
   };
 
   # Configure console keymap
@@ -68,6 +69,7 @@
   environment.systemPackages = with pkgs; [
     wget
     tailscale
+    gnome.gnome-keyring
   ];
   environment.shells = with pkgs; [ zsh ];
 
