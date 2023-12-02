@@ -46,23 +46,28 @@
   services.xserver = {
     layout = "us";
     xkbVariant = "dvorak";
-    dpi = 128;
   };
 
   # Configure console keymap
   console.keyMap = "dvorak";
 
+  # Enable ALSA
+  sound.enable = true;
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "audio" "networkmanager" "wheel" ];
     shell = pkgs.zsh;
     # packages = with pkgs; [];
   };
 
   # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    pulseaudio = true;
+  };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -74,6 +79,8 @@
   environment.shells = with pkgs; [ zsh ];
 
   programs.zsh.enable = true;
+  programs.dconf.enable = true;
+
   fonts.packages = with pkgs; [
     font-awesome
     nerdfonts
@@ -104,7 +111,12 @@
 	}
       ];
     };
-    displayManager.defaultSession = "xsession";
+    displayManager = {
+      defaultSession = "xsession";
+      gdm = {
+        enable = true;
+      };
+    };
   };
 
 

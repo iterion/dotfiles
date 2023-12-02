@@ -49,6 +49,7 @@ in
 
     terraform
     terraform-ls
+    yaml-language-server
   ];
 
   fonts.fontconfig.enable = true;
@@ -161,6 +162,28 @@ in
       top = {
         icons = "awesome6";
         blocks = [
+         { block = "cpu"; }
+         {
+           block = "disk_space";
+           path = "/";
+           info_type = "available";
+           interval = 20;
+           warning = 20.0;
+           alert = 10.0;
+           format = " $icon root: $available.eng(w:2) ";
+         }
+         {
+           block = "memory";
+           format = " $icon $mem_total_used_percents.eng(w:2) ";
+           format_alt = " $icon_swap $swap_used_percents.eng(w:2) ";
+         }
+         {
+           block = "sound";
+           click = [{
+             button = "left";
+             cmd = "pavucontrol";
+           }];
+         }
          {
            block = "time";
            interval = 60;
