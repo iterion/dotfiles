@@ -11,8 +11,23 @@
     ];
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
+  #boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.grub = {
+      devices = [ "nodev" ];
+      efiSupport = true;
+      enable = true;
+      extraEntries = ''
+        menuentry "Windows" {
+          insmod part_gpt
+          insmod fat
+          insmod search_fs_uuid
+          insmod chain
+          search --fs-uuid --set=root A9E3-668B
+          chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+        }
+      '';
+    };
 
   networking.hostName = "iterion-nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -23,6 +38,8 @@
 
   # Enable networking
   networking.networkmanager.enable = true;
+  
+  virtualisation.docker.enable = true;
 
   # Set your time zone.
   time.timeZone = "America/Detroit";
@@ -58,7 +75,7 @@
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
-    extraGroups = [ "audio" "networkmanager" "wheel" ];
+    extraGroups = [ "audio" "networkmanager" "wheel" "docker" ];
     shell = pkgs.zsh;
     # packages = with pkgs; [];
   };
@@ -87,6 +104,10 @@
   ];
 
   # List services that you want to enable:
+  services.mysql = {
+    enable = true;
+    package = pkgs.mysql80;
+  };
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;

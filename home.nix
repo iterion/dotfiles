@@ -34,6 +34,7 @@ in
     _1password
     _1password-gui
     htop
+    bat
 
     ripgrep
     xclip
@@ -43,6 +44,9 @@ in
     cargo
     rustc
     nil
+    lldb
+    gnumake
+    gccgo
 
     kubectl
     kubectx
@@ -116,6 +120,11 @@ in
     '';
   };
 
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+    nix-direnv.enable = true;
+  };
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
   programs.zsh = {
@@ -200,15 +209,19 @@ in
     vimdiffAlias = true;
     defaultEditor = true;
     plugins = with pkgs.vimPlugins; [
-      nvim-treesitter.withAllGrammars
-      vim-nix
-      nvim-lspconfig
       cmp-nvim-lsp
-      nvim-cmp
-      luasnip
-      fzf-vim
       fzf-lsp-nvim
+      fzf-vim
+      luasnip
+      nvim-cmp
+      nvim-dap
+      nvim-dap-virtual-text
+      nvim-lspconfig
+      nvim-treesitter.withAllGrammars
+      plenary-nvim
+      rust-tools-nvim
       telescope-nvim
+      vim-nix
     ];
     extraLuaConfig = builtins.readFile ./vim.lua;
   };
@@ -218,6 +231,7 @@ in
   };
 
   services.gnome-keyring.enable = true;
+
 
   nixpkgs.config.allowUnfree = true;
 }
