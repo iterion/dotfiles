@@ -55,6 +55,7 @@
     wget
     tailscale
     gnome.gnome-keyring
+    lshw
   ];
   environment.shells = with pkgs; [ zsh ];
 
