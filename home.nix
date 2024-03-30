@@ -54,6 +54,9 @@ in
     terraform
     terraform-ls
     yaml-language-server
+
+    # todo put in repo specific config
+    openssl
   ];
 
   fonts.fontconfig.enable = true;
