@@ -55,8 +55,9 @@ in
     terraform-ls
     yaml-language-server
 
-    # todo put in repo specific config
-    openssl
+    nix-index
+    xorg.xev
+    xorg.xmodmap
   ];
 
   fonts.fontconfig.enable = true;
@@ -69,7 +70,7 @@ in
   home.pointerCursor = {
     package = pkgs.vanilla-dmz;
     name = "Vanilla-DMZ";
-    size = 64;
+    size = 48;
   };
 
   xdg.enable = true;
@@ -104,6 +105,10 @@ in
 	  "${mod}+Shift+8" = "move container to workspace 8";
 	  "${mod}+Shift+9" = "move container to workspace 9";
 	  "${mod}+Shift+0" = "move container to workspace 10";
+          "${mod}+Ctrl+less" = "move workspace to output left";
+          "${mod}+Ctrl+greater" = "move workspace to output right";
+          "${mod}+Ctrl+Left" = "move workspace to output left";
+          "${mod}+Ctrl+Right" = "move workspace to output right";
 
 	  "${mod}+Shift+r" = "restart";
 	};
@@ -233,8 +238,52 @@ in
     settings = ./aws-settings.nix;
   };
 
-  services.gnome-keyring.enable = true;
 
+  programs.autorandr = {
+    enable = true;
+    profiles = {
+      both = {
+        config = {
+          "eDP-1" = {
+            enable = true;
+            mode = "1920x1080";
+            primary = true;
+            position = "0x0";
+            rate = "144.00";
+            crtc = 0;
+          };
+          "HDMI-1-0" = {
+            enable = true;
+            mode = "3840x2160";
+            position = "1920x0";
+            rate = "30.00";
+            crtc = 4;
+          };
+        };
+        fingerprint = {
+          "HDMI-1-0" = "00ffffffffffff0010acbf404c33333226190103803c2278eaee95a3544c99260f5054a54b00d100d1c0b300a94081808100714f010104740030f2705a80b0588a0055502100001e000000ff0056375750393539453233334c0a000000fc0044454c4c205032373135510a20000000fd001d4b1f8c1e000a202020202020014302032bf150101f200514041312110302161507060123091f076d030c001000003c2000600302018301000004740030f2705a80b0588a0055502100001e023a801871382d40582c450055502100001e011d8018711c1620582c250055502100009e011d007251d01e206e28550055502100001e00000000000000000000000056";
+          "eDP-1" = "00ffffffffffff000dae5615000000001f200104a522137803ee95a3544c99260f505400000001010101010101010101010101010101ad3780a070383e403020a50058c110000018000000fd003c90a5a522010a202020202020000000fc004e313536484d412d4741310a20000000fe00434d4e0a20202020202020202001cc7020790200220014243805857f079f002f001f0037043d00090004002b000627003c8f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002e90";
+        };
+      };
+      primary = {
+        config = {
+          "eDP-1" = {
+            enable = true;
+            mode = "1920x1080";
+            position = "0x0";
+            primary = true;
+            rate = "144.00";
+            crtc = 0;
+          };
+        };
+        fingerprint = {
+          "eDP-1" = "00ffffffffffff000dae5615000000001f200104a522137803ee95a3544c99260f505400000001010101010101010101010101010101ad3780a070383e403020a50058c110000018000000fd003c90a5a522010a202020202020000000fc004e313536484d412d4741310a20000000fe00434d4e0a20202020202020202001cc7020790200220014243805857f079f002f001f0037043d00090004002b000627003c8f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002e90";
+        };
+      };
+    };
+  };
+
+  services.gnome-keyring.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 }

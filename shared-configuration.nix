@@ -67,12 +67,6 @@
     nerdfonts
   ];
 
-  # List services that you want to enable:
-  services.mysql = {
-    enable = true;
-    package = pkgs.mysql80;
-  };
-
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
   services.tailscale.enable = true;
