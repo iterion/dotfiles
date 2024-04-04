@@ -30,11 +30,14 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden'
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 set -o vi
 
-export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential)
-export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
 
 function decode_aws_auth() {
   aws sts decode-authorization-message --encoded-message $1 | jq -r .DecodedMessage | jq .
+}
+
+function fetch-kc-token() {
+  export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential)
+  export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
 }
 
 function ssh-k8s() {

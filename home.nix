@@ -33,6 +33,7 @@ in
     alacritty
     _1password
     _1password-gui
+    spotify
     htop
     bat
 
@@ -146,9 +147,38 @@ in
       ];
       theme = "robbyrussell";
     };
+    enableCompletion = true;
     shellAliases = {
       k = "kubectl";
     };
+    initExtra = ''
+      function decode_aws_auth() {
+        aws sts decode-authorization-message --encoded-message $1 | jq -r .DecodedMessage | jq .
+      }
+      
+      function fetch-kc-token() {
+        export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential)
+        export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
+      }
+      
+      function ssh-k8s() {
+        INSTANCE_ID=$(kubectl get node $1 -ojson | jq -r ".spec.providerID" | cut -d \/ -f5)
+        aws ssm start-session --target $INSTANCE_ID
+      }
+      
+      function vault-login() {
+        export VAULT_ADDR="http://vault.hawk-dinosaur.ts.net"
+        export GITHUB_VAULT_TOKEN=$(op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields token)
+        echo $GITHUB_VAULT_TOKEN | vault login -method=github token=-
+      }
+      
+      function fetch-tfvars() {
+        op --account kittycadinc.1password.com item get TerraformCreds --format=json | jq -r '.fields[] | select(.value != null) | "\(.label)=\(.value)"' | while read -r line; do
+            # Exporting each line as an environment variable
+            export "$line"
+        done
+      }
+    '';
   };
   programs.git = {
     enable = true;
@@ -256,15 +286,17 @@ in
             enable = true;
             mode = "3840x2160";
             position = "1920x0";
-            rate = "30.00";
+            rate = "60.00";
             crtc = 4;
           };
         };
         fingerprint = {
-          "HDMI-1-0" = "00ffffffffffff0010acbf404c33333226190103803c2278eaee95a3544c99260f5054a54b00d100d1c0b300a94081808100714f010104740030f2705a80b0588a0055502100001e000000ff0056375750393539453233334c0a000000fc0044454c4c205032373135510a20000000fd001d4b1f8c1e000a202020202020014302032bf150101f200514041312110302161507060123091f076d030c001000003c2000600302018301000004740030f2705a80b0588a0055502100001e023a801871382d40582c450055502100001e011d8018711c1620582c250055502100009e011d007251d01e206e28550055502100001e00000000000000000000000056";
+          "HDMI-1-0" = "00ffffffffffff001e6dc15b8c8702000721010380462878ea40b5ae5142ad260f5054210800d1c0614045400101010101010101010108e80030f2705a80b0588a00b9882100001e000000fd00283c1e873c000a202020202020000000fc004c4720554c54524146494e450a000000ff003330374d584a5834563737320a01360203427223090707830100004d01030410121f202261605f5e5d6d030c001000b83c20006001020367d85dc401788003e30f0003e2006ae305c000e606058160605004740030f2705a80b0588a00b9882100001e565e00a0a0a0295030203500b9882100001a1a3680a070381f402a263500b9882100001a000000000000008d";
           "eDP-1" = "00ffffffffffff000dae5615000000001f200104a522137803ee95a3544c99260f505400000001010101010101010101010101010101ad3780a070383e403020a50058c110000018000000fd003c90a5a522010a202020202020000000fc004e313536484d412d4741310a20000000fe00434d4e0a20202020202020202001cc7020790200220014243805857f079f002f001f0037043d00090004002b000627003c8f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002e90";
         };
       };
+      # dell monitor fingerprint
+      # "00ffffffffffff0010acbf404c33333226190103803c2278eaee95a3544c99260f5054a54b00d100d1c0b300a94081808100714f010104740030f2705a80b0588a0055502100001e000000ff0056375750393539453233334c0a000000fc0044454c4c205032373135510a20000000fd001d4b1f8c1e000a202020202020014302032bf150101f200514041312110302161507060123091f076d030c001000003c2000600302018301000004740030f2705a80b0588a0055502100001e023a801871382d40582c450055502100001e011d8018711c1620582c250055502100009e011d007251d01e206e28550055502100001e00000000000000000000000056";
       primary = {
         config = {
           "eDP-1" = {

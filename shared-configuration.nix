@@ -57,10 +57,16 @@
     gnome.gnome-keyring
     lshw
   ];
+  environment.pathsToLink = [ "/share/zsh" ];
   environment.shells = with pkgs; [ zsh ];
 
   programs.zsh.enable = true;
   programs.dconf.enable = true;
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "iterion" ];
+  };
 
   fonts.packages = with pkgs; [
     font-awesome
