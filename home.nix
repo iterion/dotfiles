@@ -29,14 +29,15 @@ in
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    google-chrome
-    alacritty
     _1password
     _1password-gui
-    spotify
-    discord
-    htop
+    alacritty
     bat
+    discord
+    google-chrome
+    htop
+    spotify
+    zoom-us
 
     ripgrep
     xclip
