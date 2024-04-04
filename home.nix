@@ -34,6 +34,7 @@ in
     _1password
     _1password-gui
     spotify
+    discord
     htop
     bat
 
@@ -198,8 +199,18 @@ in
         tool = "vimdiff";
         mnemonicprefix = true;
       };
+      help = {
+        autocorrect = 1;
+      };
       push = {
         default = "simple";
+        autoSetupRemote = true;
+      };
+      fetch = {
+        prune = true;
+      };
+      init = {
+        defaultBranch = "main";
       };
     };
   };
