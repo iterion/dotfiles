@@ -29,6 +29,31 @@
     [ { device = "/dev/disk/by-uuid/b4a52fb1-5e19-48c4-8428-46b2a89156d2"; }
     ];
 
+  services.blueman.enable = true;
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Enable = "Source,Sink,Media,Socket";
+      };
+    };
+  };
+
+  hardware.pulseaudio = {
+    enable = true;
+    package = pkgs.pulseaudioFull;
+    support32Bit = true;
+    extraConfig = ''
+      load-module module-combine-sink
+      load-module module-switch-on-connect
+      load-module module-bluetooth-policy
+      load-module module-bluetooth-discover
+      # load-module module-bluez5-device
+      # load-module module-bluez5-discover
+    '';
+  };
+
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
   # still possible to use this option, but it's recommended to use it in conjunction

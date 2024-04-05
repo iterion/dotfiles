@@ -213,6 +213,10 @@ in
       init = {
         defaultBranch = "main";
       };
+      url."git@github.com:" = {
+        insteadOf = "gh:";
+        pushInsteadOf = "github:";
+      };
     };
   };
   programs.i3status-rust = {
