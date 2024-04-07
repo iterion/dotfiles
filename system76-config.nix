@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports =
@@ -16,12 +16,20 @@
   boot.initrd.luks.devices."luks-bcdc740f-7023-4bb5-982f-081db97f671f".device = "/dev/disk/by-uuid/bcdc740f-7023-4bb5-982f-081db97f671f";
 
   hardware.system76.enableAll = true;
-
-  hardware.bluetooth = {
+  programs.hyprland = {
     enable = true;
-    powerOnBoot = true;
+    xwayland.enable = true;
   };
-  services.blueman.enable = true;
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.systemPackages = [
+    inputs.anyrun.packages.${pkgs.system}.anyrun
+    pkgs.wlr-randr
+    pkgs.waybar
+    pkgs.qt6.qtwayland
+    pkgs.libsForQt5.qt5.qtwayland
+    pkgs.gtk3
+    pkgs.gtk4
+  ];
   
   # Enable OpenGL
   hardware.opengl = {

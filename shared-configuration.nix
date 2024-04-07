@@ -28,6 +28,12 @@
     variant = "dvorak";
   };
 
+  virtualisation.docker.enable = true;
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
+  };
+
   # Configure console keymap
   console.keyMap = "dvorak";
 
@@ -79,27 +85,31 @@
 
   services.xserver = {
     enable = true;
-    desktopManager = {
-      xterm.enable = false;
-      xfce = {
-        enable = true;
-	noDesktop = true;
-	enableXfwm = false;
-      };
-      session = [
-        {
-          name = "xsession";
-	  start = ''
-	    ${pkgs.runtimeShell} $HOME/.xsession &
-	    waitPID=$!
-	  '';
-	}
-      ];
-    };
+    #desktopManager = {
+    #  xterm.enable = false;
+    #  xfce = {
+    #    enable = true;
+    #    noDesktop = true;
+    #    enableXfwm = false;
+    #  };
+    #  session = [
+    #    {
+    #      name = "xsession";
+    #      start = ''
+    #        ${pkgs.runtimeShell} $HOME/.xsession &
+    #        waitPID=$!
+    #      '';
+    #    }
+    #  ];
+    #};
     displayManager = {
-      defaultSession = "xsession";
-      lightdm = {
+      #defaultSession = "xsession";
+      #lightdm = {
+      #  enable = true;
+      #};
+      sddm  = {
         enable = true;
+        wayland.enable = true;
       };
     };
   };

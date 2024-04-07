@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 let
   mod = "Mod4";
@@ -29,6 +29,9 @@ in
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    kdePackages.konsole
+    foot
+
     _1password
     _1password-gui
     alacritty
@@ -39,22 +42,19 @@ in
     spotify
     zoom-us
 
-    ripgrep
-    xclip
-    slack
-    fzf
-    rust-analyzer
     cargo
-    rustc
+    fzf
+    jq
+    lsof
     nil
-    lldb
-    gnumake
-    gccgo
+    ripgrep
+    rust-analyzer
+    slack
+    xclip
 
     kubectl
     kubectx
 
-    terraform
     terraform-ls
     yaml-language-server
 
@@ -74,62 +74,85 @@ in
     package = pkgs.vanilla-dmz;
     name = "Vanilla-DMZ";
     size = 48;
+    gtk.enable = true;
   };
 
-  xdg.enable = true;
-  xsession = {
+  qt = {
     enable = true;
-    windowManager.i3 = {
-      enable = true;
-      config = {
-        keybindings = {
-	  "${mod}+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
-	  "${mod}+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
-	  "${mod}+Tab" = "exec ${pkgs.rofi}/bin/rofi -show window";
-	  "${mod}+Shift+apostrophe" = "kill";
-	  
-	  "${mod}+1" = "workspace ${ws-web}";
-	  "${mod}+2" = "workspace ${ws-slack}";
-	  "${mod}+3" = "workspace 3";
-	  "${mod}+4" = "workspace 4";
-	  "${mod}+5" = "workspace 5";
-	  "${mod}+6" = "workspace 6";
-	  "${mod}+7" = "workspace 7";
-	  "${mod}+8" = "workspace 8";
-	  "${mod}+9" = "workspace 9";
-	  "${mod}+0" = "workspace 10";
-	  "${mod}+Shift+1" = "move container to workspace ${ws-web}";
-	  "${mod}+Shift+2" = "move container to workspace ${ws-slack}";
-	  "${mod}+Shift+3" = "move container to workspace 3";
-	  "${mod}+Shift+4" = "move container to workspace 4";
-	  "${mod}+Shift+5" = "move container to workspace 5";
-	  "${mod}+Shift+6" = "move container to workspace 6";
-	  "${mod}+Shift+7" = "move container to workspace 7";
-	  "${mod}+Shift+8" = "move container to workspace 8";
-	  "${mod}+Shift+9" = "move container to workspace 9";
-	  "${mod}+Shift+0" = "move container to workspace 10";
-          "${mod}+Ctrl+less" = "move workspace to output left";
-          "${mod}+Ctrl+greater" = "move workspace to output right";
-          "${mod}+Ctrl+Left" = "move workspace to output left";
-          "${mod}+Ctrl+Right" = "move workspace to output right";
-
-	  "${mod}+Shift+r" = "restart";
-	};
-        fonts = primaryUiFont;
-        bars = [
-          {
-            fonts = primaryUiFont;
-            position = "top";
-            statusCommand = "${pkgs.i3status-rust}/bin/i3status-rs ~/.config/i3status-rust/config-top.toml";
-          }
-        ];
-      };
-    };
-    profileExtra = ''
-      eval $(${pkgs.gnome3.gnome-keyring}/bin/gnome-keyring-daemon --daemonize --components=ssh,secrets)
-      export SSH_AUTH_SOCK
-    '';
   };
+  gtk = {
+    enable = true;
+  };
+  programs.anyrun = {
+    enable = true;
+    config = {
+      plugins = [
+        inputs.anyrun.packages.${pkgs.system}.applications
+      ];
+      layer = "overlay";
+    };
+  };
+  wayland.windowManager.hyprland = {
+    enable = true;
+    package = pkgs.hyprland;
+    xwayland.enable = true;
+    systemd = {
+      enable = true;
+      variables = ["--all"];
+    };
+    settings = {
+      "$mod" = "SUPER";
+      monitor = [
+        "eDP-1,1920x1080@144,0x0,1"
+        "HDMI-A-3,3840x2160,1920x0,1.5"
+      ];
+
+      input = {
+        kb_layout = "us";
+        kb_variant = "dvorak";
+      };
+      bind =
+        [
+          "$mod, F, exec, ${pkgs.google-chrome}/bin/google-chrome-stable"
+          "$mod, Return, exec, ${pkgs.alacritty}/bin/alacritty"
+          "$mod, D, exec, ${inputs.anyrun.packages.${pkgs.system}.anyrun}/bin/anyrun"
+          ", Print, exec, grimblast copy area"
+          "$mod, Left, movewindow, l"
+          "$mod, Right, movewindow, r"
+        ]
+        ++ (
+          # workspaces
+          # binds $mod + [shift +] {1..10} to [move to] workspace {1..10}
+          builtins.concatLists (builtins.genList (
+              x: let
+                ws = let
+                  c = (x + 1) / 10;
+                in
+                  builtins.toString (x + 1 - (c * 10));
+              in [
+                "$mod, ${ws}, workspace, ${toString (x + 1)}"
+                "$mod SHIFT, ${ws}, movetoworkspace, ${toString (x + 1)}"
+              ]
+            )
+            10)
+        );
+    };
+  };
+  xdg.enable = true;
+  #xsession = {
+  #  enable = true;
+  #  windowManager.i3 = {
+  #    enable = true;
+  #    config = {
+  #      keybindings = {
+  #        "${mod}+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
+  #        "${mod}+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
+  #        "${mod}+Tab" = "exec ${pkgs.rofi}/bin/rofi -show window";
+  #  profileExtra = ''
+  #    eval $(${pkgs.gnome3.gnome-keyring}/bin/gnome-keyring-daemon --daemonize --components=ssh,secrets)
+  #    export SSH_AUTH_SOCK
+  #  '';
+  #};
 
   programs.direnv = {
     enable = true;
@@ -219,43 +242,43 @@ in
       };
     };
   };
-  programs.i3status-rust = {
-    enable = true;
-    bars = {
-      top = {
-        icons = "awesome6";
-        blocks = [
-         { block = "cpu"; }
-         {
-           block = "disk_space";
-           path = "/";
-           info_type = "available";
-           interval = 20;
-           warning = 20.0;
-           alert = 10.0;
-           format = " $icon root: $available.eng(w:2) ";
-         }
-         {
-           block = "memory";
-           format = " $icon $mem_total_used_percents.eng(w:2) ";
-           format_alt = " $icon_swap $swap_used_percents.eng(w:2) ";
-         }
-         {
-           block = "sound";
-           click = [{
-             button = "left";
-             cmd = "pavucontrol";
-           }];
-         }
-         {
-           block = "time";
-           interval = 60;
-           format = "$icon $timestamp.datetime(f:'%a %Y-%m-%d %R %Z')";
-         }
-       ];
-      };
-    };
-  };
+  #programs.i3status-rust = {
+  #  enable = true;
+  #  bars = {
+  #    top = {
+  #      icons = "awesome6";
+  #      blocks = [
+  #       { block = "cpu"; }
+  #       {
+  #         block = "disk_space";
+  #         path = "/";
+  #         info_type = "available";
+  #         interval = 20;
+  #         warning = 20.0;
+  #         alert = 10.0;
+  #         format = " $icon root: $available.eng(w:2) ";
+  #       }
+  #       {
+  #         block = "memory";
+  #         format = " $icon $mem_total_used_percents.eng(w:2) ";
+  #         format_alt = " $icon_swap $swap_used_percents.eng(w:2) ";
+  #       }
+  #       {
+  #         block = "sound";
+  #         click = [{
+  #           button = "left";
+  #           cmd = "pavucontrol";
+  #         }];
+  #       }
+  #       {
+  #         block = "time";
+  #         interval = 60;
+  #         format = "$icon $timestamp.datetime(f:'%a %Y-%m-%d %R %Z')";
+  #       }
+  #     ];
+  #    };
+  #  };
+  #};
   programs.neovim = {
     enable = true;
     viAlias = true;
