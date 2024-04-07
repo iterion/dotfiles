@@ -29,9 +29,8 @@ in
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
-    kdePackages.konsole
-    foot
-
+    polkit-kde-agent
+    mako
     _1password
     _1password-gui
     alacritty
@@ -92,6 +91,26 @@ in
       layer = "overlay";
     };
   };
+  programs.waybar = {
+    enable = true;
+    settings = {
+      mainBar = {
+        layer = "top";
+        position = "top";
+        height = 30;
+        output = [
+          "eDP-1"
+          "HDMI-A-1"
+        ];
+        modules-left = [ "hyprland/workspaces" ];
+        modules-right = [ "mpd" "temperature" ];
+
+        "hyprland/workspaces" = {
+          all-outputs = true;
+        };
+      };
+    };
+  };
   wayland.windowManager.hyprland = {
     enable = true;
     package = pkgs.hyprland;
@@ -103,14 +122,22 @@ in
     settings = {
       "$mod" = "SUPER";
       monitor = [
-        "eDP-1,1920x1080@144,0x0,1"
-        "HDMI-A-3,3840x2160,1920x0,1.5"
+        "eDP-1,1920x1080@144,0x0,auto"
+        "HDMI-A-3,3840x2160,1920x0,auto"
       ];
 
       input = {
         kb_layout = "us";
         kb_variant = "dvorak";
       };
+      env = [
+        "WLR_NO_HARDWARE_CURSORS,1"
+      ];
+      exec-once = [
+        "${pkgs.mako}/bin/mako"
+        "${pkgs.polkit-kde-agent}/libexec/polkit-kde-authentication-agent-1"
+        "${pkgs.waybar}/bin/waybar"
+      ];
       bind =
         [
           "$mod, F, exec, ${pkgs.google-chrome}/bin/google-chrome-stable"

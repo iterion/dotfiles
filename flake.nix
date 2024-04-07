@@ -7,9 +7,11 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     anyrun.url = "github:Kirottu/anyrun";
     anyrun.inputs.nixpkgs.follows = "nixpkgs";
+    #eww.url = "github:elkowar/eww";
+    #eww.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, anyrun } @ inputs: {
+  outputs = { self, nixpkgs, home-manager, anyrun, ... } @ inputs: {
     nixosConfigurations = {
       iterion-nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
