@@ -29,6 +29,9 @@ in
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+    xdg-desktop-portal-gtk
+    inputs.hyprlock.packages.${pkgs.system}.hyprlock
+    inputs.hypridle.packages.${pkgs.system}.hypridle
     polkit-kde-agent
     mako
     _1password
@@ -50,6 +53,7 @@ in
     rust-analyzer
     slack
     xclip
+    killall
 
     kubectl
     kubectx
@@ -100,16 +104,44 @@ in
         height = 30;
         output = [
           "eDP-1"
-          "HDMI-A-1"
+          "HDMI-A-3"
         ];
         modules-left = [ "hyprland/workspaces" ];
-        modules-right = [ "mpd" "temperature" ];
+        modules-center = [ "hyprland/window" ];
+        modules-right = [ "hyprland/submap" "temperature" ];
 
         "hyprland/workspaces" = {
           all-outputs = true;
         };
+        "hyprland/window" = {
+          "separate-outputs" = true;
+        };
       };
     };
+  };
+  services.hypridle = {
+    enable = true;
+    
+  };
+  programs.hyprlock = {
+    enable = true;
+    backgrounds = [
+      {
+        path = "";
+        color = "rgba(50, 50, 50, 0.99)";
+        blur_passes = 1;
+      }
+    ];
+    input-fields = [
+      {
+        fade_on_empty = false;
+        outline_thickness = 2;
+        size = {
+          width = 300;
+          height = 50;
+        };
+      }
+    ];
   };
   wayland.windowManager.hyprland = {
     enable = true;
@@ -122,9 +154,11 @@ in
     settings = {
       "$mod" = "SUPER";
       monitor = [
-        "eDP-1,1920x1080@144,0x0,auto"
-        "HDMI-A-3,3840x2160,1920x0,auto"
+        "eDP-1,1920x1080@144,0x0,1"
+        "HDMI-A-3,3840x2160,1920x0,1.5"
       ];
+      "general:gaps_out" = 5;
+      #"decoration:inactive_opacity" = 0.8;
 
       input = {
         kb_layout = "us";
@@ -146,6 +180,7 @@ in
           ", Print, exec, grimblast copy area"
           "$mod, Left, movewindow, l"
           "$mod, Right, movewindow, r"
+          "$mod SHIFT, C, killactive,"
         ]
         ++ (
           # workspaces
