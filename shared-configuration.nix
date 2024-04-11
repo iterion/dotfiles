@@ -22,12 +22,6 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "dvorak";
-  };
-
   virtualisation.docker.enable = true;
   virtualisation.docker.rootless = {
     enable = true;
@@ -60,56 +54,62 @@
   environment.systemPackages = with pkgs; [
     wget
     tailscale
-    gnome.gnome-keyring
+    libsecret
+    polkit_gnome
     lshw
   ];
   environment.pathsToLink = [ "/share/zsh" ];
   environment.shells = with pkgs; [ zsh ];
-
-  programs.zsh.enable = true;
-  programs.dconf.enable = true;
-  programs._1password.enable = true;
-  programs._1password-gui = {
-    enable = true;
-    polkitPolicyOwners = [ "iterion" ];
-  };
 
   fonts.packages = with pkgs; [
     font-awesome
     nerdfonts
   ];
 
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
-  services.tailscale.enable = true;
+  programs = {
+    zsh.enable = true;
+    dconf.enable = true;
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
+    _1password.enable = true;
+    _1password-gui = {
+      enable = true;
+      polkitPolicyOwners = [ "iterion" ];
+    };
+  };
 
-  services.xserver = {
-    enable = true;
-    #desktopManager = {
-    #  xterm.enable = false;
-    #  xfce = {
-    #    enable = true;
-    #    noDesktop = true;
-    #    enableXfwm = false;
-    #  };
-    #  session = [
-    #    {
-    #      name = "xsession";
-    #      start = ''
-    #        ${pkgs.runtimeShell} $HOME/.xsession &
-    #        waitPID=$!
-    #      '';
-    #    }
-    #  ];
-    #};
-    displayManager = {
-      #defaultSession = "xsession";
-      #lightdm = {
-      #  enable = true;
+  services = {
+    # Enable the OpenSSH daemon.
+    openssh.enable = true;
+    tailscale.enable = true;
+    gnome.gnome-keyring.enable = true;
+
+    xserver = {
+      enable = true;
+
+      xkb = {
+        layout = "us";
+        variant = "dvorak";
+      };
+      #desktopManager = {
+      #  xterm.enable = false;
+      #  session = [
+      #    {
+      #      name = "xsession";
+      #      start = ''
+      #        ${pkgs.runtimeShell} $HOME/.xsession &
+      #        waitPID=$!
+      #      '';
+      #    }
+      #  ];
       #};
-      sddm  = {
-        enable = true;
-        wayland.enable = true;
+      displayManager = {
+        sddm  = {
+          enable = true;
+          wayland.enable = true;
+        };
       };
     };
   };

@@ -32,7 +32,6 @@ in
     xdg-desktop-portal-gtk
     inputs.hyprlock.packages.${pkgs.system}.hyprlock
     inputs.hypridle.packages.${pkgs.system}.hypridle
-    polkit-kde-agent
     mako
     _1password
     _1password-gui
@@ -44,7 +43,7 @@ in
     spotify
     zoom-us
 
-    cargo
+    vault
     fzf
     jq
     lsof
@@ -61,6 +60,7 @@ in
     terraform-ls
     yaml-language-server
 
+    wl-clipboard
     nix-index
     xorg.xev
     xorg.xmodmap
@@ -108,7 +108,7 @@ in
         ];
         modules-left = [ "hyprland/workspaces" ];
         modules-center = [ "hyprland/window" ];
-        modules-right = [ "hyprland/submap" "temperature" ];
+        modules-right = [ "idle_inhibitor" "cpu" "temperature" "tray"];
 
         "hyprland/workspaces" = {
           all-outputs = true;
@@ -121,7 +121,13 @@ in
   };
   services.hypridle = {
     enable = true;
-    
+    lockCmd = "pidof hyprlock || ${inputs.hyprlock.packages.${pkgs.system}.hyprlock}/bin/hyprlock";
+    listeners = [
+      {
+        timeout = 300;
+        onTimeout = "loginctl lock-session";
+      }
+    ];
   };
   programs.hyprlock = {
     enable = true;
@@ -169,8 +175,14 @@ in
       ];
       exec-once = [
         "${pkgs.mako}/bin/mako"
-        "${pkgs.polkit-kde-agent}/libexec/polkit-kde-authentication-agent-1"
+        "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
         "${pkgs.waybar}/bin/waybar"
+      ];
+      device = [
+        {
+          name = "clearly-superior-technologies.-cst-laser-trackball";
+          sensitivity = -0.5;
+        }
       ];
       bind =
         [
@@ -201,21 +213,6 @@ in
     };
   };
   xdg.enable = true;
-  #xsession = {
-  #  enable = true;
-  #  windowManager.i3 = {
-  #    enable = true;
-  #    config = {
-  #      keybindings = {
-  #        "${mod}+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
-  #        "${mod}+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
-  #        "${mod}+Tab" = "exec ${pkgs.rofi}/bin/rofi -show window";
-  #  profileExtra = ''
-  #    eval $(${pkgs.gnome3.gnome-keyring}/bin/gnome-keyring-daemon --daemonize --components=ssh,secrets)
-  #    export SSH_AUTH_SOCK
-  #  '';
-  #};
-
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
@@ -304,43 +301,6 @@ in
       };
     };
   };
-  #programs.i3status-rust = {
-  #  enable = true;
-  #  bars = {
-  #    top = {
-  #      icons = "awesome6";
-  #      blocks = [
-  #       { block = "cpu"; }
-  #       {
-  #         block = "disk_space";
-  #         path = "/";
-  #         info_type = "available";
-  #         interval = 20;
-  #         warning = 20.0;
-  #         alert = 10.0;
-  #         format = " $icon root: $available.eng(w:2) ";
-  #       }
-  #       {
-  #         block = "memory";
-  #         format = " $icon $mem_total_used_percents.eng(w:2) ";
-  #         format_alt = " $icon_swap $swap_used_percents.eng(w:2) ";
-  #       }
-  #       {
-  #         block = "sound";
-  #         click = [{
-  #           button = "left";
-  #           cmd = "pavucontrol";
-  #         }];
-  #       }
-  #       {
-  #         block = "time";
-  #         interval = 60;
-  #         format = "$icon $timestamp.datetime(f:'%a %Y-%m-%d %R %Z')";
-  #       }
-  #     ];
-  #    };
-  #  };
-  #};
   programs.neovim = {
     enable = true;
     viAlias = true;
@@ -367,6 +327,10 @@ in
   programs.awscli = {
     enable = true;
     settings = ./aws-settings.nix;
+  };
+  programs.ssh = {
+    enable = true;
+    addKeysToAgent = "yes";
   };
 
 
