@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   # Enable networking
@@ -57,6 +57,7 @@
     libsecret
     polkit_gnome
     lshw
+    inputs.alejandra.defaultPackage.${pkgs.system}
   ];
   environment.pathsToLink = [ "/share/zsh" ];
   environment.shells = with pkgs; [ zsh ];

@@ -11,6 +11,9 @@
     hypridle.inputs.nixpkgs.follows = "nixpkgs";
     anyrun.url = "github:Kirottu/anyrun";
     anyrun.inputs.nixpkgs.follows = "nixpkgs";
+
+    alejandra.url = "github:kamadorueda/alejandra/3.0.0";
+    alejandra.inputs.nixpkgs.follows = "nixpkgs";
     #eww.url = "github:elkowar/eww";
     #eww.inputs.nixpkgs.follows = "nixpkgs";
   };
