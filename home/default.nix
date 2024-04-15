@@ -4,7 +4,6 @@
   inputs,
   ...
 }: let
-  mod = "Mod4";
   ws-web = "1: Web";
   ws-slack = "2: Slack";
   primaryUiFont = {
@@ -36,7 +35,6 @@ in {
     mako
     _1password
     _1password-gui
-    alacritty
     bat
     discord
     google-chrome
@@ -110,13 +108,16 @@ in {
         ];
         modules-left = ["hyprland/workspaces"];
         modules-center = ["hyprland/window"];
-        modules-right = ["idle_inhibitor" "cpu" "temperature" "tray"];
+        modules-right = ["idle_inhibitor" "cpu" "temperature" "clock" "tray"];
 
         "hyprland/workspaces" = {
           all-outputs = true;
         };
         "hyprland/window" = {
           "separate-outputs" = true;
+        };
+        clock = {
+          format = "{:  %Y-%m-%d %I:%M %p}";
         };
       };
     };
