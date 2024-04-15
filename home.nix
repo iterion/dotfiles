@@ -1,17 +1,18 @@
-{ config, pkgs, inputs, ... }:
-
-let
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}: let
   mod = "Mod4";
   ws-web = "1: Web";
   ws-slack = "2: Slack";
   primaryUiFont = {
-    names = [ "FiraCode Nerd Font" ];
+    names = ["FiraCode Nerd Font"];
     style = "Regular";
     size = 14.0;
   };
-
-in 
-{
+in {
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "iterion";
@@ -41,16 +42,17 @@ in
     google-chrome
     htop
     spotify
+    slack
     zoom-us
 
     vault
+    dig.dnsutils
     fzf
     jq
     lsof
     nil
     ripgrep
     rust-analyzer
-    slack
     xclip
     killall
 
@@ -106,9 +108,9 @@ in
           "eDP-1"
           "HDMI-A-3"
         ];
-        modules-left = [ "hyprland/workspaces" ];
-        modules-center = [ "hyprland/window" ];
-        modules-right = [ "idle_inhibitor" "cpu" "temperature" "tray"];
+        modules-left = ["hyprland/workspaces"];
+        modules-center = ["hyprland/window"];
+        modules-right = ["idle_inhibitor" "cpu" "temperature" "tray"];
 
         "hyprland/workspaces" = {
           all-outputs = true;
@@ -227,7 +229,7 @@ in
       plugins = [
         "git"
         "brew"
-        "kubectl" 
+        "kubectl"
       ];
       theme = "robbyrussell";
     };
@@ -239,23 +241,23 @@ in
       function decode_aws_auth() {
         aws sts decode-authorization-message --encoded-message $1 | jq -r .DecodedMessage | jq .
       }
-      
+
       function fetch-kc-token() {
         export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential)
         export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
       }
-      
+
       function ssh-k8s() {
         INSTANCE_ID=$(kubectl get node $1 -ojson | jq -r ".spec.providerID" | cut -d \/ -f5)
         aws ssm start-session --target $INSTANCE_ID
       }
-      
+
       function vault-login() {
         export VAULT_ADDR="http://vault.hawk-dinosaur.ts.net"
         export GITHUB_VAULT_TOKEN=$(op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields token)
         echo $GITHUB_VAULT_TOKEN | vault login -method=github token=-
       }
-      
+
       function fetch-tfvars() {
         op --account kittycadinc.1password.com item get TerraformCreds --format=json | jq -r '.fields[] | select(.value != null) | "\(.label)=\(.value)"' | while read -r line; do
             # Exporting each line as an environment variable
@@ -332,7 +334,6 @@ in
     enable = true;
     addKeysToAgent = "yes";
   };
-
 
   programs.autorandr = {
     enable = true;

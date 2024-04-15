@@ -23,8 +23,6 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = [
     inputs.anyrun.packages.${pkgs.system}.anyrun
-    inputs.alejandra.defaultPackage.${pkgs.system}
-    #inputs.eww.packages.${pkgs.system}.eww-wayland
     pkgs.wlr-randr
     pkgs.waybar
     pkgs.qt6.qtwayland

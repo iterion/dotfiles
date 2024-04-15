@@ -1,9 +1,12 @@
-{ config, pkgs, inputs, ... }:
-
 {
+  config,
+  pkgs,
+  inputs,
+  ...
+}: {
   # Enable networking
   networking.networkmanager.enable = true;
- 
+
   # Set your time zone.
   time.timeZone = "America/Detroit";
 
@@ -22,10 +25,12 @@
     LC_TIME = "en_US.UTF-8";
   };
 
-  virtualisation.docker.enable = true;
-  virtualisation.docker.rootless = {
-    enable = true;
-    setSocketVariable = true;
+  virtualisation = {
+    docker.enable = true;
+    docker.rootless = {
+      enable = true;
+      setSocketVariable = true;
+    };
   };
 
   # Configure console keymap
@@ -38,7 +43,7 @@
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
-    extraGroups = [ "audio" "networkmanager" "wheel" ];
+    extraGroups = ["audio" "networkmanager" "wheel"];
     shell = pkgs.zsh;
     # packages = with pkgs; [];
   };
@@ -51,16 +56,18 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    wget
-    tailscale
-    libsecret
-    polkit_gnome
-    lshw
-    inputs.alejandra.defaultPackage.${pkgs.system}
-  ];
-  environment.pathsToLink = [ "/share/zsh" ];
-  environment.shells = with pkgs; [ zsh ];
+  environment = {
+    systemPackages = with pkgs; [
+      wget
+      tailscale
+      libsecret
+      polkit_gnome
+      lshw
+      inputs.alejandra.defaultPackage.${pkgs.system}
+    ];
+    pathsToLink = ["/share/zsh"];
+    shells = with pkgs; [zsh];
+  };
 
   fonts.packages = with pkgs; [
     font-awesome
@@ -74,10 +81,11 @@
       enable = true;
       enableSSHSupport = true;
     };
+    seahorse.enable = true;
     _1password.enable = true;
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = [ "iterion" ];
+      polkitPolicyOwners = ["iterion"];
     };
   };
 
@@ -85,6 +93,12 @@
     # Enable the OpenSSH daemon.
     openssh.enable = true;
     tailscale.enable = true;
+    fstrim.enable = true;
+    dbus = {
+      enable = true;
+      packages = [pkgs.gnome.seahorse];
+
+    };
     gnome.gnome-keyring.enable = true;
 
     xserver = {
@@ -94,20 +108,8 @@
         layout = "us";
         variant = "dvorak";
       };
-      #desktopManager = {
-      #  xterm.enable = false;
-      #  session = [
-      #    {
-      #      name = "xsession";
-      #      start = ''
-      #        ${pkgs.runtimeShell} $HOME/.xsession &
-      #        waitPID=$!
-      #      '';
-      #    }
-      #  ];
-      #};
       displayManager = {
-        sddm  = {
+        sddm = {
           enable = true;
           wayland.enable = true;
         };
