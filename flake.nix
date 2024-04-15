@@ -12,10 +12,11 @@
     anyrun.url = "github:Kirottu/anyrun";
     anyrun.inputs.nixpkgs.follows = "nixpkgs";
 
+    watershot.url = "github:Kirottu/watershot";
+    watershot.inputs.nixpkgs.follows = "nixpkgs";
+
     alejandra.url = "github:kamadorueda/alejandra/3.0.0";
     alejandra.inputs.nixpkgs.follows = "nixpkgs";
-    #eww.url = "github:elkowar/eww";
-    #eww.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, ... } @ inputs: {
@@ -46,7 +47,7 @@
               inputs.hypridle.homeManagerModules.hypridle
             ];
             home-manager.extraSpecialArgs = { inherit inputs; };
-            home-manager.users.iterion = import ./home.nix;
+            home-manager.users.iterion = import ./home;
           }
         ];
       };
