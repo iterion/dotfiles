@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   inputs,
   ...
@@ -48,6 +47,30 @@
     # packages = with pkgs; [];
   };
 
+  boot = {
+    # Bootloader.
+    loader = {
+      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = true;
+    };
+    plymouth = {
+      enable = true;
+      theme = "breeze";
+    };
+  };
+
+  nix = {
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 1w";
+    };
+    settings = {
+      auto-optimise-store = true;
+      experimental-features = ["nix-command" "flakes"];
+    };
+    package = pkgs.nixFlakes;
+  };
   # Allow unfree packages
   nixpkgs.config = {
     allowUnfree = true;
@@ -96,6 +119,15 @@
       enable = true;
       polkitPolicyOwners = ["iterion"];
     };
+    # file picker
+    xfconf.enable = true;
+    thunar = {
+      enable = true;
+      plugins = with pkgs.xfce; [
+        thunar-archive-plugin
+        thunar-volman
+      ];
+    };
   };
 
   services = {
@@ -103,25 +135,27 @@
     openssh.enable = true;
     tailscale.enable = true;
     fstrim.enable = true;
+    gvfs.enable = true;
+    tumbler.enable = true;
     dbus = {
       enable = true;
       packages = [pkgs.gnome.seahorse];
-
     };
     gnome.gnome-keyring.enable = true;
+    greetd = {
+      enable = true;
+      settings = {
+        default_session = {
+          command = "${pkgs.hyprland}/bin/Hyprland";
+        };
+      };
+    };
 
     xserver = {
       enable = true;
-
       xkb = {
         layout = "us";
         variant = "dvorak";
-      };
-      displayManager = {
-        sddm = {
-          enable = true;
-          wayland.enable = true;
-        };
       };
     };
   };

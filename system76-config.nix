@@ -1,6 +1,4 @@
-{ config, pkgs, inputs, ... }:
-
-{
+{ config, ... }: {
   imports =
     [ 
       ./shared-configuration.nix
@@ -8,9 +6,6 @@
       ./system76-hardware-configuration.nix
     ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
   networking.hostName = "system76-nixos";
 
   boot.initrd.luks.devices."luks-bcdc740f-7023-4bb5-982f-081db97f671f".device = "/dev/disk/by-uuid/bcdc740f-7023-4bb5-982f-081db97f671f";
@@ -21,15 +16,7 @@
     xwayland.enable = true;
   };
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  environment.systemPackages = [
-    inputs.anyrun.packages.${pkgs.system}.anyrun
-    pkgs.wlr-randr
-    pkgs.waybar
-    pkgs.qt6.qtwayland
-    pkgs.libsForQt5.qt5.qtwayland
-    pkgs.gtk3
-    pkgs.gtk4
-  ];
+  environment.systemPackages = [];
   
   # Enable OpenGL
   hardware.opengl = {
@@ -74,8 +61,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "23.05"; # Did you read the comment?
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nix = {
-    package = pkgs.nixFlakes;
-  };
 }

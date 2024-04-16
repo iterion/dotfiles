@@ -3,11 +3,30 @@
     inputs.hyprlock.packages.${pkgs.system}.hyprlock
     inputs.hypridle.packages.${pkgs.system}.hypridle
 
+    # app runner
+    inputs.anyrun.packages.${pkgs.system}.anyrun
+
+    # toolbar
+    waybar
+
+    # some desktop libs & utils
+    wlr-randr
+    qt6.qtwayland
+    libsForQt5.qt5.qtwayland
+    gtk3
+    gtk4
+
     #wayland screenshots
     inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
 
+    # TODO is this necessary since hyprland has its own?
+    xdg-desktop-portal-gtk
+
     # wayland copy/paste
     wl-clipboard
+
+    # notifications
+    mako
   ];
 
   home.pointerCursor = {

@@ -1,4 +1,10 @@
 {pkgs, ...}: {
+  home.packages = with pkgs; [
+    nil
+    rust-analyzer
+    terraform-ls
+    yaml-language-server
+  ];
   programs.neovim = {
     enable = true;
     viAlias = true;

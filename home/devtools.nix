@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{...}: {
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
@@ -76,6 +76,11 @@
       fetch = {
         prune = true;
       };
+      stash = {
+        showPatch = true;
+      };
+      #commit.gpgsign = true;
+      #credential.helper = "osxkeychain";
       init = {
         defaultBranch = "main";
       };
@@ -93,6 +98,5 @@
     enable = true;
     addKeysToAgent = "yes";
   };
-
   services.gnome-keyring.enable = true;
 }

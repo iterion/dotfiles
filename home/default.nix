@@ -25,8 +25,7 @@
   };
 
   home.packages = with pkgs; [
-    xdg-desktop-portal-gtk
-
+    # desktop apps
     _1password
     _1password-gui
     discord
@@ -35,6 +34,8 @@
     slack
     zoom-us
 
+
+    # cli tools
     vault
     htop
     dig.dnsutils
@@ -42,19 +43,13 @@
     bat
     jq
     lsof
-    nil
     ripgrep
-    rust-analyzer
     killall
+    nix-index
 
+    # for convenience put this in every shell
     kubectl
     kubectx
-
-    terraform-ls
-    yaml-language-server
-
-    mako
-    nix-index
   ];
 
   fonts.fontconfig.enable = true;
