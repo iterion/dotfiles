@@ -1,8 +1,12 @@
 {
   pkgs,
+  inputs,
   ...
 }: {
   imports = [
+    inputs.walker.homeManagerModules.walker
+    inputs.hyprlock.homeManagerModules.hyprlock
+    inputs.hypridle.homeManagerModules.hypridle
     ./alacritty.nix
     ./devtools.nix
     ./waybar.nix

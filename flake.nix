@@ -9,8 +9,9 @@
     hyprlock.inputs.nixpkgs.follows = "nixpkgs";
     hypridle.url = "github:hyprwm/hypridle";
     hypridle.inputs.nixpkgs.follows = "nixpkgs";
-    anyrun.url = "github:Kirottu/anyrun";
-    anyrun.inputs.nixpkgs.follows = "nixpkgs";
+
+    walker.url = "github:abenz1267/walker";
+    walker.inputs.nixpkgs.follows = "nixpkgs";
 
     hyprland-contrib = {
       url = "github:hyprwm/contrib";
@@ -50,11 +51,6 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.sharedModules = [
-              inputs.anyrun.homeManagerModules.anyrun
-              inputs.hyprlock.homeManagerModules.hyprlock
-              inputs.hypridle.homeManagerModules.hypridle
-            ];
             home-manager.extraSpecialArgs = {inherit inputs;};
             home-manager.users.iterion = import ./home;
           }

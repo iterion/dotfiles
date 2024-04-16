@@ -1,11 +1,5 @@
 {pkgs, inputs, ...}: {
   home.packages = with pkgs; [
-    inputs.hyprlock.packages.${pkgs.system}.hyprlock
-    inputs.hypridle.packages.${pkgs.system}.hypridle
-
-    # app runner
-    inputs.anyrun.packages.${pkgs.system}.anyrun
-
     # toolbar
     waybar
 
@@ -41,14 +35,9 @@
   gtk = {
     enable = true;
   };
-  programs.anyrun = {
+  programs.walker = {
     enable = true;
-    config = {
-      plugins = [
-        inputs.anyrun.packages.${pkgs.system}.applications
-      ];
-      layer = "overlay";
-    };
+    runAsService = true;
   };
   services.hypridle = {
     enable = true;
@@ -116,15 +105,12 @@
           sensitivity = -0.5;
         }
       ];
-      layerrule = [
-        #"dimaround, anyrun"
-      ];
+      layerrule = [];
       bind =
         [
           "$mod, F, exec, ${pkgs.google-chrome}/bin/google-chrome-stable"
           "$mod, Return, exec, ${pkgs.alacritty}/bin/alacritty"
-          "$mod, D, exec, ${inputs.anyrun.packages.${pkgs.system}.anyrun}/bin/anyrun"
-          "$mod SHIFT, D, exec, ${pkgs.tofi}/bin/tofi"
+          "$mod, D, exec, ${inputs.walker.packages.${pkgs.system}.walker}/bin/walker"
           "$mod, Left, movewindow, l"
           "$mod, Right, movewindow, r"
           "$mod SHIFT, Apostrophe, killactive,"
