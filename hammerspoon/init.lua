@@ -1,7 +1,6 @@
 -- Hammerspoon config: http://www.hammerspoon.org/go/
 local application = require "hs.application"
 local hotkey = require "hs.hotkey"
-local Grid = require "grid"
 local log = hs.logger.new('iterion','debug')
 
 local mashApps = {
@@ -16,18 +15,6 @@ local mashGeneral = {
 
 -- Disable window animations (janky for iTerm)
 hs.window.animationDuration = 0
-
--- Window Management
-hotkey.bind(mashGeneral, 'O', Grid.fullscreen)
-hotkey.bind(mashGeneral, 'H', Grid.leftchunk)
-hotkey.bind(mashGeneral, 'L', Grid.rightchunk)
-hotkey.bind(mashGeneral, 'K', Grid.topHalf)
-hotkey.bind(mashGeneral, 'J', Grid.bottomHalf)
-
-hotkey.bind(mashGeneral, 'U', Grid.topleft)
-hotkey.bind(mashGeneral, 'N', Grid.bottomleft)
-hotkey.bind(mashGeneral, 'I', Grid.topright)
-hotkey.bind(mashGeneral, 'M', Grid.bottomright)
 
 function showSlack()
   local appName = 'Slack'
@@ -92,7 +79,6 @@ end
 -- App Shortcuts
 hotkey.bind(mashApps, 'S', showSlack)
 hotkey.bind(mashApps, 'Z', showZoom)
-hotkey.bind(mashApps, 'V', showPritunl)
 hotkey.bind(mashApps, '9', identifyFrontmost)
 
 

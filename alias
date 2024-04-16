@@ -1,8 +1,0 @@
-# Custom aliases
-alias vi="nvim"
-alias vim="nvim"
-alias y="yarn"
-alias pr="hub pull-request -b master -p -d -o"
-alias k='kubectl'
-alias aws-login='aws-vault login default --no-session --duration=12h'
-alias ecr-login='aws-vault exec default -- aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin .dkr.ecr.us-east-1.amazonaws.com'
