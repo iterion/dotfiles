@@ -1,4 +1,11 @@
-{...}: {
+{pkgs, ...}: {
+  home.packages = with pkgs; [
+    # secret scanning
+    trufflehog
+
+    #calculator
+    libqalculate
+  ];
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;

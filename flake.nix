@@ -5,16 +5,25 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
     hyprlock.url = "github:hyprwm/hyprlock";
     hyprlock.inputs.nixpkgs.follows = "nixpkgs";
-    hypridle.url = "github:hyprwm/hypridle";
-    hypridle.inputs.nixpkgs.follows = "nixpkgs";
-
-    walker.url = "github:abenz1267/walker";
-    walker.inputs.nixpkgs.follows = "nixpkgs";
+    hypridle = {
+      url = "github:hyprwm/hypridle";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    hyprpaper = {
+      url = "github:hyprwm/hyprpaper";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     hyprland-contrib = {
       url = "github:hyprwm/contrib";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    anyrun = {
+      url = "github:Kirottu/anyrun";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -38,7 +47,8 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.iterion = import ./home.nix;
+            home-manager.extraSpecialArgs = {inherit inputs;};
+            home-manager.users.iterion = import ./home;
           }
         ];
       };

@@ -1,5 +1,9 @@
-{pkgs, inputs, ...}: {
+{pkgs, inputs, ...}: let
+  wallpapers = (pkgs.callPackage ../wallpapers { inherit pkgs; });
+in {
   home.packages = with pkgs; [
+    wallpapers
+
     # toolbar
     waybar
 
@@ -12,9 +16,6 @@
 
     #wayland screenshots
     inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
-
-    # TODO is this necessary since hyprland has its own?
-    xdg-desktop-portal-gtk
 
     # wayland copy/paste
     wl-clipboard
@@ -35,17 +36,27 @@
   gtk = {
     enable = true;
   };
-  programs.walker = {
+  services.hyprpaper = {
     enable = true;
-    runAsService = true;
+    preloads = [
+      "${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png"
+    ];
+    wallpapers = [
+      ",${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png"
+    ];
   };
   services.hypridle = {
     enable = true;
     lockCmd = "pidof hyprlock || ${inputs.hyprlock.packages.${pkgs.system}.hyprlock}/bin/hyprlock";
     listeners = [
       {
-        timeout = 300;
+        timeout = 5 * 60;
         onTimeout = "loginctl lock-session";
+      }
+      {
+        timeout = 6 * 60;
+        onTimeout = "hyprctl dispatch dpms off";
+        onResume = "hyprctl dispatch dpms on";
       }
     ];
   };
@@ -53,8 +64,7 @@
     enable = true;
     backgrounds = [
       {
-        path = "";
-        color = "rgba(50, 50, 50, 0.99)";
+        path = "${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png";
         blur_passes = 1;
       }
     ];
@@ -110,7 +120,7 @@
         [
           "$mod, F, exec, ${pkgs.google-chrome}/bin/google-chrome-stable"
           "$mod, Return, exec, ${pkgs.alacritty}/bin/alacritty"
-          "$mod, D, exec, ${inputs.walker.packages.${pkgs.system}.walker}/bin/walker"
+          "$mod, D, exec, ${inputs.anyrun.packages.${pkgs.system}.anyrun}/bin/anyrun"
           "$mod, Left, movewindow, l"
           "$mod, Right, movewindow, r"
           "$mod SHIFT, Apostrophe, killactive,"

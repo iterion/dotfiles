@@ -1,6 +1,7 @@
 {
   pkgs,
   inputs,
+  lib,
   ...
 }: {
   # Enable networking
@@ -146,7 +147,10 @@
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.hyprland}/bin/Hyprland";
+          command = ''
+            ${ lib.makeBinPath [ pkgs.greetd.tuigreet ] }/tuigreet -r --asterisks --time \
+              --cmd "${pkgs.hyprland}/bin/Hyprland";
+          '';
         };
       };
     };

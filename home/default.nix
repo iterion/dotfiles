@@ -4,14 +4,17 @@
   ...
 }: {
   imports = [
-    inputs.walker.homeManagerModules.walker
+    inputs.anyrun.homeManagerModules.anyrun
     inputs.hyprlock.homeManagerModules.hyprlock
     inputs.hypridle.homeManagerModules.hypridle
+    inputs.hyprpaper.homeManagerModules.hyprpaper
+
     ./alacritty.nix
     ./devtools.nix
     ./waybar.nix
     ./neovim
     ./hyprland.nix
+    ./anyrun.nix
   ];
 
   home = {
@@ -37,6 +40,7 @@
     spotify
     slack
     zoom-us
+    obsidian
 
 
     # cli tools
@@ -55,6 +59,13 @@
     kubectl
     kubectx
   ];
+  programs.btop = {
+    enable = true;
+    settings = {
+      color_theme = "gruvbox_dark";
+      theme_background = false; # make btop transparent
+    };
+  };
 
   fonts.fontconfig.enable = true;
 

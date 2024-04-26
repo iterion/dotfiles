@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
     helvum
+    coppwr
   ];
   programs.waybar = {
     enable = true;
@@ -51,7 +52,7 @@
         wireplumber = {
           format = "{volume}% {icon}";
           format-muted = "";
-          on-click = "helvum";
+          on-click = "coppwr";
           format-icons = ["" "" ""];
         };
       };

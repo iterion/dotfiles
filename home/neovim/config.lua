@@ -3,6 +3,7 @@ vim.opt.relativenumber = false
 vim.opt.number = true
 vim.opt.spell = true
 vim.opt.signcolumn = "auto"
+vim.opt.clipboard = "unnamedplus"
 vim.opt.wrap = false
 local lspconfig = require('lspconfig')
 local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
