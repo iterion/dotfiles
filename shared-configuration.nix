@@ -7,6 +7,16 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  networking.nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+
+  services.resolved = {
+    enable = true;
+    dnssec = "true";
+    domains = [ "~." ];
+    fallbackDns = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+    dnsovertls = "true";
+  };
+
   # Set your time zone.
   time.timeZone = "America/Detroit";
 
@@ -32,6 +42,7 @@
       setSocketVariable = true;
     };
   };
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   # Configure console keymap
   console.keyMap = "dvorak";
@@ -51,7 +62,6 @@
   boot = {
     # Bootloader.
     loader = {
-      systemd-boot.enable = true;
       efi.canTouchEfiVariables = true;
     };
     plymouth = {
@@ -107,6 +117,16 @@
     proggyfonts
   ];
 
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Enable = "Source,Sink,Media,Socket";
+      };
+    };
+  };
+
   programs = {
     zsh.enable = true;
     dconf.enable = true;
@@ -130,6 +150,7 @@
       ];
     };
   };
+  security.rtkit.enable = true;
 
   services = {
     # Enable the OpenSSH daemon.
@@ -138,6 +159,13 @@
     fstrim.enable = true;
     gvfs.enable = true;
     tumbler.enable = true;
+    blueman.enable = true;
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+    };
     dbus = {
       enable = true;
       packages = [pkgs.gnome.seahorse];

@@ -18,23 +18,6 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = [];
 
-  services.blueman.enable = true;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = {
-      General = {
-        Enable = "Source,Sink,Media,Socket";
-      };
-    };
-  };
   
   # Enable OpenGL
   hardware.opengl = {
