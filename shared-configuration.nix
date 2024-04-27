@@ -149,6 +149,10 @@
         thunar-volman
       ];
     };
+    hyprland = {
+      enable = true;
+      xwayland.enable = true;
+    };
   };
   security.rtkit.enable = true;
 
