@@ -1,9 +1,9 @@
 { config, lib, pkgs, ... }:
 with lib;
 let
-  cfg = config.iterion.lightsout;
+  cfg = config.services.lightsout;
 in {
-  options.iterion.lightsout = {
+  options.services.lightsout = {
     enable = mkEnableOption "Enable the lightsout service.";
   };
 
@@ -13,11 +13,15 @@ in {
         phue
       ]);
     in {
+      wantedBy = [ "multi-user.target" ];
+      after = [ "network.target" ];
       description = "Lights out service enforces lightsout on hue bulbs";
+      script = ''
+        ${python}/bin/python ${./lightsout.py}
+      '';
       serviceConfig = {
-        Type = "service";
-        User = "iterion";
-        ExecStart = "${python}/bin/python ${./lightsout.py}";
+        Restart = "always";
+        User = "nobody";
       };
     };
   };

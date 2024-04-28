@@ -1,3 +1,3 @@
-{ config, ... }: {
-  config.iterion.desktop.enable = false;
+{ ... }: {
+  iterion.desktop.enable = false;
 }

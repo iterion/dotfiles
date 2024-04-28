@@ -1,9 +1,8 @@
 { ... }: {
-  imports =
-    [ 
-      ../base
-      ./hardware-configuration.nix
-    ];
+  imports = [ 
+    ../base
+    ./hardware-configuration.nix
+  ];
 
 
   networking.hostName = "lattepanda-nixos";
@@ -14,7 +13,7 @@
   boot.loader.systemd-boot.enable = true;
 
   # What is my purpose? You tell children to go to bed. Oh my god.
-  config.iterion.lightsout.enable = true;
+  services.lightsout.enable = true;
   
 
   # This value determines the NixOS release from which the default
