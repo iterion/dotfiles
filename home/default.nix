@@ -9,12 +9,10 @@
     inputs.hypridle.homeManagerModules.hypridle
     inputs.hyprpaper.homeManagerModules.hyprpaper
 
-    ./alacritty.nix
     ./devtools.nix
-    ./waybar.nix
     ./neovim
-    ./hyprland.nix
-    ./anyrun.nix
+
+    ./desktop
   ];
 
   home = {
@@ -32,17 +30,6 @@
   };
 
   home.packages = with pkgs; [
-    # desktop apps
-    _1password
-    _1password-gui
-    discord
-    google-chrome
-    spotify
-    slack
-    zoom-us
-    obsidian
-
-
     # cli tools
     vault
     htop
@@ -74,7 +61,6 @@
   home.file = {};
 
   home.sessionVariables = {};
-  xdg.enable = true;
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }

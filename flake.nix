@@ -48,7 +48,10 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = {inherit inputs;};
-            home-manager.users.iterion = import ./home;
+            home-manager.users.iterion.imports = [
+              ./home
+              ./hosts/corsair/home.nix
+            ];
           }
         ];
       };
@@ -62,7 +65,10 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = {inherit inputs;};
-            home-manager.users.iterion = import ./home;
+            home-manager.users.iterion.imports = [
+              ./home
+              ./hosts/system76/home.nix
+            ];
           }
         ];
       };
@@ -76,7 +82,10 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.extraSpecialArgs = {inherit inputs;};
-            home-manager.users.iterion = import ./home;
+            home-manager.users.iterion.imports = [
+              ./home
+              ./hosts/lattepanda/home.nix
+            ];
           }
         ];
       };
