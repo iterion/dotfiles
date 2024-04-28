@@ -81,20 +81,27 @@
   };
   nixpkgs.overlays = [ 
     (final: prev: {
-      # nix-shell -p python.pkgs.my_stuff
-      python = prev.python.override {
-        # Careful, we're using a different final and prev here!
-        packageOverrides = final: prev: {
-          phue = prev.buildPythonPackage rec {
+      pythonPackagesOverlays = (prev.pythonPackagesOverlays or [ ]) ++ [
+        (python-final: python-prev: {
+          phue = python-prev.buildPythonPackage rec {
             pname = "phue";
             version = "1.1";
-            src = prev.fetchPypi {
+            src = python-prev.fetchPypi {
               inherit pname version;
               hash = "0bp9bjqy1n6ij1zb86wz9lqa1dhla8qr1d7w2kxyn7jbj56sbmcw";
             };
           };
-        };
-      };
+        })
+      ];
+      python3 =
+        let 
+          self = prev.python3.override {
+            inherit self;
+            packageOverrides = prev.lib.composeManyExtensions final.pythonPackagesOverlays;
+        }; in 
+      self;
+
+      python3Packages = final.python3.pkgs;
     })
   ];
 
