@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   inputs,
   ...
 }: {
@@ -17,7 +18,7 @@
 
   home = {
     username = "iterion";
-    homeDirectory = "/home/iterion";
+    homeDirectory = lib.mkForce "/home/iterion";
 
     # This value determines the Home Manager release that your configuration is
     # compatible with. This helps avoid breakage when a new Home Manager release

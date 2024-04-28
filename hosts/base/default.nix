@@ -1,21 +1,12 @@
 {
   pkgs,
   inputs,
-  lib,
   ...
 }: {
   # Enable networking
   networking.networkmanager.enable = true;
 
   networking.nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
-
-  services.resolved = {
-    enable = true;
-    dnssec = "true";
-    domains = [ "~." ];
-    fallbackDns = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
-    dnsovertls = "true";
-  };
 
   # Set your time zone.
   time.timeZone = "America/Detroit";
@@ -42,7 +33,6 @@
       setSocketVariable = true;
     };
   };
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   # Configure console keymap
   console.keyMap = "dvorak";
@@ -65,10 +55,6 @@
     # Bootloader.
     loader = {
       efi.canTouchEfiVariables = true;
-    };
-    plymouth = {
-      enable = true;
-      theme = "breeze";
     };
   };
 
@@ -97,7 +83,6 @@
       wget
       tailscale
       libsecret
-      polkit_gnome
       lshw
       inputs.alejandra.defaultPackage.${pkgs.system}
     ];
@@ -119,81 +104,38 @@
     proggyfonts
   ];
 
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = {
-      General = {
-        Enable = "Source,Sink,Media,Socket";
-      };
-    };
-  };
-
   programs = {
     zsh.enable = true;
-    dconf.enable = true;
     gnupg.agent = {
       enable = true;
       enableSSHSupport = true;
     };
-    seahorse.enable = true;
-    _1password.enable = true;
-    _1password-gui = {
-      enable = true;
-      polkitPolicyOwners = ["iterion"];
-    };
-    # file picker
-    xfconf.enable = true;
-    thunar = {
-      enable = true;
-      plugins = with pkgs.xfce; [
-        thunar-archive-plugin
-        thunar-volman
-      ];
-    };
-    hyprland = {
-      enable = true;
-      xwayland.enable = true;
-    };
   };
-  security.rtkit.enable = true;
 
   services = {
-    # Enable the OpenSSH daemon.
-    openssh.enable = true;
+    resolved = {
+      enable = true;
+      dnssec = "true";
+      domains = [ "~." ];
+      fallbackDns = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+      dnsovertls = "true";
+    };
+
     tailscale.enable = true;
     fstrim.enable = true;
     gvfs.enable = true;
     tumbler.enable = true;
-    blueman.enable = true;
     pipewire = {
       enable = true;
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
     };
-    dbus = {
-      enable = true;
-      packages = [pkgs.gnome.seahorse];
-    };
-    gnome.gnome-keyring.enable = true;
-    greetd = {
+    openssh = {
       enable = true;
       settings = {
-        default_session = {
-          command = ''
-            ${ lib.makeBinPath [ pkgs.greetd.tuigreet ] }/tuigreet -r --asterisks --time \
-              --cmd "${pkgs.hyprland}/bin/Hyprland";
-          '';
-        };
-      };
-    };
-
-    xserver = {
-      enable = true;
-      xkb = {
-        layout = "us";
-        variant = "dvorak";
+        PasswordAuthentication = false;
+        KbdInteractiveAuthentication = false;
       };
     };
   };

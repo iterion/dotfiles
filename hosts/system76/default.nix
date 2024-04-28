@@ -2,6 +2,7 @@
   imports =
     [ 
       ../base
+      ../desktop
       ./hardware-configuration.nix
     ];
 

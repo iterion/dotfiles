@@ -1,16 +1,10 @@
 { ... }: {
   imports =
     [ 
+      ../base
       ./hardware-configuration.nix
     ];
 
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-    };
-  };
 
   networking.hostName = "lattepanda-nixos";
 
