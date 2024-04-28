@@ -3,9 +3,8 @@
 {
   imports =
     [ 
-      ./shared-configuration.nix
-      # Include the results of the hardware scan.
-      ./corsair-hardware-configuration.nix
+      ../base
+      ./hardware-configuration.nix
     ];
 
   # Bootloader.

@@ -42,7 +42,7 @@
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules = [
-          ./corsair-config.nix
+          ./hosts/corsair
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
@@ -56,7 +56,21 @@
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules = [
-          ./system76-config.nix
+          ./hosts/system76
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = {inherit inputs;};
+            home-manager.users.iterion = import ./home;
+          }
+        ];
+      };
+      lattepanda-nixos = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
+        modules = [
+          ./hosts/lattepanda
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;

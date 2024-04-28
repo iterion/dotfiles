@@ -1,9 +1,8 @@
 { config, pkgs, ... }: {
   imports =
     [ 
-      ./shared-configuration.nix
-      # Include the results of the hardware scan.
-      ./system76-hardware-configuration.nix
+      ../base
+      ./hardware-configuration.nix
     ];
 
   networking.hostName = "system76-nixos";
@@ -18,6 +17,8 @@
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   environment.systemPackages = [];
 
+  # use systemd boot as we don't need grub
+  boot.loader.systemd-boot.enable = true;
   
   # Enable OpenGL
   hardware.opengl = {
