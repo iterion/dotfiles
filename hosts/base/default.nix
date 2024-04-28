@@ -3,6 +3,10 @@
   inputs,
   ...
 }: {
+  imports = [
+    ../../modules/lightsout
+  ];
+
   # Enable networking
   networking.networkmanager.enable = true;
 

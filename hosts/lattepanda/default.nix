@@ -12,6 +12,9 @@
 
   # use systemd boot as we don't need grub
   boot.loader.systemd-boot.enable = true;
+
+  # What is my purpose? You tell children to go to bed. Oh my god.
+  config.iterion.lightsout.enable = true;
   
 
   # This value determines the NixOS release from which the default
