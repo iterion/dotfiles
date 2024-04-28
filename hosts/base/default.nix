@@ -4,6 +4,7 @@
   ...
 }: {
   imports = [
+    ../../modules/phue
     ../../modules/lightsout
   ];
 
