@@ -88,7 +88,7 @@
             version = "1.1";
             src = python-prev.fetchPypi {
               inherit pname version;
-              hash = "0bp9bjqy1n6ij1zb86wz9lqa1dhla8qr1d7w2kxyn7jbj56sbmcw";
+              sha256 = "sha256-YfrMmRourR1yffhRPQbOCJAzSJttygm+CT2yT3zbiHQ=";
             };
           };
         })
