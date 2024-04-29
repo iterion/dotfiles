@@ -6,22 +6,23 @@ from phue import Bridge
 BRIDGE_IP = '192.168.1.200'
 
 # Light ID you want to control
-LIGHT_ID = 1  # Adjust this to the ID of the light you want to control
+LIGHT_ID = "Desk"  # Adjust this to the ID of the light you want to control
 
 def main():
     bridge = Bridge(BRIDGE_IP)
     
     # If the bridge button has not been pressed in the last 30 seconds, press it before running this script
     # bridge.connect()
-    lights = b.lights
+    # lights = bridge.lights
 
-    # Print light names
-    for l in lights:
-      print(l.name)
+    # # Print light names
+    # for l in lights:
+    #   print(l.id)
+    #   print(l.name)
     
     current_time = datetime.now()
     # Check if current time is after 9 PM
-    if current_time.hour >= 21:
+    if current_time.hour >= 21 && bridge.get_light(LIGHT_ID, 'on'):
         # Turn off the light
         bridge.set_light(LIGHT_ID, 'on', False)
         print(f"Light {LIGHT_ID} turned off at {current_time.strftime('%Y-%m-%d %H:%M:%S')}")

@@ -10,7 +10,7 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
-  networking.nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+  networking.nameservers = [ "192.168.1.1" "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
 
   # Set your time zone.
   time.timeZone = "America/Detroit";
@@ -71,6 +71,7 @@
     settings = {
       auto-optimise-store = true;
       experimental-features = ["nix-command" "flakes"];
+      trusted-users = [ "iterion" ];
     };
     package = pkgs.nixFlakes;
   };
@@ -146,7 +147,7 @@
       enable = true;
       dnssec = "true";
       domains = [ "~." ];
-      fallbackDns = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+      fallbackDns = [ "192.168.1.1" "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
       dnsovertls = "true";
     };
 
