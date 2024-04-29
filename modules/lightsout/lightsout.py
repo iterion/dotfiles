@@ -12,7 +12,12 @@ def main():
     bridge = Bridge(BRIDGE_IP)
     
     # If the bridge button has not been pressed in the last 30 seconds, press it before running this script
-    bridge.connect()
+    # bridge.connect()
+    lights = b.lights
+
+    # Print light names
+    for l in lights:
+      print(l.name)
     
     current_time = datetime.now()
     # Check if current time is after 9 PM

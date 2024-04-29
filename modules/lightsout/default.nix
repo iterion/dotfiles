@@ -2,6 +2,9 @@
 with lib;
 let
   cfg = config.services.lightsout;
+  python = pkgs.python3.withPackages (ppkgs: with ppkgs; [
+    phue
+  ]);
 in {
   options.services.lightsout = {
     enable = mkEnableOption "Enable the lightsout service.";
@@ -16,11 +19,7 @@ in {
         Unit = "lightsout.service";
       }; 
     };
-    systemd.services.lightsout = let
-      python = pkgs.python3.withPackages (ppkgs: with ppkgs; [
-        phue
-      ]);
-    in {
+    systemd.services.lightsout = {
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
       description = "Lights out service enforces lightsout on hue bulbs";
