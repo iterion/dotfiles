@@ -8,6 +8,14 @@ in {
   };
 
   config = mkIf cfg.enable {
+    systemd.timers.lightsout = {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "10s";
+        OnUnitActiveSec = "10s";
+        Unit = "lightsout.service";
+      }; 
+    };
     systemd.services.lightsout = let
       python = pkgs.python3.withPackages (ppkgs: with ppkgs; [
         phue
@@ -20,8 +28,8 @@ in {
         ${python}/bin/python ${./lightsout.py}
       '';
       serviceConfig = {
-        Restart = "always";
-        User = "nobody";
+        Type = "oneshot";
+        User = "root";
       };
     };
   };

@@ -20,7 +20,6 @@ def main():
         # Turn off the light
         bridge.set_light(LIGHT_ID, 'on', False)
         print(f"Light {LIGHT_ID} turned off at {current_time.strftime('%Y-%m-%d %H:%M:%S')}")
-        break  # Stop the script after turning off the light
 
 if __name__ == "__main__":
     main()
