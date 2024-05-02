@@ -49,7 +49,7 @@
     isNormalUser = true;
     description = "Adam Sunderland";
     extraGroups = ["audio" "networkmanager" "wheel"];
-    shell = pkgs.zsh;
+    shell = pkgs.nushell;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWdZ6Ae9HwLtPBGCQVjbsHbF0lCADWTAEXW+nZzY6mh iterion"
     ];
@@ -153,8 +153,6 @@
 
     tailscale.enable = true;
     fstrim.enable = true;
-    gvfs.enable = true;
-    tumbler.enable = true;
     pipewire = {
       enable = true;
       alsa.enable = true;

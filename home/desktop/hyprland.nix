@@ -21,9 +21,6 @@ in {
 
       # wayland copy/paste
       wl-clipboard
-
-      # notifications
-      mako
     ];
 
     home.pointerCursor = {
@@ -37,6 +34,14 @@ in {
     };
     gtk = {
       enable = true;
+    };
+
+    # notifications
+    services.mako = {
+      enable = true;
+      extraConfig = ''
+        on-button-right=dismiss-all
+      '';
     };
     services.hyprpaper = {
       enable = true;
