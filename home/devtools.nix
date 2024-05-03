@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{lib, pkgs, ...}: {
   home.packages = with pkgs; [
     # secret scanning
     trufflehog
@@ -110,7 +110,7 @@
 
     nushell = {
       enable = true;
-      extraConfig = ''
+      extraConfig = lib.mkAfter ''
         $env.config = {
           show_banner: false,
           completions: {
@@ -118,6 +118,11 @@
             quick: true    # set to false to prevent auto-selecting completions
             partial: true    # set to false to prevent partial filling of the prompt
             algorithm: "fuzzy"    # prefix or fuzzy
+            external: {
+              enable: true
+              max_results: 100
+              completer: $carapace_completer
+            }
           }
         }
 
@@ -132,6 +137,10 @@
         }
       '';
       shellAliases = {};
+    };
+    carapace = {
+      enable = true;
+      enableNushellIntegration = true;
     };
 
     starship = {

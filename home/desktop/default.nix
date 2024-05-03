@@ -23,11 +23,13 @@ in {
       _1password
       _1password-gui
       discord
+      firefox
       google-chrome
-      spotify
-      slack
-      zoom-us
       obsidian
+      slack
+      spotify
+      zed-editor
+      zoom-us
     ];
   };
 }
