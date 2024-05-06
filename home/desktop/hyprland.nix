@@ -54,18 +54,22 @@ in {
     };
     services.hypridle = {
       enable = true;
-      lockCmd = "pidof hyprlock || ${inputs.hyprlock.packages.${pkgs.system}.hyprlock}/bin/hyprlock";
-      listeners = [
-        {
-          timeout = 5 * 60;
-          onTimeout = "loginctl lock-session";
-        }
-        {
-          timeout = 6 * 60;
-          onTimeout = "hyprctl dispatch dpms off";
-          onResume = "hyprctl dispatch dpms on";
-        }
-      ];
+      settings = {
+        general = {
+          lock_cmd = "pidof hyprlock || ${inputs.hyprlock.packages.${pkgs.system}.hyprlock}/bin/hyprlock";
+        };
+        listener = [
+          {
+            timeout = 5 * 60;
+            on-timeout = "loginctl lock-session";
+          }
+          {
+            timeout = 6 * 60;
+            on-timeout = "hyprctl dispatch dpms off";
+            on-resume = "hyprctl dispatch dpms on";
+          }
+        ];
+      };
     };
     programs.hyprlock = {
       enable = true;

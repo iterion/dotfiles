@@ -7,7 +7,6 @@
   imports = [
     inputs.anyrun.homeManagerModules.anyrun
     inputs.hyprlock.homeManagerModules.hyprlock
-    inputs.hypridle.homeManagerModules.hypridle
     inputs.hyprpaper.homeManagerModules.hyprpaper
 
     ./devtools.nix
