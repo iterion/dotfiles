@@ -17,7 +17,7 @@
 
   home = {
     username = "iterion";
-    homeDirectory = lib.mkForce "/home/iterion";
+    homeDirectory = lib.mkForce "/Users/iterion";
 
     # This value determines the Home Manager release that your configuration is
     # compatible with. This helps avoid breakage when a new Home Manager release

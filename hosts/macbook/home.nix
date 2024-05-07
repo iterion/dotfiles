@@ -1,0 +1,3 @@
+{ ... }: {
+  iterion.desktop.enable = false;
+}

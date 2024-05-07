@@ -114,8 +114,8 @@
         $env.config = {
           show_banner: false,
           completions: {
-            case_sensitive: false # case-sensitive completions
-            quick: true    # set to false to prevent auto-selecting completions
+            case_sensitive: false
+            quick: false
             partial: true    # set to false to prevent partial filling of the prompt
             algorithm: "fuzzy"    # prefix or fuzzy
             external: {
@@ -154,5 +154,5 @@
       };
     };
   };
-  services.gnome-keyring.enable = true;
+  services.gnome-keyring.enable = pkgs.stdenv.isLinux;
 }
