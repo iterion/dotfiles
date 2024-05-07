@@ -135,8 +135,18 @@
         def --env fetch-tfvars [] {
           op --account kittycadinc.1password.com item get TerraformCreds --format=json | from json | get fields | select -i label value | where value != null | transpose -r | into record | load-env
         }
+
+        def --env fetch-kc-token [] {
+          $env.KITTYCAD_TOKEN = (op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential)
+          $env.KITTYCAD_DEV_TOKEN = (op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
+        }
       '';
-      shellAliases = {};
+      shellAliases = {
+        k = "kubectl";
+      };
+      environmentVariables = {
+        EDITOR = "nvim";
+      };
     };
     carapace = {
       enable = true;

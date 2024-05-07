@@ -3,7 +3,9 @@
   lib,
   inputs,
   ...
-}: {
+}: let 
+  homeDir = if pkgs.stdenv.isLinux then "/home/iterion" else "/Users/iterion";
+in {
   imports = [
     inputs.anyrun.homeManagerModules.anyrun
     inputs.hyprlock.homeManagerModules.hyprlock
@@ -17,7 +19,7 @@
 
   home = {
     username = "iterion";
-    homeDirectory = lib.mkForce "/Users/iterion";
+    homeDirectory = lib.mkForce homeDir;
 
     # This value determines the Home Manager release that your configuration is
     # compatible with. This helps avoid breakage when a new Home Manager release
