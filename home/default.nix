@@ -10,6 +10,7 @@ in {
     inputs.anyrun.homeManagerModules.anyrun
     inputs.hyprlock.homeManagerModules.hyprlock
     inputs.hyprpaper.homeManagerModules.hyprpaper
+    inputs.nix-index-database.hmModules.nix-index
 
     ./devtools.nix
     ./neovim
@@ -42,7 +43,6 @@ in {
     lsof
     ripgrep
     killall
-    nix-index
 
     # for convenience put this in every shell
     kubectl
@@ -55,6 +55,8 @@ in {
       theme_background = false; # make btop transparent
     };
   };
+  programs.nix-index.enable = true;
+  programs.nix-index-database.comma.enable = true;
 
   fonts.fontconfig.enable = true;
 
