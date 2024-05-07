@@ -89,7 +89,7 @@
           showPatch = true;
         };
         #commit.gpgsign = true;
-        #credential.helper = "osxkeychain";
+        credential.helper = if pkgs.stdenv.isDarwin then "osxkeychain" else "libsecret";
         init = {
           defaultBranch = "main";
         };
@@ -99,6 +99,7 @@
         };
       };
     };
+      
     awscli = {
       enable = true;
       settings = ./aws-settings.nix;
