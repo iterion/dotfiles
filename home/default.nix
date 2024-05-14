@@ -8,8 +8,6 @@
 in {
   imports = [
     inputs.anyrun.homeManagerModules.anyrun
-    inputs.hyprlock.homeManagerModules.hyprlock
-    inputs.hyprpaper.homeManagerModules.hyprpaper
     inputs.nix-index-database.hmModules.nix-index
 
     ./devtools.nix

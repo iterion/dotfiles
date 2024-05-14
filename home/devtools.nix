@@ -116,7 +116,7 @@
           show_banner: false,
           completions: {
             case_sensitive: false
-            quick: false
+            quick: true
             partial: true    # set to false to prevent partial filling of the prompt
             algorithm: "fuzzy"    # prefix or fuzzy
             external: {

@@ -45,18 +45,20 @@ in {
     };
     services.hyprpaper = {
       enable = true;
-      preloads = [
-        "${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png"
-      ];
-      wallpapers = [
-        ",${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png"
-      ];
+      settings = {
+        ipc = "on";
+        splash = false;
+
+        preload = ["${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png"];
+
+        wallpaper = [",${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png"];
+      };
     };
     services.hypridle = {
       enable = true;
       settings = {
         general = {
-          lock_cmd = "pidof hyprlock || ${inputs.hyprlock.packages.${pkgs.system}.hyprlock}/bin/hyprlock";
+          lock_cmd = "pidof hyprlock || ${pkgs.hyprlock}/bin/hyprlock";
         };
         listener = [
           {
@@ -73,22 +75,27 @@ in {
     };
     programs.hyprlock = {
       enable = true;
-      backgrounds = [
-        {
-          path = "${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png";
-          blur_passes = 1;
-        }
-      ];
-      input-fields = [
-        {
-          fade_on_empty = false;
-          outline_thickness = 2;
-          size = {
-            width = 300;
-            height = 50;
-          };
-        }
-      ];
+      settings = {
+        general = {
+          disable_loading_bar = true;
+          grace = 300;
+          hide_cursor = true;
+          no_fade_in = false;
+        };
+        background = [
+          {
+            path = "${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png";
+            blur_passes = 1;
+          }
+        ];
+        input-field = [
+          {
+            fade_on_empty = false;
+            outline_thickness = 2;
+            size = "300, 50";
+          }
+        ];
+      };
     };
     wayland.windowManager.hyprland = {
       enable = true;
