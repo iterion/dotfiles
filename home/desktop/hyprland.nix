@@ -136,7 +136,7 @@ in {
         layerrule = [];
         bind =
           [
-            "$mod, F, exec, ${pkgs.google-chrome}/bin/google-chrome-stable"
+            "$mod, F, exec, ${pkgs.firefox}/bin/firefox"
             "$mod, Return, exec, ${pkgs.alacritty}/bin/alacritty"
             "$mod, D, exec, ${inputs.anyrun.packages.${pkgs.system}.anyrun}/bin/anyrun"
             "$mod, Left, movewindow, l"

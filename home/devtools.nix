@@ -5,6 +5,8 @@
 
     #calculator
     libqalculate
+
+    llm
   ];
   programs = {
     direnv = {
@@ -140,6 +142,10 @@
         def --env fetch-kc-token [] {
           $env.KITTYCAD_TOKEN = (op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential)
           $env.KITTYCAD_DEV_TOKEN = (op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
+        }
+
+        def --env fetch-openai-token [] {
+          $env.OPENAI_API_KEY = (op --account kittycadinc.1password.com item get "OpenAI Token" --fields credential)
         }
       '';
       shellAliases = {
