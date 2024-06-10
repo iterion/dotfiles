@@ -78,6 +78,7 @@
   # Allow unfree packages
   nixpkgs.config = {
     allowUnfree = true;
+    nvidia.acceptLicense = true;
     pulseaudio = true;
   };
   nixpkgs.overlays = [ 

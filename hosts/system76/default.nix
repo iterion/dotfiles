@@ -28,12 +28,38 @@
     driSupport32Bit = true;
     extraPackages = [
       pkgs.intel-media-driver
+      pkgs.nvidia-vaapi-driver
       pkgs.vaapiVdpau
     ];
   };
 
   # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
+
+  environment.variables = {
+    LIBVA_DRIVER_NAME = "nvidia";
+    GBM_BACKEND = "nvidia-drm";
+    NVD_BACKEND = "direct";
+    EGL_PLATFORM = "wayland";
+  };
+
+  virtualisation = {
+    docker = {
+      enableNvidia = true;
+    };
+  };
+
+  # just testing k3s for now:
+  networking.firewall = {
+    allowedTCPPorts = [
+      6443 # needed for pod comms with k8s API
+    ];
+    allowedUDPPorts = [ ];
+  };
+  services.k3s = {
+    enable = true;
+    role = "server";
+  };
 
   hardware.nvidia = {
     # Modesetting is required.
@@ -53,12 +79,10 @@
     # accessible via `nvidia-settings`.
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
-      version = "535.154.05";
-      sha256_64bit = "sha256-fpUGXKprgt6SYRDxSCemGXLrEsIA6GOinp+0eGbqqJg=";
-      sha256_aarch64 = "sha256-G0/GiObf/BZMkzzET8HQjdIcvCSqB1uhsinro2HLK9k=";
-      openSha256 = "sha256-wvRdHguGLxS0mR06P5Qi++pDJBCF8pJ8hr4T8O6TJIo=";
+      version = "535.171.04";
+      sha256_64bit = "sha256-6PFkO0vJXYrNZaRHB4SpfazkZC8UkjZGYSDbKqlCQ3o=";
       settingsSha256 = "sha256-9wqoDEWY4I7weWW05F4igj1Gj9wjHsREFMztfEmqm10=";
-      persistencedSha256 = "sha256-d0Q3Lk80JqkS1B54Mahu2yY/WocOqFFbZVBh+ToGhaE=";
+      persistencedSha256 = "sha256-P90qWA1yObhQQl3sKTWw+uUq7S9ZZcCzKnx/jHbfclo=";
 
       #version = "550.40.07";
       #sha256_64bit = "sha256-KYk2xye37v7ZW7h+uNJM/u8fNf7KyGTZjiaU03dJpK0=";
