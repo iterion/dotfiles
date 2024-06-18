@@ -36,6 +36,7 @@
       enable = true;
       setSocketVariable = true;
     };
+    libvirtd.enable = true;
   };
 
   # Configure console keymap
@@ -48,7 +49,7 @@
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
-    extraGroups = ["audio" "networkmanager" "wheel"];
+    extraGroups = ["audio" "networkmanager" "wheel" "libvirtd"];
     shell = pkgs.nushell;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWdZ6Ae9HwLtPBGCQVjbsHbF0lCADWTAEXW+nZzY6mh iterion"
@@ -80,6 +81,9 @@
     allowUnfree = true;
     nvidia.acceptLicense = true;
     pulseaudio = true;
+    permittedInsecurePackages = [
+      "openssl-1.1.1w" # todo find and eliminate this bs
+    ];
   };
   nixpkgs.overlays = [ 
     (final: prev: {
@@ -116,6 +120,7 @@
       libsecret
       lshw
       inputs.alejandra.defaultPackage.${pkgs.system}
+      vagrant
     ];
     pathsToLink = ["/share/zsh"];
     shells = with pkgs; [zsh];

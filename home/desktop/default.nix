@@ -22,6 +22,7 @@ in {
       # desktop apps
       _1password
       _1password-gui
+      aws-workspaces
       discord
       firefox
       google-chrome
