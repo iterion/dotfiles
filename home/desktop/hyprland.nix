@@ -111,6 +111,7 @@ in {
           "eDP-1,1920x1080@144,0x0,1"
           "HDMI-A-3,3840x2160,1920x0,1.5"
         ];
+        "debug:disable_logs" = false;
         "general:gaps_out" = 5;
         #"decoration:inactive_opacity" = 0.8;
         xwayland.force_zero_scaling = true;

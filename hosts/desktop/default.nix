@@ -3,7 +3,10 @@
   lib,
   ...
 }: {
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    SSH_AUTH_SOCK = "/run/user/1000/keyring/ssh";
+  };
 
   boot = {
     plymouth = {
@@ -15,6 +18,7 @@
   environment = {
     systemPackages = with pkgs; [
       polkit_gnome
+      kdePackages.ark
     ];
   };
 
@@ -58,9 +62,8 @@
     blueman.enable = true;
     dbus = {
       enable = true;
-      packages = [pkgs.gnome.seahorse];
+      packages = [pkgs.seahorse];
     };
-    gnome.gnome-keyring.enable = true;
     greetd = {
       enable = true;
       settings = {

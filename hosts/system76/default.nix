@@ -21,11 +21,10 @@
   # use systemd boot as we don't need grub
   boot.loader.systemd-boot.enable = true;
   
-  # Enable OpenGL
-  hardware.opengl = {
+  # Enable graphics
+  hardware.graphics = {
     enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
+    enable32Bit = true;
     extraPackages = [
       pkgs.intel-media-driver
       pkgs.nvidia-vaapi-driver
