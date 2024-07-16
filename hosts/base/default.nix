@@ -45,6 +45,13 @@
   # Enable ALSA
   sound.enable = true;
 
+  security.pam.loginLimits = [{
+    domain = "*";
+    type = "soft";
+    item = "nofile";
+    value = "16384";
+  }];
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.iterion = {
     isNormalUser = true;
