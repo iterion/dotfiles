@@ -53,10 +53,11 @@
   }];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.groups.plugdev = {};
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
-    extraGroups = ["audio" "networkmanager" "wheel" "libvirtd"];
+    extraGroups = ["audio" "networkmanager" "wheel" "libvirtd" "plugdev"];
     shell = pkgs.nushell;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWdZ6Ae9HwLtPBGCQVjbsHbF0lCADWTAEXW+nZzY6mh iterion"
@@ -156,6 +157,9 @@
   };
 
   services = {
+    udev.extraRules = ''
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="2c99", ATTRS{idProduct}=="0002", GROUP="plugdev", TAG+="uaccess"
+    '';
     resolved = {
       enable = true;
       dnssec = "true";

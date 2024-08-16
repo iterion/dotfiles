@@ -7,6 +7,9 @@
     libqalculate
 
     llm
+
+    # Curl alternative
+    xh
   ];
   programs = {
     direnv = {

@@ -6,7 +6,9 @@
       ./hardware-configuration.nix
     ];
 
-  networking.hostName = "system76-nixos";
+  networking = {
+    hostName = "system76-nixos";
+  };
 
   boot.initrd.luks.devices."luks-bcdc740f-7023-4bb5-982f-081db97f671f".device = "/dev/disk/by-uuid/bcdc740f-7023-4bb5-982f-081db97f671f";
 
@@ -40,6 +42,7 @@
     GBM_BACKEND = "nvidia-drm";
     NVD_BACKEND = "direct";
     EGL_PLATFORM = "wayland";
+    VK_DRIVER_FILES = "/run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json";
   };
 
   virtualisation = {
@@ -51,9 +54,12 @@
   # just testing k3s for now:
   networking.firewall = {
     allowedTCPPorts = [
+      8585 # running machine-api locally
       6443 # needed for pod comms with k8s API
     ];
-    allowedUDPPorts = [ ];
+    allowedUDPPorts = [
+      5353 # mDNS allow for machine-api
+    ];
   };
   services.k3s = {
     enable = true;

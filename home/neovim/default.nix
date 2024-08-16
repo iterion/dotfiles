@@ -3,7 +3,9 @@
     nil
     rust-analyzer
     terraform-ls
+    typescript
     yaml-language-server
+    vscode-langservers-extracted
   ];
   programs.neovim = {
     enable = true;
@@ -25,6 +27,7 @@
       rust-tools-nvim
       telescope-nvim
       vim-nix
+      typescript-tools-nvim
     ];
     extraLuaConfig = builtins.readFile ./config.lua;
   };

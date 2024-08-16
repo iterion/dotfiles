@@ -38,6 +38,7 @@ in {
     fzf
     bat
     jq
+    yq-go
     lsof
     ripgrep
     killall
@@ -45,6 +46,9 @@ in {
     # for convenience put this in every shell
     kubectl
     kubectx
+
+    # 3d printing
+    prusa-slicer
   ];
   programs.btop = {
     enable = true;

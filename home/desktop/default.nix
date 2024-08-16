@@ -31,6 +31,7 @@ in {
       spotify
       zed-editor
       zoom-us
+      orca-slicer
     ];
   };
 }

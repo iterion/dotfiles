@@ -10,6 +10,13 @@ local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
 lspconfig.nil_ls.setup{}
 lspconfig.terraformls.setup{}
 lspconfig.yamlls.setup {}
+lspconfig.eslint.setup {}
+
+require("typescript-tools").setup({
+    on_attach = function(client, _)
+	client.server_capabilities.documentFormattingProvider = false
+    end,
+})
 
 local rt = require("rust-tools")
 
