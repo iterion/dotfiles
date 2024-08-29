@@ -77,7 +77,7 @@
     shells = with pkgs; [zsh nushell];
   };
 
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
     font-awesome
     nerdfonts
     noto-fonts

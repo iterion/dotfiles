@@ -57,6 +57,17 @@ in {
       theme_background = false; # make btop transparent
     };
   };
+
+  programs.zellij = {
+    enable = true;
+    enableZshIntegration = true;
+    settings = {
+      pane_frames = false;
+      default_layout = "compact";
+      copy_command = if pkgs.stdenv.isLinux then "wl-copy" else "pbcopy";
+      copy_on_select = true;
+    };
+  };
   programs.nix-index.enable = true;
   programs.nix-index-database.comma.enable = true;
 
