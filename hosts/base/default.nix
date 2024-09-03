@@ -42,9 +42,6 @@
   # Configure console keymap
   console.keyMap = "dvorak";
 
-  # Enable ALSA
-  sound.enable = true;
-
   security.pam.loginLimits = [{
     domain = "*";
     type = "soft";

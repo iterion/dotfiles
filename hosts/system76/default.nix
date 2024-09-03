@@ -45,12 +45,6 @@
     VK_DRIVER_FILES = "/run/opengl-driver/share/vulkan/icd.d/nvidia_icd.x86_64.json";
   };
 
-  virtualisation = {
-    docker = {
-      enableNvidia = true;
-    };
-  };
-
   # just testing k3s for now:
   networking.firewall = {
     allowedTCPPorts = [
@@ -66,6 +60,7 @@
     role = "server";
   };
 
+  hardware.nvidia-container-toolkit.enable = true;
   hardware.nvidia = {
     # Modesetting is required.
     modesetting.enable = true;
