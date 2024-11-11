@@ -25,7 +25,7 @@
       experimental-features = ["nix-command" "flakes"];
       trusted-users = [ "iterion" ];
     };
-    package = pkgs.nixFlakes;
+    package = pkgs.nixVersions.stable;
   };
 
   homebrew = {
@@ -81,7 +81,7 @@
     font-awesome
     nerdfonts
     noto-fonts
-    noto-fonts-cjk
+    noto-fonts-cjk-sans
     noto-fonts-emoji
     liberation_ttf
     fira-code

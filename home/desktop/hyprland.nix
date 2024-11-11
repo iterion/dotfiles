@@ -34,6 +34,14 @@ in {
     };
     gtk = {
       enable = true;
+      iconTheme = {
+        name = "Pop";
+        package = pkgs.pop-icon-theme;
+      };
+      theme = {
+        name = "Pop";
+        package = pkgs.pop-gtk-theme;
+      };
     };
 
     # notifications
@@ -121,8 +129,11 @@ in {
           kb_layout = "us";
           kb_variant = "dvorak";
         };
+        cursor = {
+          no_hardware_cursors = true;
+        };
         env = [
-          "WLR_NO_HARDWARE_CURSORS,1"
+          "AQ_DRM_DEVICES,/dev/dri/card1"
         ];
         exec-once = [
           "${pkgs.mako}/bin/mako"
@@ -138,6 +149,12 @@ in {
         layerrule = [];
         bind =
           [
+            "$mod, C, sendshortcut, CTRL, C, class:(google-chrome)"
+            "$mod, V, sendshortcut, CTRL, V, class:(google-chrome)"
+            "$mod, X, sendshortcut, CTRL, X, class:(google-chrome)"
+            "$mod, C, sendshortcut, CTRL_SHIFT, C, class:(Alacritty)"
+            "$mod, V, sendshortcut, CTRL_SHIFT, V, class:(Alacritty)"
+            "$mod, X, sendshortcut, CTRL_SHIFT, X, class:(Alacritty)"
             "$mod, F, exec, ${pkgs.firefox}/bin/firefox"
             "$mod, Return, exec, ${pkgs.alacritty}/bin/alacritty"
             "$mod, D, exec, ${inputs.anyrun.packages.${pkgs.system}.anyrun}/bin/anyrun"

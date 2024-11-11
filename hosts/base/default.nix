@@ -32,10 +32,10 @@
 
   virtualisation = {
     docker.enable = true;
-    docker.rootless = {
-      enable = true;
-      setSocketVariable = true;
-    };
+    # docker.rootless = {
+    #   enable = true;
+    #   setSocketVariable = true;
+    # };
     libvirtd.enable = true;
   };
 
@@ -54,7 +54,7 @@
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
-    extraGroups = ["audio" "networkmanager" "wheel" "libvirtd" "plugdev"];
+    extraGroups = ["audio" "docker" "networkmanager" "wheel" "libvirtd" "plugdev"];
     shell = pkgs.nushell;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWdZ6Ae9HwLtPBGCQVjbsHbF0lCADWTAEXW+nZzY6mh iterion"
@@ -79,7 +79,7 @@
       experimental-features = ["nix-command" "flakes"];
       trusted-users = [ "iterion" ];
     };
-    package = pkgs.nixFlakes;
+    package = pkgs.nixVersions.stable;
   };
   # Allow unfree packages
   nixpkgs.config = {
@@ -125,7 +125,7 @@
       libsecret
       lshw
       inputs.alejandra.defaultPackage.${pkgs.system}
-      vagrant
+      # vagrant.override { withLibvirt = false; }
     ];
     pathsToLink = ["/share/zsh"];
     shells = with pkgs; [zsh];
@@ -135,7 +135,7 @@
     font-awesome
     nerdfonts
     noto-fonts
-    noto-fonts-cjk
+    noto-fonts-cjk-sans
     noto-fonts-emoji
     liberation_ttf
     fira-code

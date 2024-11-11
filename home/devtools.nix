@@ -8,6 +8,9 @@
 
     llm
 
+    # hex editor
+    imhex
+
     # Curl alternative
     xh
   ];
@@ -104,7 +107,7 @@
         };
       };
     };
-      
+
     awscli = {
       enable = true;
       settings = ./aws-settings.nix;
@@ -112,25 +115,38 @@
     ssh = {
       enable = true;
       addKeysToAgent = "yes";
+      matchBlocks = {
+        "zookeeper" = {
+          user = "zoo";
+          hostname = "192.168.2.2";
+          proxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
+          forwardAgent = true;
+        };
+        "mgmt1" = {
+          user = "root";
+          hostname = "192.168.2.13";
+          proxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
+          forwardAgent = true;
+        };
+        "mgmt2" = {
+          user = "root";
+          hostname = "192.168.2.14";
+          proxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
+          forwardAgent = true;
+        };
+        "compute1" = {
+          user = "root";
+          hostname = "192.168.2.15";
+          proxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
+          forwardAgent = true;
+        };
+      };
     };
 
     nushell = {
       enable = true;
       extraConfig = lib.mkAfter ''
-        $env.config = {
-          show_banner: false,
-          completions: {
-            case_sensitive: false
-            quick: true
-            partial: true    # set to false to prevent partial filling of the prompt
-            algorithm: "fuzzy"    # prefix or fuzzy
-            external: {
-              enable: true
-              max_results: 100
-              completer: $carapace_completer
-            }
-          }
-        }
+        $env.config.show_banner = false
 
         def --env vault-login [] {
           $env.VAULT_ADDR = "http://vault.hawk-dinosaur.ts.net"
@@ -155,7 +171,7 @@
         k = "kubectl";
       };
       environmentVariables = {
-        EDITOR = "nvim";
+        EDITOR = "\"nvim\"";
       };
     };
     carapace = {
@@ -173,6 +189,21 @@
         };
       };
     };
+
+    yazi = {
+      enable = true;
+      enableZshIntegration = true;
+      enableNushellIntegration = true;
+    };
+    gpg.enable = true;
   };
-  services.gnome-keyring.enable = pkgs.stdenv.isLinux;
+  services = {
+    gpg-agent = {
+      enable = true;
+      pinentryPackage = pkgs.wayprompt;
+      enableSshSupport = true;
+      enableZshIntegration = true;
+      enableNushellIntegration = true;
+    };
+  };
 }

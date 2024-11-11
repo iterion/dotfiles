@@ -20,18 +20,28 @@ in {
     xdg.enable = true;
     home.packages = with pkgs; [
       # desktop apps
-      _1password
+      _1password-cli
       _1password-gui
       aws-workspaces
       discord
       firefox
-      google-chrome
       obsidian
       slack
       spotify
       zed-editor
       zoom-us
       orca-slicer
+      gimp
+      libva-utils
+      vdpauinfo
+      glib
+      egl-wayland
+      vulkan-tools
+      (google-chrome.override {
+        commandLineArgs = [
+          "--enable-features=VaapiVideoDecoder,VaapiIgnoreDriverChecks"
+        ];
+      })
     ];
   };
 }
