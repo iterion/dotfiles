@@ -42,8 +42,8 @@
         }
 
         function fetch-kc-token() {
-          export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential)
-          export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
+          export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential --reveal)
+          export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential --reveal)
         }
 
         function ssh-k8s() {
@@ -53,12 +53,12 @@
 
         function vault-login() {
           export VAULT_ADDR="http://vault.hawk-dinosaur.ts.net"
-          export GITHUB_VAULT_TOKEN=$(op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields token)
+          export GITHUB_VAULT_TOKEN=$(op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields token --reveal)
           echo $GITHUB_VAULT_TOKEN | vault login -method=github token=-
         }
 
         function fetch-tfvars() {
-          op --account kittycadinc.1password.com item get TerraformCreds --format=json | jq -r '.fields[] | select(.value != null) | "\(.label)=\(.value)"' | while read -r line; do
+          op --account kittycadinc.1password.com item get TerraformCreds --format=json --reveal | jq -r '.fields[] | select(.value != null) | "\(.label)=\(.value)"' | while read -r line; do
               # Exporting each line as an environment variable
               export "$line"
           done
@@ -150,21 +150,21 @@
 
         def --env vault-login [] {
           $env.VAULT_ADDR = "http://vault.hawk-dinosaur.ts.net"
-          let token = (op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields token)
+          let token = (op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields token --reveal)
           $env.VAULT_TOKEN = ($token | vault login -format=json -method=github token=- | from json | get auth.client_token)
         }
 
         def --env fetch-tfvars [] {
-          op --account kittycadinc.1password.com item get TerraformCreds --format=json | from json | get fields | select -i label value | where value != null | transpose -r | into record | load-env
+          op --account kittycadinc.1password.com item get TerraformCreds --format=json --reveal | from json | get fields | select -i label value | where value != null | transpose -r | into record | load-env
         }
 
         def --env fetch-kc-token [] {
-          $env.KITTYCAD_TOKEN = (op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential)
-          $env.KITTYCAD_DEV_TOKEN = (op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential)
+          $env.KITTYCAD_TOKEN = (op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential --reveal)
+          $env.KITTYCAD_DEV_TOKEN = (op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential --reveal)
         }
 
         def --env fetch-openai-token [] {
-          $env.OPENAI_API_KEY = (op --account kittycadinc.1password.com item get "OpenAI Token" --fields credential)
+          $env.OPENAI_API_KEY = (op --account kittycadinc.1password.com item get "OpenAI Token" --fields credential --reveal)
         }
       '';
       shellAliases = {

@@ -109,7 +109,7 @@
     # Enable the Nvidia settings menu,
     # accessible via `nvidia-settings`.
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.production;
+    package = config.boot.kernelPackages.nvidiaPackages.beta;
     # package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
     #    version = "535.171.04";
     #    sha256_64bit = "sha256-6PFkO0vJXYrNZaRHB4SpfazkZC8UkjZGYSDbKqlCQ3o=";
