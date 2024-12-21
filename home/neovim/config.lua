@@ -11,6 +11,7 @@ lspconfig.nil_ls.setup{}
 lspconfig.terraformls.setup{}
 lspconfig.yamlls.setup {}
 lspconfig.eslint.setup {}
+lspconfig.zls.setup {}
 
 require("typescript-tools").setup({
     on_attach = function(client, _)

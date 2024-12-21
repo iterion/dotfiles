@@ -6,6 +6,7 @@
     typescript
     yaml-language-server
     vscode-langservers-extracted
+    zls
   ];
   programs.neovim = {
     enable = true;
