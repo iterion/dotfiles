@@ -65,6 +65,23 @@
           }
         ];
       };
+      iterion-gaming = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = {inherit inputs;};
+        modules = [
+          ./hosts/gaming
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = {inherit inputs;};
+            home-manager.users.iterion.imports = [
+              ./home
+              ./hosts/gaming/home.nix
+            ];
+          }
+        ];
+      };
       system76-nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         specialArgs = {inherit inputs;};
