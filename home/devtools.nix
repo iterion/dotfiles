@@ -14,6 +14,10 @@
     # Curl alternative
     xh
   ];
+  xdg.configFile."ghostty/config".text = ''
+    keybind = ctrl+shift+h=goto_split:left
+    keybind = ctrl+shift+l=goto_split:right
+  '';
   programs = {
     direnv = {
       enable = true;

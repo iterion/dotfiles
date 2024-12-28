@@ -37,6 +37,7 @@
     #   setSocketVariable = true;
     # };
     libvirtd.enable = true;
+    spiceUSBRedirection.enable = true;
   };
 
   # Configure console keymap
@@ -124,6 +125,7 @@
       tailscale
       libsecret
       lshw
+      usbutils
       inputs.alejandra.defaultPackage.${pkgs.system}
       # vagrant.override { withLibvirt = false; }
     ];
@@ -133,7 +135,6 @@
 
   fonts.packages = with pkgs; [
     font-awesome
-    nerdfonts
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-emoji
@@ -143,7 +144,7 @@
     mplus-outline-fonts.githubRelease
     dina-font
     proggyfonts
-  ];
+  ] ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
 
   programs = {
     zsh.enable = true;

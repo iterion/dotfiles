@@ -116,10 +116,6 @@ in {
       };
       settings = {
         "$mod" = "SUPER";
-        monitor = [
-          "eDP-1,1920x1080@144,0x0,1"
-          "HDMI-A-3,3840x2160,1920x0,1.5"
-        ];
         "debug:disable_logs" = false;
         "general:gaps_out" = 5;
         #"decoration:inactive_opacity" = 0.8;
@@ -140,12 +136,6 @@ in {
           "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
           "${pkgs.waybar}/bin/waybar"
         ];
-        device = [
-          {
-            name = "clearly-superior-technologies.-cst-laser-trackball";
-            sensitivity = -0.5;
-          }
-        ];
         layerrule = [];
         bind =
           [
@@ -156,7 +146,7 @@ in {
             "$mod, V, sendshortcut, CTRL_SHIFT, V, class:(Alacritty)"
             "$mod, X, sendshortcut, CTRL_SHIFT, X, class:(Alacritty)"
             "$mod, F, exec, ${pkgs.firefox}/bin/firefox"
-            "$mod, Return, exec, ${pkgs.alacritty}/bin/alacritty"
+            "$mod, Return, exec, gtk-launch com.mitchellh.ghostty.desktop"
             "$mod, D, exec, ${inputs.anyrun.packages.${pkgs.system}.anyrun}/bin/anyrun"
             "$mod, Left, movewindow, l"
             "$mod, Right, movewindow, r"

@@ -43,33 +43,45 @@ in {
     ripgrep
     killall
 
+    # usb debugging
+    hidviz
+
     # for convenience put this in every shell
     kubectl
     kubectx
 
     # 3d printing
     prusa-slicer
-  ];
-  programs.btop = {
-    enable = true;
-    settings = {
-      color_theme = "gruvbox_dark";
-      theme_background = false; # make btop transparent
-    };
-  };
 
-  programs.zellij = {
-    enable = true;
-    enableZshIntegration = true;
-    settings = {
-      pane_frames = false;
-      default_layout = "compact";
-      copy_command = if pkgs.stdenv.isLinux then "wl-copy" else "pbcopy";
-      copy_on_select = true;
+
+    inputs.ghostty.packages.x86_64-linux.default
+  ];
+  programs = {
+    btop = {
+      enable = true;
+      settings = {
+        color_theme = "gruvbox_dark";
+        theme_background = false; # make btop transparent
+      };
     };
+
+    zellij = {
+      enable = true;
+      enableZshIntegration = true;
+      settings = {
+        pane_frames = false;
+        default_layout = "compact";
+        copy_command = if pkgs.stdenv.isLinux then "wl-copy" else "pbcopy";
+        copy_on_select = true;
+      };
+    };
+
+    nix-index.enable = true;
+    nix-index-database.comma.enable = true;
+
+    # fans & temps
+    #coolercontrol.enable = true;
   };
-  programs.nix-index.enable = true;
-  programs.nix-index-database.comma.enable = true;
 
   fonts.fontconfig.enable = true;
 
