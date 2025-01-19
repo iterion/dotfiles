@@ -3,6 +3,8 @@
     # secret scanning
     trufflehog
 
+    helix
+
     #calculator
     libqalculate
 
@@ -17,6 +19,7 @@
   xdg.configFile."ghostty/config".text = ''
     keybind = ctrl+shift+h=goto_split:left
     keybind = ctrl+shift+l=goto_split:right
+    keybind = super+alt+c=close_surface
   '';
   programs = {
     direnv = {
@@ -175,7 +178,7 @@
         k = "kubectl";
       };
       environmentVariables = {
-        EDITOR = "\"nvim\"";
+        EDITOR = "nvim";
       };
     };
     carapace = {

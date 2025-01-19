@@ -30,7 +30,7 @@ in {
       spotify
       zed-editor
       zoom-us
-      orca-slicer
+      # orca-slicer
       gimp
       libva-utils
       vdpauinfo
