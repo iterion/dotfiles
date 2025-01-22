@@ -155,9 +155,20 @@
   };
 
   services = {
-    udev.extraRules = ''
-      SUBSYSTEM=="usb", ATTRS{idVendor}=="2c99", ATTRS{idProduct}=="0002", GROUP="plugdev", TAG+="uaccess"
-    '';
+
+    udev = {
+      enable = true;
+      extraRules = ''
+
+      '';
+      packages = [
+        (pkgs.writeTextFile {
+          name = "usb-udev-rules";
+          text = ''SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", GROUP="plugdev", TAG+="uaccess"'';
+          destination = "/etc/udev/rules.d/70-usb.rules";
+        })
+      ];
+    };
     resolved = {
       enable = true;
       dnssec = "true";

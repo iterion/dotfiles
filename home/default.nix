@@ -11,6 +11,7 @@ in {
     inputs.nix-index-database.hmModules.nix-index
 
     ./devtools.nix
+    ./fpv.nix
     ./neovim
 
     ./desktop

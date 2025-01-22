@@ -1,5 +1,6 @@
 { ... }: {
   iterion.desktop.enable = true;
+  iterion.fpv.enable = true;
   wayland.windowManager.hyprland = {
     settings = {
       monitor = [
