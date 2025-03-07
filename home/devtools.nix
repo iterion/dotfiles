@@ -4,6 +4,7 @@
     trufflehog
 
     helix
+    hyperfine
 
     #calculator
     libqalculate
@@ -25,7 +26,7 @@
     direnv = {
       enable = true;
       enableZshIntegration = true;
-      enableNushellIntegration = true;
+      enableNushellIntegration = false;
       nix-direnv.enable = true;
     };
     zsh = {
@@ -183,7 +184,7 @@
     };
     carapace = {
       enable = true;
-      enableNushellIntegration = true;
+      enableNushellIntegration = false;
     };
 
     starship = {
@@ -200,7 +201,7 @@
     yazi = {
       enable = true;
       enableZshIntegration = true;
-      enableNushellIntegration = true;
+      enableNushellIntegration = false;
     };
     gpg.enable = true;
   };
@@ -210,7 +211,7 @@
       pinentryPackage = pkgs.wayprompt;
       enableSshSupport = true;
       enableZshIntegration = true;
-      enableNushellIntegration = true;
+      enableNushellIntegration = false;
     };
   };
 }

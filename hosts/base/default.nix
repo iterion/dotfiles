@@ -56,7 +56,7 @@
     isNormalUser = true;
     description = "Adam Sunderland";
     extraGroups = ["audio" "docker" "networkmanager" "wheel" "libvirtd" "plugdev"];
-    shell = pkgs.nushell;
+    shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWdZ6Ae9HwLtPBGCQVjbsHbF0lCADWTAEXW+nZzY6mh iterion"
     ];
@@ -164,7 +164,10 @@
       packages = [
         (pkgs.writeTextFile {
           name = "usb-udev-rules";
-          text = ''SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", GROUP="plugdev", TAG+="uaccess"'';
+          text = ''
+            SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", GROUP="plugdev", TAG+="uaccess"
+            SUBSYSTEM=="usb", ATTRS{idVendor}=="2c99", GROUP="plugdev", TAG+="uaccess"
+            '';
           destination = "/etc/udev/rules.d/70-usb.rules";
         })
       ];

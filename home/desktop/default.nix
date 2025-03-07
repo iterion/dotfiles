@@ -30,18 +30,14 @@ in {
       spotify
       zed-editor
       zoom-us
+      prusa-slicer
       # orca-slicer
       gimp
       libva-utils
-      vdpauinfo
       glib
       egl-wayland
       vulkan-tools
-      (google-chrome.override {
-        commandLineArgs = [
-          "--enable-features=VaapiVideoDecoder,VaapiIgnoreDriverChecks"
-        ];
-      })
+      google-chrome
     ];
   };
 }

@@ -10,10 +10,11 @@
     hostName = "system76-nixos";
   };
 
-  boot.kernelPackages = pkgs.linuxPackages_6_6;
+  boot.kernelPackages = pkgs.linuxPackages;
   boot.initrd.luks.devices."luks-bcdc740f-7023-4bb5-982f-081db97f671f".device = "/dev/disk/by-uuid/bcdc740f-7023-4bb5-982f-081db97f671f";
   boot.initrd.kernelModules = [ "nvidia" ];
-  boot.kernelParams = [ "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];
+  boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
+  boot.blacklistedKernelModules = [ "i915" ];
 
   hardware.system76.enableAll = true;
   programs.hyprland = {
@@ -31,10 +32,8 @@
     enable = true;
     enable32Bit = true;
     extraPackages = [
-      # pkgs.vpl-gpu-rt
       # pkgs.intel-media-driver
       pkgs.nvidia-vaapi-driver
-      # pkgs.libvdpau-va-gl
     ];
   };
 
@@ -101,14 +100,16 @@
 
     # Fine-grained power management. Turns off GPU when not in use.
     # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-    # powerManagement.finegrained = true;
+    powerManagement.finegrained = true;
 
     # open source driver, it doesn't suck?
-    open = false;
+    open = true;
+
+    # forceFullCompositionPipeline = true;
 
     # Enable the Nvidia settings menu,
     # accessible via `nvidia-settings`.
-    nvidiaSettings = true;
+    #nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.beta;
     # package = config.boot.kernelPackages.nvidiaPackages.mkDriver {
     #    version = "535.171.04";
@@ -132,15 +133,16 @@
     #     patches = [ rcu_patch ];
     #  };
 
-    # prime = {
-    #   #offload = {
-    #   #  enable = true;
-    #   #  enableOffloadCmd = true;
-    #   #};
-    #   reverseSync.enable = true;
-    #   intelBusId = "PCI:0:2:0";
-    #   nvidiaBusId = "PCI:1:0:0";
-    # };
+    prime = {
+      # offload = {
+      #  enable = false;
+      #  enableOffloadCmd = false;
+      # };
+      
+      reverseSync.enable = true;
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
+    };
   };
 
   # This value determines the NixOS release from which the default

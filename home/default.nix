@@ -51,10 +51,6 @@ in {
     kubectl
     kubectx
 
-    # 3d printing
-    prusa-slicer
-
-
     inputs.ghostty.packages.x86_64-linux.default
   ];
   programs = {
@@ -68,7 +64,7 @@ in {
 
     zellij = {
       enable = true;
-      enableZshIntegration = true;
+      enableZshIntegration = false;
       settings = {
         pane_frames = false;
         default_layout = "compact";

@@ -129,7 +129,8 @@ in {
           no_hardware_cursors = true;
         };
         env = [
-          "AQ_DRM_DEVICES,/dev/dri/card1"
+          "GBM_BACKEND,nvidia-drm"
+          #"AQ_DRM_DEVICES,/dev/dri/by-path/pci-0000:01:00.0-card"
         ];
         exec-once = [
           "${pkgs.mako}/bin/mako"
