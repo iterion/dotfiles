@@ -4,9 +4,6 @@
     #./hardware-configuration.nix
   ];
 
-  # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
-
   # Set Git commit hash for darwin-version.
   system.configurationRevision = null;#self.rev or self.dirtyRev or null;
 

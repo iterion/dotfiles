@@ -33,26 +33,29 @@ in {
 
   home.packages = with pkgs; [
     # cli tools
-    vault
     htop
-    dig.dnsutils
     fzf
     bat
     jq
     yq-go
-    lsof
     ripgrep
     killall
-
-    # usb debugging
-    hidviz
 
     # for convenience put this in every shell
     kubectl
     kubectx
 
-    inputs.ghostty.packages.x86_64-linux.default
-  ];
+  ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux (with pkgs; [
+    inputs.ghostty.packages.${pkgs.system}.default
+    # usb debugging
+    hidviz
+    lsof
+    dig.dnsutils
+
+    # why linux only?
+    vault
+  ]);
+
   programs = {
     btop = {
       enable = true;

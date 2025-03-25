@@ -13,6 +13,7 @@
   #console.keyMap = "dvorak";
 
   nix = {
+    enable = true;
     gc = {
       automatic = true;
       interval = {
@@ -20,8 +21,10 @@
       };
       options = "--delete-older-than 1w";
     };
+    optimise = {
+      automatic = true;
+    };
     settings = {
-      auto-optimise-store = true;
       experimental-features = ["nix-command" "flakes"];
       trusted-users = [ "iterion" ];
     };
@@ -30,8 +33,6 @@
 
   homebrew = {
     enable = true;
-    #font-fira-code			
-    #font-inconsolata-nerd-font	
     casks = [
       "iterm2"
       "1password-cli"
@@ -79,7 +80,6 @@
 
   fonts.packages = with pkgs; [
     font-awesome
-    nerdfonts
     noto-fonts
     noto-fonts-cjk-sans
     noto-fonts-emoji

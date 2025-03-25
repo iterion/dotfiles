@@ -207,7 +207,7 @@
   };
   services = {
     gpg-agent = {
-      enable = true;
+      enable = false;
       pinentryPackage = pkgs.wayprompt;
       enableSshSupport = true;
       enableZshIntegration = true;
