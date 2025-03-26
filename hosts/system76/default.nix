@@ -39,6 +39,7 @@
 
   # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
+  services.logind.lidSwitchExternalPower = "ignore";
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
