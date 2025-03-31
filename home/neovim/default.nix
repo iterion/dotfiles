@@ -15,15 +15,15 @@
     vimdiffAlias = true;
     defaultEditor = true;
     plugins = with pkgs.vimPlugins; [
-      cmp-nvim-lsp
       fzf-lsp-nvim
       fzf-vim
       luasnip
-      nvim-cmp
+      blink-cmp
+      blink-copilot
       nvim-dap
       nvim-dap-virtual-text
       nvim-lspconfig
-      nvim-treesitter.withAllGrammars
+      # nvim-treesitter.withAllGrammars
       plenary-nvim
       rust-tools-nvim
       telescope-nvim

@@ -6,7 +6,7 @@ vim.opt.signcolumn = "auto"
 vim.opt.clipboard = "unnamedplus"
 vim.opt.wrap = false
 local lspconfig = require('lspconfig')
-local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
+-- local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
 lspconfig.nil_ls.setup{}
 lspconfig.terraformls.setup{}
 lspconfig.yamlls.setup {}
@@ -66,30 +66,34 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   }
 )
 
-local default_setup = function(server)
-  lspconfig[server].setup({
-    capabilities = lsp_capabilities,
-  })
-end
-local cmp = require('cmp')
-
-cmp.setup({
+require('blink.cmp').setup({
   sources = {
-    {name = 'nvim_lsp'},
+    default = {'lsp', 'path', 'snippets', 'buffer'},
   },
-  mapping = cmp.mapping.preset.insert({
-    -- Enter key confirms completion item
-    ['<CR>'] = cmp.mapping.confirm({select = false}),
-
-    -- Ctrl + space triggers completion menu
-    ['<C-Space>'] = cmp.mapping.complete(),
-  }),
-  snippet = {
-    expand = function(args)
-      require('luasnip').lsp_expand(args.body)
-    end,
-  },
+  keymap = { preset = 'super-tab' },
+  config = function(_, opts)
+    local lspconfig = require('lspconfig')
+    for server, config in pairs(opts.servers) do
+      -- passing config.capabilities to blink.cmp merges with the capabilities in your
+      -- `opts[server].capabilities, if you've defined it
+      config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
+      lspconfig[server].setup(config)
+    end
+  end
+  -- mapping = cmp.mapping.preset.insert({
+  --   -- Enter key confirms completion item
+  --   ['<CR>'] = cmp.mapping.confirm({select = false}),
+  --
+  --   -- Ctrl + space triggers completion menu
+  --   ['<C-Space>'] = cmp.mapping.complete(),
+  -- }),
+  -- snippet = {
+  --   expand = function(args)
+  --     require('luasnip').lsp_expand(args.body)
+  --   end,
+  -- },
 })
+
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
 vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
