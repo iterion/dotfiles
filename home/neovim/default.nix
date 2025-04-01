@@ -18,12 +18,12 @@
       fzf-lsp-nvim
       fzf-vim
       luasnip
-      blink-cmp
-      blink-copilot
+      # blink-cmp
+      # blink-copilot
       nvim-dap
       nvim-dap-virtual-text
       nvim-lspconfig
-      # nvim-treesitter.withAllGrammars
+      nvim-treesitter.withAllGrammars
       plenary-nvim
       rust-tools-nvim
       telescope-nvim

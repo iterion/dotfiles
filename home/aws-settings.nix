@@ -15,6 +15,14 @@
     "sso_role_name" = "admin";
     "sso_start_url" = "https://kittycad.awsapps.com/start#";
   };
+  "profile admin-logging" = {
+    "output" = "json";
+    "region" = "us-east-1";
+    "sso_account_id" = "909448057351";
+    "sso_region" = "us-east-1";
+    "sso_role_name" = "admin";
+    "sso_start_url" = "https://kittycad.awsapps.com/start#";
+  };
   "profile admin-prod" = {
     "output" = "json";
     "region" = "us-east-1";

@@ -14,6 +14,9 @@
   boot.initrd.luks.devices."luks-bcdc740f-7023-4bb5-982f-081db97f671f".device = "/dev/disk/by-uuid/bcdc740f-7023-4bb5-982f-081db97f671f";
   boot.initrd.kernelModules = [ "nvidia" ];
   boot.kernelParams = [ "nvidia-drm.fbdev=1" ];
+  boot.extraModprobeConfig = ''
+    options nvidia_uvm uvm_disable_hmm=1
+  '';
   boot.blacklistedKernelModules = [ "i915" ];
 
   hardware.system76.enableAll = true;

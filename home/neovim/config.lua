@@ -5,6 +5,7 @@ vim.opt.spell = true
 vim.opt.signcolumn = "auto"
 vim.opt.clipboard = "unnamedplus"
 vim.opt.wrap = false
+vim.opt.completeopt = "menuone,fuzzy,noinsert,popup"
 local lspconfig = require('lspconfig')
 -- local lsp_capabilities = require('cmp_nvim_lsp').default_capabilities()
 lspconfig.nil_ls.setup{}
@@ -12,6 +13,8 @@ lspconfig.terraformls.setup{}
 lspconfig.yamlls.setup {}
 lspconfig.eslint.setup {}
 lspconfig.zls.setup {}
+
+
 
 require("typescript-tools").setup({
     on_attach = function(client, _)
@@ -33,53 +36,53 @@ rt.setup({
   },
 })
 
+
+vim.diagnostic.config({
+  virtual_lines = true
+})
 vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 vim.api.nvim_create_autocmd('LspAttach', {
   desc = 'LSP actions',
-  callback = function(event)
-    local opts = {buffer = event.buf}
-
-    vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
-    vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
-    vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
-    vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
-    vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
-    vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
-    vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
-    vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-    vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
-    vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
-
-    vim.keymap.set('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>', opts)
-    vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
-    vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts) 
-  end
-})
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics,
-  {
-    virtual_text = true,
-    signs = true,
-    update_in_insert = true,
-    underline = true,
-    severity_sort = true,
-  }
-)
-
-require('blink.cmp').setup({
-  sources = {
-    default = {'lsp', 'path', 'snippets', 'buffer'},
-  },
-  keymap = { preset = 'super-tab' },
-  config = function(_, opts)
-    local lspconfig = require('lspconfig')
-    for server, config in pairs(opts.servers) do
-      -- passing config.capabilities to blink.cmp merges with the capabilities in your
-      -- `opts[server].capabilities, if you've defined it
-      config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
-      lspconfig[server].setup(config)
+  callback = function(ev)
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    if client:supports_method('textDocument/completion') then
+      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
     end
-  end
+  end,
+})
+--     local opts = {buffer = event.buf}
+--
+--     vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
+--     vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
+--     vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
+--     vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
+--     vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
+--     vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
+--     vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
+--     vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
+--     vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
+--     vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+--
+--     vim.keymap.set('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>', opts)
+--     vim.keymap.set('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>', opts)
+--     vim.keymap.set('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>', opts) 
+--   end
+-- })
+
+-- require('blink.cmp').setup({
+--   sources = {
+--     default = {'lsp', 'path', 'snippets', 'buffer'},
+--   },
+--   keymap = { preset = 'super-tab' },
+  -- config = function(_, opts)
+  --   local lspconfig = require('lspconfig')
+  --   for server, config in pairs(opts.servers) do
+  --     -- passing config.capabilities to blink.cmp merges with the capabilities in your
+  --     -- `opts[server].capabilities, if you've defined it
+  --     config.capabilities = require('blink.cmp').get_lsp_capabilities(config.capabilities)
+  --     lspconfig[server].setup(config)
+  --   end
+  -- end
   -- mapping = cmp.mapping.preset.insert({
   --   -- Enter key confirms completion item
   --   ['<CR>'] = cmp.mapping.confirm({select = false}),
@@ -92,7 +95,7 @@ require('blink.cmp').setup({
   --     require('luasnip').lsp_expand(args.body)
   --   end,
   -- },
-})
+-- })
 
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
