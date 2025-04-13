@@ -32,9 +32,6 @@ in {
   };
 
   home.packages = with pkgs; [
-    # screenshot
-    flameshot
-
     # cli tools
     htop
     fzf
@@ -58,6 +55,12 @@ in {
     # why linux only?
     vault
   ]);
+  services.flameshot = {
+    enable = true;
+    settings.General = { 
+      showStartupLaunchMessage = false;
+    };
+  };
 
   programs = {
     btop = {
