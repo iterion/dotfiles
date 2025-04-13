@@ -32,6 +32,9 @@ in {
   };
 
   home.packages = with pkgs; [
+    # screenshot
+    flameshot
+
     # cli tools
     htop
     fzf
