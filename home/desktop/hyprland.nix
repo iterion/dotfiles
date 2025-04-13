@@ -16,9 +16,6 @@ in {
       gtk3
       gtk4
 
-      #wayland screenshots
-      inputs.hyprland-contrib.packages.${pkgs.system}.grimblast
-
       # wayland copy/paste
       wl-clipboard
     ];
@@ -152,7 +149,7 @@ in {
             "$mod, Left, movewindow, l"
             "$mod, Right, movewindow, r"
             "$mod SHIFT, Apostrophe, killactive,"
-            "$mod SHIFT, S, exec, ${inputs.hyprland-contrib.packages.${pkgs.system}.grimblast}/bin/grimblast --notify copy area"
+            "$mod SHIFT, S, exec, ${pkgs.flameshot}/bin/flameshot gui"
           ]
           ++ (
             # workspaces
