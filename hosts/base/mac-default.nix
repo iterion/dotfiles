@@ -34,15 +34,12 @@
   homebrew = {
     enable = true;
     casks = [
-      "iterm2"
       "1password-cli"
       "github"
       "slack"
-      "warp"
       "zoom"
       "docker"
       "gpg-suite"
-      "mysql-shell"
       "spotify"
       "xquartz"
     ];
@@ -72,6 +69,7 @@
     systemPackages = with pkgs; [
       wget
       tailscale
+      fleetctl
       inputs.alejandra.defaultPackage.${pkgs.system}
     ];
     pathsToLink = ["/share/zsh"];

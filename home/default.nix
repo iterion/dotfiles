@@ -7,7 +7,7 @@
   homeDir = if pkgs.stdenv.isLinux then "/home/iterion" else "/Users/iterion";
 in {
   imports = [
-    inputs.anyrun.homeManagerModules.anyrun
+    # inputs.anyrun.homeManagerModules.anyrun
     inputs.nix-index-database.hmModules.nix-index
 
     ./devtools.nix
@@ -55,12 +55,6 @@ in {
     # why linux only?
     vault
   ]);
-  services.flameshot = {
-    enable = true;
-    settings.General = { 
-      showStartupLaunchMessage = false;
-    };
-  };
 
   programs = {
     btop = {

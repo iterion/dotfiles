@@ -18,6 +18,12 @@ in {
 
   config = mkIf cfg.enable {
     xdg.enable = true;
+    services.flameshot = {
+      enable = true;
+      settings.General = { 
+        showStartupLaunchMessage = false;
+      };
+    };
     home.packages = with pkgs; [
       # desktop apps
       _1password-cli
