@@ -12,23 +12,24 @@
   # Configure console keymap
   #console.keyMap = "dvorak";
 
+  # Disable for determinate nix install
   nix = {
-    enable = true;
-    gc = {
-      automatic = true;
-      interval = {
-        Day = 5;
-      };
-      options = "--delete-older-than 1w";
-    };
-    optimise = {
-      automatic = true;
-    };
-    settings = {
-      experimental-features = ["nix-command" "flakes"];
-      trusted-users = [ "iterion" ];
-    };
-    package = pkgs.nixVersions.stable;
+    enable = false;
+    # gc = {
+    #   automatic = true;
+    #   interval = {
+    #     Day = 5;
+    #   };
+    #   options = "--delete-older-than 1w";
+    # };
+    # optimise = {
+    #   automatic = true;
+    # };
+    # settings = {
+    #   experimental-features = ["nix-command" "flakes"];
+    #   trusted-users = [ "iterion" ];
+    # };
+    # package = pkgs.nixVersions.stable;
   };
 
   homebrew = {
@@ -49,6 +50,7 @@
     enableKeyMapping = true;
     remapCapsLockToControl = true;
   };
+  system.primaryUser = "iterion";
 
   # Allow unfree packages
   nixpkgs.config = {
@@ -70,7 +72,7 @@
       wget
       tailscale
       fleetctl
-      inputs.alejandra.defaultPackage.${pkgs.system}
+      # inputs.alejandra.defaultPackage.${pkgs.system}
     ];
     pathsToLink = ["/share/zsh"];
     shells = with pkgs; [zsh nushell];
