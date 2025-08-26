@@ -15,19 +15,15 @@
     vimdiffAlias = true;
     defaultEditor = true;
     plugins = with pkgs.vimPlugins; [
-      fzf-lsp-nvim
       fzf-vim
       luasnip
-      # blink-cmp
-      # blink-copilot
       nvim-dap
       nvim-dap-virtual-text
       nvim-lspconfig
       nvim-treesitter.withAllGrammars
       plenary-nvim
-      rust-tools-nvim
+      rustaceanvim
       telescope-nvim
-      vim-nix
       typescript-tools-nvim
     ];
     extraLuaConfig = builtins.readFile ./config.lua;

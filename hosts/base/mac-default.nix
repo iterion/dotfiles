@@ -2,7 +2,8 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+{
   imports = [
   ];
 
@@ -72,10 +73,13 @@
       wget
       tailscale
       fleetctl
-      # inputs.alejandra.defaultPackage.${pkgs.system}
+      alejandra
     ];
-    pathsToLink = ["/share/zsh"];
-    shells = with pkgs; [zsh nushell];
+    pathsToLink = [ "/share/zsh" ];
+    shells = with pkgs; [
+      zsh
+      nushell
+    ];
   };
 
   fonts.packages = with pkgs; [

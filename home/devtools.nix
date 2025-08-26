@@ -1,4 +1,5 @@
-{lib, pkgs, ...}: {
+{ lib, pkgs, ... }:
+{
   home.packages = with pkgs; [
     # secret scanning
     trufflehog
@@ -81,7 +82,12 @@
           name = "Adam Sunderland";
         };
         ui = {
-          default-command = ["log" "--reversed" "--limit" "20"];
+          default-command = [
+            "log"
+            "--reversed"
+            "--limit"
+            "20"
+          ];
           paginate = "never";
         };
       };
@@ -224,7 +230,7 @@
   services = {
     gpg-agent = {
       enable = false;
-      pinentryPackage = pkgs.wayprompt;
+      pinentry.package = pkgs.wayprompt;
       enableSshSupport = true;
       enableZshIntegration = true;
       enableNushellIntegration = false;

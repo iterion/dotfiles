@@ -2,7 +2,8 @@
   pkgs,
   inputs,
   ...
-}: {
+}:
+{
   imports = [
     ../../modules/lightsout
   ];
@@ -10,7 +11,11 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
-  networking.nameservers = [ "192.168.1.1" "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+  networking.nameservers = [
+    "192.168.1.1"
+    "1.1.1.1#one.one.one.one"
+    "1.0.0.1#one.one.one.one"
+  ];
 
   # Set your time zone.
   time.timeZone = "America/Detroit";
@@ -43,19 +48,28 @@
   # Configure console keymap
   console.keyMap = "dvorak";
 
-  security.pam.loginLimits = [{
-    domain = "*";
-    type = "soft";
-    item = "nofile";
-    value = "16384";
-  }];
+  security.pam.loginLimits = [
+    {
+      domain = "*";
+      type = "soft";
+      item = "nofile";
+      value = "16384";
+    }
+  ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.groups.plugdev = {};
+  users.groups.plugdev = { };
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
-    extraGroups = ["audio" "docker" "networkmanager" "wheel" "libvirtd" "plugdev"];
+    extraGroups = [
+      "audio"
+      "docker"
+      "networkmanager"
+      "wheel"
+      "libvirtd"
+      "plugdev"
+    ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINWdZ6Ae9HwLtPBGCQVjbsHbF0lCADWTAEXW+nZzY6mh iterion"
@@ -79,7 +93,10 @@
       automatic = true;
     };
     settings = {
-      experimental-features = ["nix-command" "flakes"];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
       trusted-users = [ "iterion" ];
     };
     package = pkgs.nixVersions.stable;
@@ -93,7 +110,7 @@
       "openssl-1.1.1w" # todo find and eliminate this bs
     ];
   };
-  nixpkgs.overlays = [ 
+  nixpkgs.overlays = [
     (final: prev: {
       pythonPackagesOverlays = (prev.pythonPackagesOverlays or [ ]) ++ [
         (python-final: python-prev: {
@@ -108,12 +125,13 @@
         })
       ];
       python3 =
-        let 
+        let
           self = prev.python3.override {
             inherit self;
             packageOverrides = prev.lib.composeManyExtensions final.pythonPackagesOverlays;
-        }; in 
-      self;
+          };
+        in
+        self;
 
       python3Packages = final.python3.pkgs;
     })
@@ -128,25 +146,28 @@
       libsecret
       lshw
       usbutils
-      inputs.alejandra.defaultPackage.${pkgs.system}
+      alejandra
       # vagrant.override { withLibvirt = false; }
     ];
-    pathsToLink = ["/share/zsh"];
-    shells = with pkgs; [zsh];
+    pathsToLink = [ "/share/zsh" ];
+    shells = with pkgs; [ zsh ];
   };
 
-  fonts.packages = with pkgs; [
-    font-awesome
-    noto-fonts
-    noto-fonts-cjk-sans
-    noto-fonts-emoji
-    liberation_ttf
-    fira-code
-    fira-code-symbols
-    mplus-outline-fonts.githubRelease
-    dina-font
-    proggyfonts
-  ] ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+  fonts.packages =
+    with pkgs;
+    [
+      font-awesome
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-emoji
+      liberation_ttf
+      fira-code
+      fira-code-symbols
+      mplus-outline-fonts.githubRelease
+      dina-font
+      proggyfonts
+    ]
+    ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
 
   programs = {
     zsh.enable = true;
@@ -169,7 +190,7 @@
           text = ''
             SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", GROUP="plugdev", TAG+="uaccess"
             SUBSYSTEM=="usb", ATTRS{idVendor}=="2c99", GROUP="plugdev", TAG+="uaccess"
-            '';
+          '';
           destination = "/etc/udev/rules.d/70-usb.rules";
         })
       ];
@@ -178,7 +199,11 @@
       enable = true;
       dnssec = "true";
       domains = [ "~." ];
-      fallbackDns = [ "192.168.1.1" "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
+      fallbackDns = [
+        "192.168.1.1"
+        "1.1.1.1#one.one.one.one"
+        "1.0.0.1#one.one.one.one"
+      ];
       dnsovertls = "true";
     };
 
