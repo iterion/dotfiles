@@ -10,8 +10,25 @@
   boot = {
     plymouth = {
       enable = true;
-      theme = "breeze";
+      theme = "rings";
+      themePackages = with pkgs; [
+        # By default we would install all themes
+        (adi1090x-plymouth-themes.override {
+          selected_themes = [ "rings" ];
+        })
+      ];
     };
+
+    # Enable "Silent boot"
+    consoleLogLevel = 3;
+    initrd.verbose = false;
+    kernelParams = [
+      "quiet"
+      "splash"
+      "boot.shell_on_fail"
+      "udev.log_priority=3"
+      "rd.systemd.show_status=auto"
+    ];
   };
 
   environment = {
@@ -69,7 +86,7 @@
       settings = {
         default_session = {
           command = ''
-            ${ lib.makeBinPath [ pkgs.greetd.tuigreet ] }/tuigreet -r --asterisks --time \
+            ${ lib.makeBinPath [ pkgs.tuigreet ] }/tuigreet -r --asterisks --time \
               --cmd "${pkgs.hyprland}/bin/Hyprland";
           '';
         };

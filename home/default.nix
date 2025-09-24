@@ -8,7 +8,7 @@
 in {
   imports = [
     # inputs.anyrun.homeManagerModules.anyrun
-    inputs.nix-index-database.hmModules.nix-index
+    inputs.nix-index-database.homeModules.nix-index
 
     ./devtools.nix
     ./fpv.nix

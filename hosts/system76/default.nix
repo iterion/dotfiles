@@ -25,7 +25,11 @@
     xwayland.enable = true;
   };
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  environment.systemPackages = [];
+  environment.systemPackages = [
+    pkgs.fleetctl
+    pkgs.osquery
+  ];
+  services.osquery.enable = true;
 
   # use systemd boot as we don't need grub
   boot.loader.systemd-boot.enable = true;
@@ -42,7 +46,7 @@
 
   # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];
-  services.logind.lidSwitchExternalPower = "ignore";
+  services.logind.settings.Login.HandleLidSwitchExternalPower = "ignore";
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";

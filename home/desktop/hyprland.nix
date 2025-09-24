@@ -44,9 +44,9 @@ in {
     # notifications
     services.mako = {
       enable = true;
-      extraConfig = ''
-        on-button-right=dismiss-all
-      '';
+      # settings = ''
+      #   on-button-right=dismiss-all
+      # '';
     };
     services.hyprpaper = {
       enable = true;
