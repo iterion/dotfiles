@@ -1,5 +1,8 @@
-{ lib, pkgs, ... }:
 {
+  lib,
+  pkgs,
+  ...
+}: {
   home.packages = with pkgs; [
     # secret scanning
     trufflehog
@@ -17,6 +20,9 @@
 
     # Curl alternative
     xh
+
+    # Better diffing on syntax trees
+    difftastic
   ];
   xdg.configFile."ghostty/config".text = ''
     keybind = ctrl+shift+h=goto_split:left
@@ -82,6 +88,7 @@
           name = "Adam Sunderland";
         };
         ui = {
+          diff-formatter = ["difft" "--color=always" "$left" "$right"];
           default-command = [
             "log"
             "--reversed"
@@ -127,7 +134,10 @@
           showPatch = true;
         };
         #commit.gpgsign = true;
-        credential.helper = if pkgs.stdenv.isDarwin then "osxkeychain" else "libsecret";
+        credential.helper =
+          if pkgs.stdenv.isDarwin
+          then "osxkeychain"
+          else "libsecret";
         init = {
           defaultBranch = "main";
         };

@@ -2,8 +2,7 @@
   pkgs,
   inputs,
   ...
-}:
-{
+}: {
   imports = [
   ];
 
@@ -74,8 +73,9 @@
       tailscale
       fleetctl
       alejandra
+      codex
     ];
-    pathsToLink = [ "/share/zsh" ];
+    pathsToLink = ["/share/zsh"];
     shells = with pkgs; [
       zsh
       nushell
