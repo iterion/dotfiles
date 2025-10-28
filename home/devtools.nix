@@ -108,18 +108,20 @@
     };
     git = {
       enable = true;
-      userName = "Adam Sunderland";
-      userEmail = "iterion@gmail.com";
-      aliases = {
-        co = "checkout";
-        amend = "commit -a --amend";
-        st = "status";
-        b = "branch";
-      };
       lfs = {
         enable = true;
       };
-      extraConfig = {
+      settings = {
+        user = {
+          name = "Adam Sunderland";
+          email = "iterion@gmail.com";
+        };
+        alias = {
+          co = "checkout";
+          amend = "commit -a --amend";
+          st = "status";
+          b = "branch";
+        };
         color = {
           ui = "auto";
         };
@@ -161,8 +163,11 @@
     };
     ssh = {
       enable = true;
-      addKeysToAgent = "yes";
+      enableDefaultConfig = false;
       matchBlocks = {
+        "*" = {
+          addKeysToAgent = "yes";
+        };
         "zookeeper" = {
           user = "zoo";
           hostname = "192.168.2.2";
