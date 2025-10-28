@@ -1,6 +1,7 @@
 {
   lib,
   pkgs,
+  inputs,
   ...
 }: {
   home.packages = with pkgs; [
@@ -25,10 +26,16 @@
     difftastic
   ];
   xdg.configFile."ghostty/config".text = ''
+    custom-shader = ./shaders/cursor_warp.glsl
+    custom-shader = ./shaders/ripple_cursor.glsl
     keybind = ctrl+shift+h=goto_split:left
     keybind = ctrl+shift+l=goto_split:right
     keybind = super+alt+c=close_surface
   '';
+  xdg.configFile."ghostty/shaders" = {
+    source = "${inputs.ghostty-cursor-shaders}";
+    recursive = true;
+  };
   programs = {
     direnv = {
       enable = true;
