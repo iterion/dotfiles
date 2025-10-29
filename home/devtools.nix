@@ -36,6 +36,7 @@
     source = "${inputs.ghostty-cursor-shaders}";
     recursive = true;
   };
+  home.file.".codex/config.toml".source = ./codex/config.toml;
   programs = {
     direnv = {
       enable = true;
