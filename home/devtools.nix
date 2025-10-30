@@ -36,7 +36,65 @@
     source = "${inputs.ghostty-cursor-shaders}";
     recursive = true;
   };
-  home.file.".codex/config.toml".source = ./codex/config.toml;
+  home.file.".codex/config.toml".text = let
+    homeDir =
+      if pkgs.stdenv.isDarwin
+      then "/Users/iterion"
+      else "/home/iterion";
+    baseWritableRoots = [
+      "${homeDir}/.cache"
+      "${homeDir}/.cargo"
+      "${homeDir}/.cargo/registry/cache"
+      "${homeDir}/.cargo/git/db"
+      "${homeDir}/.npm"
+      "${homeDir}/.cache/node"
+      "${homeDir}/.cache/yarn"
+      "/tmp"
+    ];
+    darwinWritableRoots = [
+      "${homeDir}/Library/Application Support"
+      "${homeDir}/Library/Caches"
+      "${homeDir}/Library/Caches/Yarn"
+      "${homeDir}/Library/pnpm"
+    ];
+    linuxWritableRoots = [
+      "${homeDir}/.local/share"
+      "${homeDir}/.local/state"
+      "${homeDir}/.local/share/pnpm"
+      "${homeDir}/.cache/pnpm"
+    ];
+    writableRoots =
+      baseWritableRoots
+      ++ lib.optionals pkgs.stdenv.isDarwin darwinWritableRoots
+      ++ lib.optionals pkgs.stdenv.isLinux linuxWritableRoots;
+    codexConfig = {
+      profile = "iterion-default";
+      profiles."iterion-default" = {
+        approval_policy = "on-request";
+        model_reasoning_effort = "high";
+        sandbox_mode = "workspace-write";
+      };
+      projects = {
+        "${homeDir}/dotfiles" = {trust_level = "trusted";};
+        "${homeDir}/Development/offshape" = {trust_level = "trusted";};
+        "${homeDir}/Development/websocket.zig" = {trust_level = "trusted";};
+        "${homeDir}/Development/deploy-bot" = {trust_level = "trusted";};
+        "${homeDir}/Development/infra" = {trust_level = "trusted";};
+        "${homeDir}/Development/api" = {trust_level = "trusted";};
+        "${homeDir}/Development/common" = {trust_level = "trusted";};
+        "${homeDir}/Development/dockerfelines" = {trust_level = "trusted";};
+      };
+      sandbox_workspace_write = {
+        network_access = true;
+        writable_roots = writableRoots;
+      };
+      tools = {
+        web_search = true;
+      };
+    };
+    tomlFormat = pkgs.formats.toml {};
+  in
+    builtins.readFile (tomlFormat.generate "codex-config" codexConfig);
   programs = {
     direnv = {
       enable = true;
