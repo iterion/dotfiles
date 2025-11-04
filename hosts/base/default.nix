@@ -2,8 +2,7 @@
   pkgs,
   inputs,
   ...
-}:
-{
+}: {
   imports = [
     ../../modules/lightsout
   ];
@@ -58,7 +57,7 @@
   ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.groups.plugdev = { };
+  users.groups.plugdev = {};
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
@@ -97,7 +96,7 @@
         "nix-command"
         "flakes"
       ];
-      trusted-users = [ "iterion" ];
+      trusted-users = ["iterion"];
     };
     package = pkgs.nixVersions.stable;
   };
@@ -112,25 +111,26 @@
   };
   nixpkgs.overlays = [
     (final: prev: {
-      pythonPackagesOverlays = (prev.pythonPackagesOverlays or [ ]) ++ [
-        (python-final: python-prev: {
-          phue = python-prev.buildPythonPackage rec {
-            pname = "phue";
-            version = "1.1";
-            src = python-prev.fetchPypi {
-              inherit pname version;
-              sha256 = "sha256-YfrMmRourR1yffhRPQbOCJAzSJttygm+CT2yT3zbiHQ=";
+      pythonPackagesOverlays =
+        (prev.pythonPackagesOverlays or [])
+        ++ [
+          (python-final: python-prev: {
+            phue = python-prev.buildPythonPackage rec {
+              pname = "phue";
+              version = "1.1";
+              src = python-prev.fetchPypi {
+                inherit pname version;
+                sha256 = "sha256-YfrMmRourR1yffhRPQbOCJAzSJttygm+CT2yT3zbiHQ=";
+              };
             };
-          };
-        })
-      ];
-      python3 =
-        let
-          self = prev.python3.override {
-            inherit self;
-            packageOverrides = prev.lib.composeManyExtensions final.pythonPackagesOverlays;
-          };
-        in
+          })
+        ];
+      python3 = let
+        self = prev.python3.override {
+          inherit self;
+          packageOverrides = prev.lib.composeManyExtensions final.pythonPackagesOverlays;
+        };
+      in
         self;
 
       python3Packages = final.python3.pkgs;
@@ -149,17 +149,16 @@
       alejandra
       # vagrant.override { withLibvirt = false; }
     ];
-    pathsToLink = [ "/share/zsh" ];
-    shells = with pkgs; [ zsh ];
+    pathsToLink = ["/share/zsh"];
+    shells = with pkgs; [zsh];
   };
 
-  fonts.packages =
-    with pkgs;
+  fonts.packages = with pkgs;
     [
       font-awesome
       noto-fonts
       noto-fonts-cjk-sans
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       liberation_ttf
       fira-code
       fira-code-symbols
@@ -178,7 +177,6 @@
   };
 
   services = {
-
     udev = {
       enable = true;
       extraRules = ''
@@ -198,7 +196,7 @@
     resolved = {
       enable = true;
       dnssec = "true";
-      domains = [ "~." ];
+      domains = ["~."];
       fallbackDns = [
         "192.168.1.1"
         "1.1.1.1#one.one.one.one"
