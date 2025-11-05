@@ -4,27 +4,32 @@
   inputs,
   ...
 }: {
-  home.packages = with pkgs; [
-    # secret scanning
-    trufflehog
+  home.packages =
+    with pkgs;
+    [
+      # secret scanning
+      trufflehog
 
-    helix
-    hyperfine
+      helix
+      hyperfine
 
-    #calculator
-    libqalculate
+      #calculator
+      libqalculate
 
-    llm
+      llm
 
-    # hex editor
-    imhex
+      # hex editor
+      imhex
 
-    # Curl alternative
-    xh
+      # Curl alternative
+      xh
 
-    # Better diffing on syntax trees
-    difftastic
-  ];
+      # Better diffing on syntax trees
+      difftastic
+    ]
+    ++ lib.optionals pkgs.stdenv.isDarwin [
+      terminal-notifier
+    ];
   xdg.configFile."ghostty/config".text = ''
     custom-shader = ./shaders/cursor_warp.glsl
     custom-shader = ./shaders/ripple_cursor.glsl
@@ -69,6 +74,9 @@
       ++ lib.optionals pkgs.stdenv.isLinux linuxWritableRoots;
     codexConfig = {
       profile = "iterion-default";
+      notify = [
+        "${homeDir}/.codex/notify"
+      ];
       profiles."iterion-default" = {
         approval_policy = "on-request";
         model_reasoning_effort = "high";
@@ -88,13 +96,16 @@
         network_access = true;
         writable_roots = writableRoots;
       };
-      tools = {
-        web_search = true;
-      };
+      web_search_request = true;
+      tui.notifications = true;
     };
     tomlFormat = pkgs.formats.toml {};
   in
     builtins.readFile (tomlFormat.generate "codex-config" codexConfig);
+  home.file.".codex/notify" = {
+    source = ./codex/notify.py;
+    executable = true;
+  };
   programs = {
     direnv = {
       enable = true;
