@@ -5,6 +5,9 @@ import os
 import shutil
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
+import urllib.request
 from typing import List, Optional
 
 
@@ -45,6 +48,27 @@ def _detect_bundle_id() -> Optional[str]:
     return None
 
 
+def _is_screen_locked() -> bool:
+    cgsession = (
+        "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession"
+    )
+
+    if not os.path.exists(cgsession):
+        return False
+
+    try:
+        result = subprocess.run(
+            [cgsession, "-s"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+    return "CGSSessionScreenIsLocked = 1" in (result.stdout or "")
+
+
 def _notify_with_terminal_notifier(title: str, message: str, thread_id: str) -> bool:
     terminal_notifier = shutil.which("terminal-notifier")
     if not terminal_notifier:
@@ -76,6 +100,67 @@ def _notify_with_terminal_notifier(title: str, message: str, thread_id: str) -> 
     return True
 
 
+def _notify_with_pushover(title: str, message: str) -> bool:
+    token = os.environ.get("CODEX_NOTIFY_PUSHOVER_TOKEN")
+    user_key = os.environ.get("CODEX_NOTIFY_PUSHOVER_USER")
+    if not token or not user_key:
+        return False
+
+    payload = {
+        "token": token,
+        "user": user_key,
+        "title": title,
+        "message": message,
+    }
+
+    device = os.environ.get("CODEX_NOTIFY_PUSHOVER_DEVICE")
+    if device:
+        payload["device"] = device
+
+    data = urllib.parse.urlencode(payload).encode("utf-8")
+    request = urllib.request.Request(
+        "https://api.pushover.net/1/messages.json", data=data, method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=5) as response:
+            return 200 <= response.getcode() < 300
+    except (urllib.error.URLError, urllib.error.HTTPError) as error:
+        print(f"Pushover failed: {error}", file=sys.stderr)
+        return False
+
+
+def _notify_with_ntfy(title: str, message: str) -> bool:
+    topic = os.environ.get("CODEX_NOTIFY_NTFY_TOPIC")
+    if not topic:
+        return False
+
+    server = os.environ.get("CODEX_NOTIFY_NTFY_SERVER", "https://ntfy.sh")
+    url = f"{server.rstrip('/')}/{topic}"
+
+    request = urllib.request.Request(
+        url,
+        data=message.encode("utf-8"),
+        method="POST",
+        headers={"Title": title},
+    )
+
+    token = os.environ.get("CODEX_NOTIFY_NTFY_TOKEN")
+    if token:
+        request.add_header("Authorization", f"Bearer {token}")
+
+    priority = os.environ.get("CODEX_NOTIFY_NTFY_PRIORITY")
+    if priority:
+        request.add_header("Priority", priority)
+
+    try:
+        with urllib.request.urlopen(request, timeout=5) as response:
+            return 200 <= response.getcode() < 400
+    except (urllib.error.URLError, urllib.error.HTTPError) as error:
+        print(f"ntfy failed: {error}", file=sys.stderr)
+        return False
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         print("Usage: notify <NOTIFICATION_JSON>")
@@ -93,7 +178,16 @@ def main() -> int:
         print(error)
         return 0
 
+    push_sent = False
+    if _is_screen_locked():
+        pushover_sent = _notify_with_pushover(title, message)
+        ntfy_sent = _notify_with_ntfy(title, message)
+        push_sent = pushover_sent or ntfy_sent
+
     if _notify_with_terminal_notifier(title, message, thread_id):
+        return 0
+
+    if push_sent:
         return 0
 
     print("No supported notification backend found", file=sys.stderr)
