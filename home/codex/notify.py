@@ -8,7 +8,35 @@ import sys
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from typing import List, Optional
+
+
+PUSHOVER_TOKEN_PATH = os.path.expanduser("~/.config/codex/pushover-token")
+PUSHOVER_USER_PATH = os.path.expanduser("~/.config/codex/pushover-user")
+LOG_PATH = os.environ.get("CODEX_NOTIFY_LOG") or os.path.expanduser(
+    "~/.config/codex/notify.log"
+)
+
+
+def _log(message: str) -> None:
+    path = LOG_PATH
+    if not path:
+        return
+
+    directory = os.path.dirname(path)
+    try:
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+    except OSError:
+        return
+
+    timestamp = datetime.now().isoformat(timespec="seconds")
+    try:
+        with open(path, "a", encoding="utf-8") as handle:
+            handle.write(f"{timestamp} {message}\n")
+    except OSError:
+        return
 
 
 def _build_notification(notification: dict) -> tuple[str, str, str]:
@@ -59,19 +87,36 @@ def _is_screen_locked() -> bool:
     try:
         result = subprocess.run(
             [cgsession, "-s"],
-            check=True,
+            check=False,
             capture_output=True,
             text=True,
         )
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except FileNotFoundError:
         return False
 
-    return "CGSSessionScreenIsLocked = 1" in (result.stdout or "")
+    output = f"{result.stdout or ''}{result.stderr or ''}"
+    if "CGSSessionScreenIsLocked = 1" in output:
+        return True
+    if "kCGSSessionScreenIsLocked = 1" in output:
+        return True
+    if "CGSSessionOnConsoleKey = 0" in output:
+        return True
+    return False
+
+
+def _should_send_phone_notifications() -> bool:
+    override = os.environ.get("CODEX_NOTIFY_FORCE_PUSH", "")
+    if override.lower() in {"0", "false", "no"}:
+        return False
+    if override:
+        return True
+    return True
 
 
 def _notify_with_terminal_notifier(title: str, message: str, thread_id: str) -> bool:
     terminal_notifier = shutil.which("terminal-notifier")
     if not terminal_notifier:
+        _log("terminal-notifier not found on PATH")
         return False
 
     command: List[str] = [
@@ -91,19 +136,50 @@ def _notify_with_terminal_notifier(title: str, message: str, thread_id: str) -> 
 
     try:
         subprocess.run(command, check=True)
+        _log("Delivered notification via terminal-notifier")
     except subprocess.CalledProcessError as error:
         print(f"terminal-notifier failed: {error}", file=sys.stderr)
+        _log(f"terminal-notifier failed: {error}")
         return False
     except FileNotFoundError:
+        _log("terminal-notifier executable disappeared during run")
         return False
 
     return True
 
 
+def _read_secret_file(path: Optional[str]) -> Optional[str]:
+    if not path:
+        return None
+    expanded = os.path.expanduser(path)
+    try:
+        with open(expanded, "r", encoding="utf-8") as handle:
+            value = handle.read().strip()
+            if value:
+                return value
+    except OSError:
+        return None
+    return None
+
+
+def _load_secret(env_var: str, default_path: Optional[str]) -> Optional[str]:
+    direct = (os.environ.get(env_var) or "").strip()
+    if direct:
+        return direct
+
+    file_var = os.environ.get(f"{env_var}_FILE")
+    file_value = _read_secret_file(file_var)
+    if file_value:
+        return file_value
+
+    return _read_secret_file(default_path)
+
+
 def _notify_with_pushover(title: str, message: str) -> bool:
-    token = os.environ.get("CODEX_NOTIFY_PUSHOVER_TOKEN")
-    user_key = os.environ.get("CODEX_NOTIFY_PUSHOVER_USER")
+    token = _load_secret("CODEX_NOTIFY_PUSHOVER_TOKEN", PUSHOVER_TOKEN_PATH)
+    user_key = _load_secret("CODEX_NOTIFY_PUSHOVER_USER", PUSHOVER_USER_PATH)
     if not token or not user_key:
+        _log("Skipping Pushover: missing token or user key")
         return False
 
     payload = {
@@ -117,6 +193,11 @@ def _notify_with_pushover(title: str, message: str) -> bool:
     if device:
         payload["device"] = device
 
+    _log(
+        "Attempting Pushover notification "
+        f"(title='{title[:30]}', message_length={len(message)}, device={'yes' if device else 'no'})"
+    )
+
     data = urllib.parse.urlencode(payload).encode("utf-8")
     request = urllib.request.Request(
         "https://api.pushover.net/1/messages.json", data=data, method="POST"
@@ -124,9 +205,32 @@ def _notify_with_pushover(title: str, message: str) -> bool:
 
     try:
         with urllib.request.urlopen(request, timeout=5) as response:
-            return 200 <= response.getcode() < 300
-    except (urllib.error.URLError, urllib.error.HTTPError) as error:
+            code = response.getcode()
+            success = 200 <= code < 300
+            if success:
+                _log(f"Pushover notification succeeded with status {code}")
+            else:
+                _log(f"Pushover notification failed with status {code}")
+            return success
+    except urllib.error.HTTPError as error:
+        body = ""
+        try:
+            raw_body = error.read()
+            if raw_body:
+                body = raw_body.decode("utf-8", "replace").strip()
+        except OSError:
+            body = ""
+
+        if body:
+            print(f"Pushover failed: {error} - {body}", file=sys.stderr)
+            _log(f"Pushover failed: {error} - {body}")
+        else:
+            print(f"Pushover failed: {error}", file=sys.stderr)
+            _log(f"Pushover failed: {error}")
+        return False
+    except urllib.error.URLError as error:
         print(f"Pushover failed: {error}", file=sys.stderr)
+        _log(f"Pushover failed: {error}")
         return False
 
 
@@ -158,6 +262,7 @@ def _notify_with_ntfy(title: str, message: str) -> bool:
             return 200 <= response.getcode() < 400
     except (urllib.error.URLError, urllib.error.HTTPError) as error:
         print(f"ntfy failed: {error}", file=sys.stderr)
+        _log(f"ntfy failed: {error}")
         return False
 
 
@@ -176,21 +281,32 @@ def main() -> int:
         title, message, thread_id = _build_notification(notification)
     except ValueError as error:
         print(error)
+        _log(f"Skipping notification: {error}")
         return 0
 
+    _log(
+        f"Processing notification type={notification.get('type')} thread_id={thread_id}"
+    )
+
     push_sent = False
-    if _is_screen_locked():
+    if _should_send_phone_notifications():
         pushover_sent = _notify_with_pushover(title, message)
         ntfy_sent = _notify_with_ntfy(title, message)
         push_sent = pushover_sent or ntfy_sent
+        _log(
+            f"Push notification results pushover={pushover_sent} ntfy={ntfy_sent} push_sent={push_sent}"
+        )
 
     if _notify_with_terminal_notifier(title, message, thread_id):
+        _log("Notification delivered to desktop client")
         return 0
 
     if push_sent:
+        _log("Notification delivered via phone-only backend")
         return 0
 
     print("No supported notification backend found", file=sys.stderr)
+    _log("Notification delivery failed: no backend available")
     return 1
 
 

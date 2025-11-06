@@ -35,6 +35,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ghostty-cursor-shaders = {
       url = "github:sahaj-b/ghostty-cursor-shaders";
       flake = false;
@@ -52,6 +57,7 @@
       home-manager,
       nix-darwin,
       determinate,
+      sops-nix,
       ...
     }@inputs:
     {
@@ -61,6 +67,7 @@
           specialArgs = { inherit inputs; };
           modules = [
             determinate.nixosModules.default
+            inputs.sops-nix.nixosModules.sops
             ./hosts/corsair
             home-manager.nixosModules.home-manager
             {
@@ -79,6 +86,7 @@
           specialArgs = { inherit inputs; };
           modules = [
             determinate.nixosModules.default
+            inputs.sops-nix.nixosModules.sops
             ./hosts/gaming
             home-manager.nixosModules.home-manager
             {
@@ -97,6 +105,7 @@
           specialArgs = { inherit inputs; };
           modules = [
             determinate.nixosModules.default
+            inputs.sops-nix.nixosModules.sops
             ./hosts/system76
             home-manager.nixosModules.home-manager
             {
@@ -115,6 +124,7 @@
           specialArgs = { inherit inputs; };
           modules = [
             determinate.nixosModules.default
+            inputs.sops-nix.nixosModules.sops
             ./hosts/lattepanda
             home-manager.nixosModules.home-manager
             {
@@ -133,6 +143,7 @@
         iterion-macbook = nix-darwin.lib.darwinSystem {
           specialArgs = { inherit inputs; };
           modules = [
+            inputs.sops-nix.darwinModules.sops
             ./hosts/macbook
             home-manager.darwinModules.home-manager
             {

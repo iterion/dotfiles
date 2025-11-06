@@ -2,10 +2,77 @@
   lib,
   pkgs,
   inputs,
+  config,
   ...
-}: {
-  home.packages =
-    with pkgs;
+}: let
+  homeDir =
+    if pkgs.stdenv.isDarwin
+    then "/Users/iterion"
+    else "/home/iterion";
+  baseWritableRoots = [
+    "${homeDir}/.cache"
+    "${homeDir}/.cargo"
+    "${homeDir}/.cargo/registry/cache"
+    "${homeDir}/.cargo/git/db"
+    "${homeDir}/.npm"
+    "${homeDir}/.cache/node"
+    "${homeDir}/.cache/yarn"
+    "/tmp"
+  ];
+  darwinWritableRoots = [
+    "${homeDir}/Library/Application Support"
+    "${homeDir}/Library/Caches"
+    "${homeDir}/Library/Caches/Yarn"
+    "${homeDir}/Library/pnpm"
+  ];
+  linuxWritableRoots = [
+    "${homeDir}/.local/share"
+    "${homeDir}/.local/state"
+    "${homeDir}/.local/share/pnpm"
+    "${homeDir}/.cache/pnpm"
+  ];
+  writableRoots =
+    baseWritableRoots
+    ++ lib.optionals pkgs.stdenv.isDarwin darwinWritableRoots
+    ++ lib.optionals pkgs.stdenv.isLinux linuxWritableRoots;
+  tomlFormat = pkgs.formats.toml {};
+  codexConfig = {
+    profile = "iterion-default";
+    notify = [
+      "${homeDir}/.codex/notify"
+    ];
+    profiles."iterion-default" = {
+      approval_policy = "on-request";
+      model_reasoning_effort = "high";
+      sandbox_mode = "workspace-write";
+    };
+    projects = {
+      "${homeDir}/dotfiles" = {trust_level = "trusted";};
+      "${homeDir}/Development/offshape" = {trust_level = "trusted";};
+      "${homeDir}/Development/websocket.zig" = {trust_level = "trusted";};
+      "${homeDir}/Development/deploy-bot" = {trust_level = "trusted";};
+      "${homeDir}/Development/infra" = {trust_level = "trusted";};
+      "${homeDir}/Development/api" = {trust_level = "trusted";};
+      "${homeDir}/Development/common" = {trust_level = "trusted";};
+      "${homeDir}/Development/dockerfelines" = {trust_level = "trusted";};
+    };
+    sandbox_workspace_write = {
+      network_access = true;
+      writable_roots = writableRoots;
+    };
+    web_search_request = true;
+  };
+  codexToml = builtins.readFile (tomlFormat.generate "codex-config" codexConfig);
+  secretsFilePath = "${inputs.self}/secrets/codex.yaml";
+  havePushoverSecrets = builtins.pathExists secretsFilePath;
+  secretsFile =
+    if havePushoverSecrets
+    then inputs.self + /secrets/codex.yaml
+    else null;
+  pushoverTokenFile = "${homeDir}/.config/codex/pushover-token";
+  pushoverUserFile = "${homeDir}/.config/codex/pushover-user";
+in {
+  home.packages = with pkgs;
     [
       # secret scanning
       trufflehog
@@ -41,71 +108,30 @@
     source = "${inputs.ghostty-cursor-shaders}";
     recursive = true;
   };
-  home.file.".codex/config.toml".text = let
-    homeDir =
-      if pkgs.stdenv.isDarwin
-      then "/Users/iterion"
-      else "/home/iterion";
-    baseWritableRoots = [
-      "${homeDir}/.cache"
-      "${homeDir}/.cargo"
-      "${homeDir}/.cargo/registry/cache"
-      "${homeDir}/.cargo/git/db"
-      "${homeDir}/.npm"
-      "${homeDir}/.cache/node"
-      "${homeDir}/.cache/yarn"
-      "/tmp"
-    ];
-    darwinWritableRoots = [
-      "${homeDir}/Library/Application Support"
-      "${homeDir}/Library/Caches"
-      "${homeDir}/Library/Caches/Yarn"
-      "${homeDir}/Library/pnpm"
-    ];
-    linuxWritableRoots = [
-      "${homeDir}/.local/share"
-      "${homeDir}/.local/state"
-      "${homeDir}/.local/share/pnpm"
-      "${homeDir}/.cache/pnpm"
-    ];
-    writableRoots =
-      baseWritableRoots
-      ++ lib.optionals pkgs.stdenv.isDarwin darwinWritableRoots
-      ++ lib.optionals pkgs.stdenv.isLinux linuxWritableRoots;
-    codexConfig = {
-      profile = "iterion-default";
-      notify = [
-        "${homeDir}/.codex/notify"
-      ];
-      profiles."iterion-default" = {
-        approval_policy = "on-request";
-        model_reasoning_effort = "high";
-        sandbox_mode = "workspace-write";
-      };
-      projects = {
-        "${homeDir}/dotfiles" = {trust_level = "trusted";};
-        "${homeDir}/Development/offshape" = {trust_level = "trusted";};
-        "${homeDir}/Development/websocket.zig" = {trust_level = "trusted";};
-        "${homeDir}/Development/deploy-bot" = {trust_level = "trusted";};
-        "${homeDir}/Development/infra" = {trust_level = "trusted";};
-        "${homeDir}/Development/api" = {trust_level = "trusted";};
-        "${homeDir}/Development/common" = {trust_level = "trusted";};
-        "${homeDir}/Development/dockerfelines" = {trust_level = "trusted";};
-      };
-      sandbox_workspace_write = {
-        network_access = true;
-        writable_roots = writableRoots;
-      };
-      web_search_request = true;
-      tui.notifications = true;
-    };
-    tomlFormat = pkgs.formats.toml {};
-  in
-    builtins.readFile (tomlFormat.generate "codex-config" codexConfig);
+  home.file.".codex/config.toml".text = codexToml;
   home.file.".codex/notify" = {
     source = ./codex/notify.py;
     executable = true;
   };
+  sops =
+    {
+      age.keyFile = "${homeDir}/.config/sops/age/keys.txt";
+    }
+    // (lib.optionalAttrs havePushoverSecrets {
+      defaultSopsFile = secretsFile;
+      secrets = {
+        "codex/pushover-token" = {
+          format = "yaml";
+          key = "pushover-token";
+          path = pushoverTokenFile;
+        };
+        "codex/pushover-user" = {
+          format = "yaml";
+          key = "pushover-user";
+          path = pushoverUserFile;
+        };
+      };
+    });
   programs = {
     direnv = {
       enable = true;
@@ -128,34 +154,55 @@
       shellAliases = {
         k = "kubectl";
       };
-      initContent = ''
-        function decode_aws_auth() {
-          aws sts decode-authorization-message --encoded-message $1 | jq -r .DecodedMessage | jq .
-        }
+      initContent =
+        ''
+          function decode_aws_auth() {
+            aws sts decode-authorization-message --encoded-message $1 | jq -r .DecodedMessage | jq .
+          }
 
-        function fetch-kc-token() {
-          export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential --reveal)
-          export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential --reveal)
-        }
+          function fetch-kc-token() {
+            export KITTYCAD_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Token" --fields credential --reveal)
+            export KITTYCAD_DEV_TOKEN=$(op --account kittycadinc.1password.com item get "KittyCAD Dev Token" --fields credential --reveal)
+          }
 
-        function ssh-k8s() {
-          INSTANCE_ID=$(kubectl get node $1 -ojson | jq -r ".spec.providerID" | cut -d \/ -f5)
-          aws ssm start-session --target $INSTANCE_ID
-        }
+          function ssh-k8s() {
+            INSTANCE_ID=$(kubectl get node $1 -ojson | jq -r ".spec.providerID" | cut -d \/ -f5)
+            aws ssm start-session --target $INSTANCE_ID
+          }
 
-        function vault-login() {
-          export VAULT_ADDR="http://vault.hawk-dinosaur.ts.net"
-          export GITHUB_VAULT_TOKEN=$(op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields password --reveal)
-          echo $GITHUB_VAULT_TOKEN | vault login -method=github token=-
-        }
+          function vault-login() {
+            export VAULT_ADDR="http://vault.hawk-dinosaur.ts.net"
+            export GITHUB_VAULT_TOKEN=$(op --account kittycadinc.1password.com item get "GitHub Token Vault" --fields password --reveal)
+            echo $GITHUB_VAULT_TOKEN | vault login -method=github token=-
+          }
 
-        function fetch-tfvars() {
-          op --account kittycadinc.1password.com item get TerraformCreds --format=json --reveal | jq -r '.fields[] | select(.value != null) | "\(.label)=\(.value)"' | while read -r line; do
-              # Exporting each line as an environment variable
-              export "$line"
-          done
-        }
-      '';
+          function fetch-tfvars() {
+            op --account kittycadinc.1password.com item get TerraformCreds --format=json --reveal | jq -r '.fields[] | select(.value != null) | "\(.label)=\(.value)"' | while read -r line; do
+                # Exporting each line as an environment variable
+                export "$line"
+            done
+          }
+
+          SOPS_KEY_FILE="${homeDir}/.config/sops/age/keys.txt"
+          if [ -f "$SOPS_KEY_FILE" ]; then
+            export SOPS_AGE_KEY_FILE="$SOPS_KEY_FILE"
+            SOPS_RECIPIENT=$(grep '^# public key:' "$SOPS_KEY_FILE" | awk '{print $4}' | head -n1)
+            if [ -n "$SOPS_RECIPIENT" ]; then
+              export SOPS_AGE_RECIPIENTS="$SOPS_RECIPIENT"
+            fi
+          fi
+        ''
+        + lib.optionalString havePushoverSecrets ''
+          if [ -f "${pushoverTokenFile}" ]; then
+            export CODEX_NOTIFY_PUSHOVER_TOKEN="$(cat ${pushoverTokenFile})"
+            export CODEX_NOTIFY_PUSHOVER_TOKEN_FILE="${pushoverTokenFile}"
+          fi
+
+          if [ -f "${pushoverUserFile}" ]; then
+            export CODEX_NOTIFY_PUSHOVER_USER="$(cat ${pushoverUserFile})"
+            export CODEX_NOTIFY_PUSHOVER_USER_FILE="${pushoverUserFile}"
+          fi
+        '';
     };
     jujutsu = {
       enable = true;

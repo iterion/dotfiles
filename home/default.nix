@@ -9,6 +9,7 @@ in {
   imports = [
     # inputs.anyrun.homeManagerModules.anyrun
     inputs.nix-index-database.homeModules.nix-index
+    inputs.sops-nix.homeManagerModules.sops
 
     ./devtools.nix
     ./fpv.nix
@@ -40,6 +41,8 @@ in {
     yq-go
     ripgrep
     killall
+    sops
+    age
 
     # for convenience put this in every shell
     kubectl
