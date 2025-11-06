@@ -71,6 +71,15 @@
     else null;
   pushoverTokenFile = "${homeDir}/.config/codex/pushover-token";
   pushoverUserFile = "${homeDir}/.config/codex/pushover-user";
+  ghosttyConfigText = ''
+    custom-shader = ./shaders/cursor_warp.glsl
+    custom-shader = ./shaders/ripple_cursor.glsl
+    keybind = ctrl+shift+h=goto_split:left
+    keybind = ctrl+shift+l=goto_split:right
+    keybind = ctrl+alt+period=new_split:right
+    keybind = ctrl+alt+comma=new_split:down
+    keybind = super+alt+c=close_surface
+  '';
 in {
   home.packages = with pkgs;
     [
@@ -97,22 +106,28 @@ in {
     ++ lib.optionals pkgs.stdenv.isDarwin [
       terminal-notifier
     ];
-  xdg.configFile."ghostty/config".text = ''
-    custom-shader = ./shaders/cursor_warp.glsl
-    custom-shader = ./shaders/ripple_cursor.glsl
-    keybind = ctrl+shift+h=goto_split:left
-    keybind = ctrl+shift+l=goto_split:right
-    keybind = super+alt+c=close_surface
-  '';
+  xdg.configFile."ghostty/config".text = ghosttyConfigText;
   xdg.configFile."ghostty/shaders" = {
     source = "${inputs.ghostty-cursor-shaders}";
     recursive = true;
   };
-  home.file.".codex/config.toml".text = codexToml;
-  home.file.".codex/notify" = {
-    source = ./codex/notify.py;
-    executable = true;
-  };
+  home.file = lib.mkMerge [
+    {
+      ".codex/config.toml".text = codexToml;
+      ".codex/notify" = {
+        source = ./codex/notify.py;
+        executable = true;
+      };
+    }
+    (lib.optionalAttrs pkgs.stdenv.isDarwin {
+      "Library/Application Support/com.mitchellh.ghostty/config".text =
+        ghosttyConfigText;
+      "Library/Application Support/com.mitchellh.ghostty/shaders" = {
+        source = "${inputs.ghostty-cursor-shaders}";
+        recursive = true;
+      };
+    })
+  ];
   sops =
     {
       age.keyFile = "${homeDir}/.config/sops/age/keys.txt";
@@ -156,6 +171,11 @@ in {
       };
       initContent =
         ''
+          HISTSIZE="100000"
+          SAVEHIST="100000"
+          setopt APPEND_HISTORY
+          setopt INC_APPEND_HISTORY
+
           function decode_aws_auth() {
             aws sts decode-authorization-message --encoded-message $1 | jq -r .DecodedMessage | jq .
           }
