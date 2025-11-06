@@ -39,21 +39,69 @@ def _log(message: str) -> None:
         return
 
 
+def _trimmed_join(parts: List[str]) -> str:
+    seen = []
+    for part in parts:
+        cleaned = part.strip()
+        if cleaned and cleaned not in seen:
+            seen.append(cleaned)
+    return " ".join(seen)
+
+
 def _build_notification(notification: dict) -> tuple[str, str, str]:
     notification_type = notification.get("type")
-    if notification_type != "agent-turn-complete":
-        raise ValueError(f"not sending a push notification for: {notification_type}")
-
-    assistant_message = notification.get("last-assistant-message") or ""
-    input_messages = notification.get("input-messages", [])
-
-    title = f"Codex: {assistant_message}".strip() or "Codex: Turn Complete!"
-    message = " ".join(m for m in input_messages if isinstance(m, str)).strip()
-    if not message:
-        message = " "
-
+    assistant_message = (notification.get("last-assistant-message") or "").strip()
+    input_messages = [
+        m for m in notification.get("input-messages", []) if isinstance(m, str)
+    ]
+    input_summary = _trimmed_join(input_messages)
     thread_id = str(notification.get("thread-id") or "")
-    return title, message, thread_id
+
+    if notification_type == "agent-turn-complete":
+        title = f"Codex: {assistant_message}".strip() or "Codex: Turn Complete!"
+        message = input_summary or " "
+        return title, message, thread_id
+
+    if notification_type == "approval-requested":
+        default_title = "Codex: Approval Needed"
+        possible_title_fields = [
+            notification.get("title"),
+            assistant_message and f"Codex: {assistant_message}",
+        ]
+        title = next(
+            (field.strip() for field in possible_title_fields if isinstance(field, str) and field.strip()),
+            default_title,
+        )
+
+        message_candidates: List[str] = []
+        if assistant_message:
+            message_candidates.append(assistant_message)
+
+        for key in (
+            "message",
+            "summary",
+            "prompt",
+            "details",
+            "approval_reason",
+        ):
+            value = notification.get(key)
+            if isinstance(value, str):
+                message_candidates.append(value)
+
+        approvals = notification.get("approvals")
+        if isinstance(approvals, dict):
+            for key in ("message", "summary", "details"):
+                value = approvals.get(key)
+                if isinstance(value, str):
+                    message_candidates.append(value)
+
+        if input_summary:
+            message_candidates.append(input_summary)
+
+        message = _trimmed_join(message_candidates) or "Codex is waiting for your approval."
+        return title, message, thread_id
+
+    raise ValueError(f"not sending a push notification for: {notification_type}")
 
 
 def _detect_bundle_id() -> Optional[str]:
@@ -135,11 +183,36 @@ def _notify_with_terminal_notifier(title: str, message: str, thread_id: str) -> 
         command.extend(["-activate", bundle_id])
 
     try:
-        subprocess.run(command, check=True)
+        result = subprocess.run(
+            command,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        if result.stdout:
+            snippet = result.stdout.strip()
+            if len(snippet) > 200:
+                snippet = f"{snippet[:200]}…"
+            _log(f"terminal-notifier stdout: {snippet}")
+        if result.stderr:
+            snippet = result.stderr.strip()
+            if len(snippet) > 200:
+                snippet = f"{snippet[:200]}…"
+            _log(f"terminal-notifier stderr: {snippet}")
         _log("Delivered notification via terminal-notifier")
     except subprocess.CalledProcessError as error:
         print(f"terminal-notifier failed: {error}", file=sys.stderr)
         _log(f"terminal-notifier failed: {error}")
+        if error.stdout:
+            snippet = error.stdout.strip()
+            if len(snippet) > 200:
+                snippet = f"{snippet[:200]}…"
+            _log(f"terminal-notifier stdout (error): {snippet}")
+        if error.stderr:
+            snippet = error.stderr.strip()
+            if len(snippet) > 200:
+                snippet = f"{snippet[:200]}…"
+            _log(f"terminal-notifier stderr (error): {snippet}")
         return False
     except FileNotFoundError:
         _log("terminal-notifier executable disappeared during run")
