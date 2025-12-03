@@ -102,6 +102,9 @@ in {
 
       # Better diffing on syntax trees
       difftastic
+
+      # Better nix devenvs
+      devenv
     ]
     ++ lib.optionals pkgs.stdenv.isDarwin [
       terminal-notifier
