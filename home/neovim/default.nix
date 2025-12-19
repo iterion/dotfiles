@@ -1,5 +1,6 @@
 {pkgs, ...}: {
   home.packages = with pkgs; [
+    biome
     nil
     rust-analyzer
     terraform-ls

@@ -17,6 +17,18 @@ vim.lsp.config('nil_ls', {
   },
 })
 
+vim.lsp.config('biome', {
+  cmd = { 'biome', 'lsp-proxy' },
+  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  root_markers = { 'biome.json', 'biome.jsonc', 'package.json', '.git' },
+})
+
+vim.lsp.config('eslint', {
+  settings = {
+    format = { enable = false },
+  },
+})
+
 local function on_attach(client, bufnr)
   if vim.lsp.inlay_hint and client.server_capabilities.inlayHintProvider then
     pcall(vim.lsp.inlay_hint.enable, true, { bufnr = bufnr })
@@ -25,6 +37,11 @@ local function on_attach(client, bufnr)
   if client:supports_method('textDocument/completion') then
     pcall(vim.lsp.completion.enable, true, client.id, bufnr, { autotrigger = true })
   end
+end
+
+local function is_js_like(ft)
+  return ft == "javascript" or ft == "javascriptreact"
+    or ft == "typescript" or ft == "typescriptreact"
 end
 
 local fmt_group = vim.api.nvim_create_augroup("LspAutoFormat", { clear = true })
@@ -40,11 +57,6 @@ vim.api.nvim_create_autocmd("BufWritePre", {
       return
     end
 
-    if ft == "javascript" or ft == "javascriptreact"
-      or ft == "typescript" or ft == "typescriptreact" then
-      pcall(vim.cmd, "LspEslintFixAll")
-    end
-
     vim.lsp.buf.format({
       bufnr = bufnr,
       timeout_ms = 2000,
@@ -53,7 +65,11 @@ vim.api.nvim_create_autocmd("BufWritePre", {
         if ft == "nix" then
           return client.name == "nil_ls"
         end
-        -- Never treat eslint as a formatter
+        -- Prefer biome for JS/TS, avoid tsserver formatting
+        if is_js_like(ft) then
+          return client.name == "biome"
+        end
+        -- Never treat eslint as a formatter for other filetypes
         if client.name == "eslint" then
           return false
         end
@@ -71,7 +87,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
   end,
 })
 
-vim.lsp.enable({'nil_ls', 'terraformls', 'yamlls', 'eslint', 'zls'})
+vim.lsp.enable({'nil_ls', 'terraformls', 'yamlls', 'eslint', 'biome', 'zls'})
 
 vim.g.rustaceanvim = {
   tools = {
@@ -103,7 +119,13 @@ vim.g.rustaceanvim = {
   },
 }
 
-require("typescript-tools").setup({})
+require("typescript-tools").setup({
+  on_attach = function(client, bufnr)
+    client.server_capabilities.documentFormattingProvider = false
+    client.server_capabilities.documentRangeFormattingProvider = false
+    if type(on_attach) == "function" then on_attach(client, bufnr) end
+  end,
+})
 
 vim.diagnostic.config({
   virtual_lines = false,

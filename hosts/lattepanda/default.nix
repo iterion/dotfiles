@@ -1,4 +1,4 @@
-{ ... }: {
+{ config, ... }: {
   imports = [ 
     ../base
     ./hardware-configuration.nix
@@ -14,6 +14,22 @@
 
   # What is my purpose? You tell children to go to bed. Oh my god.
   services.lightsout.enable = true;
+
+  services.home-assistant = {
+    enable = true;
+    openFirewall = true;
+    extraComponents = [
+      "google"
+    ];
+    config = {
+      homeassistant = {
+        name = "Home";
+        time_zone = config.time.timeZone;
+        unit_system = "imperial";
+      };
+      default_config = {};
+    };
+  };
   
 
   # This value determines the NixOS release from which the default
