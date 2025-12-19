@@ -43,6 +43,7 @@
     ];
     profiles."iterion-default" = {
       approval_policy = "on-request";
+      model = "gpt-5.2-codex";
       model_reasoning_effort = "high";
       sandbox_mode = "workspace-write";
     };
@@ -178,6 +179,8 @@ in {
           SAVEHIST="100000"
           setopt APPEND_HISTORY
           setopt INC_APPEND_HISTORY
+
+          alias cdr='cd $(git rev-parse --show-toplevel)'
 
           function decode_aws_auth() {
             aws sts decode-authorization-message --encoded-message $1 | jq -r .DecodedMessage | jq .

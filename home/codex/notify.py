@@ -59,7 +59,7 @@ def _build_notification(notification: dict) -> tuple[str, str, str]:
 
     if notification_type == "agent-turn-complete":
         title = f"Codex: {assistant_message}".strip() or "Codex: Turn Complete!"
-        message = input_summary or " "
+        message = input_summary or "Codex finished your request."
         return title, message, thread_id
 
     if notification_type == "approval-requested":
