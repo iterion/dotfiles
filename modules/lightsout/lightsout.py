@@ -22,7 +22,7 @@ def main():
     
     current_time = datetime.now()
     # Check if current time is after 9 PM
-    if current_time.hour >= 21 and bridge.get_light(LIGHT_ID, 'on'):
+    if current_time.hour >= 21 and current_time.minute >= 30 and bridge.get_light(LIGHT_ID, 'on'):
         # Turn off the light
         bridge.set_light(LIGHT_ID, 'on', False)
         print(f"Light {LIGHT_ID} turned off at {current_time.strftime('%Y-%m-%d %H:%M:%S')}")
