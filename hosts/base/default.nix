@@ -125,6 +125,8 @@
             phue = python-prev.buildPythonPackage rec {
               pname = "phue";
               version = "1.1";
+              pyproject = true;
+              build-system = [python-prev.setuptools];
               src = python-prev.fetchPypi {
                 inherit pname version;
                 sha256 = "sha256-YfrMmRourR1yffhRPQbOCJAzSJttygm+CT2yT3zbiHQ=";

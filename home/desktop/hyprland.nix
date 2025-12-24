@@ -1,6 +1,7 @@
 {config, pkgs, lib, inputs, ...}: let
   wallpapers = (pkgs.callPackage ../../wallpapers { inherit pkgs; });
   cfg = config.iterion.desktop;
+  system = pkgs.stdenv.hostPlatform.system;
 in {
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
@@ -50,7 +51,7 @@ in {
     };
     services.hyprpaper = {
       enable = true;
-      package = inputs.hyprpaper.packages.${pkgs.system}.hyprpaper;
+      package = inputs.hyprpaper.packages.${system}.hyprpaper;
       settings = {
         ipc = "on";
         splash = false;
@@ -145,7 +146,7 @@ in {
             "$mod, X, sendshortcut, CTRL_SHIFT, X, class:(Alacritty)"
             "$mod, F, exec, ${pkgs.firefox}/bin/firefox"
             "$mod, Return, exec, gtk-launch com.mitchellh.ghostty.desktop"
-            "$mod, D, exec, ${inputs.anyrun.packages.${pkgs.system}.anyrun}/bin/anyrun"
+            "$mod, D, exec, ${inputs.anyrun.packages.${system}.anyrun}/bin/anyrun"
             "$mod, Left, movewindow, l"
             "$mod, Right, movewindow, r"
             "$mod SHIFT, Apostrophe, killactive,"

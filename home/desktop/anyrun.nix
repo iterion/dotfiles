@@ -6,10 +6,11 @@
   ...
 }: let
   cfg = config.iterion.desktop;
+  system = pkgs.stdenv.hostPlatform.system;
 in {
   config = lib.mkIf cfg.enable {
     programs.anyrun.config = {
-      plugins = with inputs.anyrun.packages.${pkgs.system}; [
+      plugins = with inputs.anyrun.packages.${system}; [
         applications
         rink
         shell

@@ -1,10 +1,14 @@
 {
+  config,
   pkgs,
   lib,
   inputs,
   ...
 }: let 
   homeDir = if pkgs.stdenv.isLinux then "/home/iterion" else "/Users/iterion";
+  system = pkgs.stdenv.hostPlatform.system;
+  desktopEnabled = config.iterion.desktop.enable;
+  ghosttyPackage = inputs.ghostty.packages.${system}.default;
 in {
   imports = [
     # inputs.anyrun.homeManagerModules.anyrun
@@ -48,8 +52,7 @@ in {
     kubectl
     kubectx
 
-  ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux (with pkgs; [
-    inputs.ghostty.packages.${pkgs.system}.default
+  ] ++ lib.optionals pkgs.stdenv.isLinux (with pkgs; [
     # usb debugging
     hidviz
     lsof
@@ -57,7 +60,10 @@ in {
 
     # why linux only?
     vault
-  ]);
+  ])
+  ++ lib.optionals (pkgs.stdenv.isDarwin || (pkgs.stdenv.isLinux && desktopEnabled)) [
+    ghosttyPackage
+  ];
 
   programs = {
     btop = {
