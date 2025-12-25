@@ -1,9 +1,8 @@
-{ config, ... }: {
-  imports = [ 
+{config, ...}: {
+  imports = [
     ../base
     ./hardware-configuration.nix
   ];
-
 
   networking.hostName = "lattepanda-nixos";
 
@@ -25,12 +24,11 @@
       homeassistant = {
         name = "Home";
         time_zone = config.time.timeZone;
-        unit_system = "imperial";
+        unit_system = "us_customary";
       };
       default_config = {};
     };
   };
-  
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
