@@ -105,7 +105,6 @@
       ];
       trusted-users = ["iterion"];
     };
-    package = pkgs.nixVersions.stable;
   };
   # Allow unfree packages
   nixpkgs.config = {
