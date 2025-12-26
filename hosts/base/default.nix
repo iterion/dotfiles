@@ -1,8 +1,19 @@
 {
+  config,
   pkgs,
+  lib,
   inputs,
   ...
-}: {
+}: let
+  desktopEnabled = lib.attrByPath [
+    "home-manager"
+    "users"
+    "iterion"
+    "iterion"
+    "desktop"
+    "enable"
+  ] false config;
+in {
   imports = [
     ../../modules/lightsout
   ];
@@ -148,20 +159,23 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment = {
-    systemPackages = with pkgs; [
-      wget
-      tailscale
-      libsecret
-      lshw
-      usbutils
-      alejandra
-      # vagrant.override { withLibvirt = false; }
-    ];
+    systemPackages = with pkgs;
+      [
+        wget
+        tailscale
+        # vagrant.override { withLibvirt = false; }
+      ]
+      ++ lib.optionals desktopEnabled [
+        libsecret
+        lshw
+        usbutils
+        alejandra
+      ];
     pathsToLink = ["/share/zsh"];
     shells = with pkgs; [zsh];
   };
 
-  fonts.packages = with pkgs;
+  fonts.packages = lib.optionals desktopEnabled (with pkgs;
     [
       font-awesome
       noto-fonts
@@ -174,7 +188,7 @@
       dina-font
       proggyfonts
     ]
-    ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+    ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts));
 
   programs = {
     zsh.enable = true;
@@ -215,7 +229,7 @@
 
     tailscale.enable = true;
     fstrim.enable = true;
-    pipewire = {
+    pipewire = lib.mkIf desktopEnabled {
       enable = true;
       alsa.enable = true;
       alsa.support32Bit = true;
