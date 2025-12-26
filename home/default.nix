@@ -8,6 +8,7 @@
   homeDir = if pkgs.stdenv.isLinux then "/home/iterion" else "/Users/iterion";
   system = pkgs.stdenv.hostPlatform.system;
   desktopEnabled = config.iterion.desktop.enable;
+  workEnabled = config.iterion.work.enable;
   ghosttyPackage = inputs.ghostty.packages.${system}.default;
 in {
   imports = [
@@ -18,6 +19,7 @@ in {
     ./devtools.nix
     ./fpv.nix
     ./neovim
+    ./work.nix
 
     ./desktop
   ];
@@ -57,8 +59,8 @@ in {
     hidviz
     lsof
     dig.dnsutils
-
-    # why linux only?
+  ])
+  ++ lib.optionals workEnabled (with pkgs; [
     vault
   ])
   ++ lib.optionals (pkgs.stdenv.isDarwin || (pkgs.stdenv.isLinux && desktopEnabled)) [
