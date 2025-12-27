@@ -60,7 +60,12 @@
   # Home Assistant Bluetooth needs BlueZ running
   hardware.bluetooth.enable = true;
   services.dbus.packages = [ pkgs.bluez ];
-  users.users."home-assistant".extraGroups = [ "bluetooth" "netdev" ];
+  users.groups.home-assistant = {};
+  users.users."home-assistant" = {
+    isSystemUser = true;
+    group = "home-assistant";
+    extraGroups = [ "bluetooth" "netdev" ];
+  };
   systemd.services.home-assistant.serviceConfig = {
     AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
     CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
