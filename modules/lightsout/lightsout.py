@@ -6,7 +6,7 @@ from phue import Bridge
 BRIDGE_IP = '192.168.1.200'
 
 # Light ID you want to control
-LIGHT_ID = "Desk"  # Adjust this to the ID of the light you want to control
+LIGHT_ID = "Desk Lamp"  # Adjust this to the ID of the light you want to control
 
 def main():
     bridge = Bridge(BRIDGE_IP)

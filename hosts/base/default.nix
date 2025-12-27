@@ -117,6 +117,14 @@ in {
       trusted-users = ["iterion"];
     };
   };
+
+  # SOPS/age key for systems that have it
+  sops = {
+    age.keyFile = "/home/iterion/.config/sops/age/keys.txt";
+    age.generateKey = false;
+  };
+  systemd.services.sops-nix.unitConfig.ConditionPathExists =
+    ["/home/iterion/.config/sops/age/keys.txt"];
   # Allow unfree packages
   nixpkgs.config = {
     allowUnfree = true;

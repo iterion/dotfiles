@@ -66,6 +66,7 @@
   codexToml = builtins.readFile (tomlFormat.generate "codex-config" codexConfig);
   secretsFilePath = "${inputs.self}/secrets/codex.yaml";
   havePushoverSecrets = builtins.pathExists secretsFilePath;
+  ageKeyFile = "${homeDir}/.config/sops/age/keys.txt";
   secretsFile =
     if havePushoverSecrets
     then inputs.self + /secrets/codex.yaml
@@ -134,7 +135,7 @@ in {
   ];
   sops =
     {
-      age.keyFile = "${homeDir}/.config/sops/age/keys.txt";
+      age.keyFile = ageKeyFile;
     }
     // (lib.optionalAttrs havePushoverSecrets {
       defaultSopsFile = secretsFile;
