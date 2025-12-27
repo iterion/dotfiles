@@ -20,6 +20,12 @@
     extraComponents = [
       "google"
     ];
+    extraPackages = pythonPackages:
+      let
+        googleNest = pythonPackages."google-nest-sdm" or null;
+        kasa = pythonPackages.python-kasa or (pythonPackages."python-kasa" or null);
+      in
+        builtins.filter (p: p != null) [googleNest kasa];
     config = {
       homeassistant = {
         name = "Home";
