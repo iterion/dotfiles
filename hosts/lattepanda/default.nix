@@ -25,6 +25,7 @@
       "nest"
       "solaredge"
       "litterrobot"
+      "caldav"
     ];
     extraPackages = pythonPackages:
       let
@@ -37,6 +38,8 @@
         teslaWallConnector = pythonPackages."tesla-wall-connector" or null;
         samsungctl = pythonPackages."samsungctl" or null;
         samsungtvws = pythonPackages."samsungtvws" or null;
+        caldav = pythonPackages."caldav" or null;
+        gtts = pythonPackages."gtts" or null;
       in
         builtins.filter (p: p != null) [
           googleNest
@@ -48,6 +51,8 @@
           teslaWallConnector
           samsungctl
           samsungtvws
+          caldav
+          gtts
         ];
     config = {
       homeassistant = {
