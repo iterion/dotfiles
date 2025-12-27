@@ -36,6 +36,7 @@
         getmac = pythonPackages."getmac" or null;
         teslaWallConnector = pythonPackages."tesla-wall-connector" or null;
         samsungctl = pythonPackages."samsungctl" or null;
+        samsungtvws = pythonPackages."samsungtvws" or null;
       in
         builtins.filter (p: p != null) [
           googleNest
@@ -46,6 +47,7 @@
           getmac
           teslaWallConnector
           samsungctl
+          samsungtvws
         ];
     config = {
       homeassistant = {
