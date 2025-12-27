@@ -24,8 +24,21 @@
       let
         googleNest = pythonPackages."google-nest-sdm" or null;
         kasa = pythonPackages.python-kasa or (pythonPackages."python-kasa" or null);
+        uiprotect = pythonPackages."pyunifiprotect" or null;
+        aiosolaredge = pythonPackages."aiosolaredge" or null;
+        pylitterbot = pythonPackages."pylitterbot" or null;
+        getmac = pythonPackages."getmac" or null;
+        teslaWallConnector = pythonPackages."tesla-wall-connector" or null;
       in
-        builtins.filter (p: p != null) [googleNest kasa];
+        builtins.filter (p: p != null) [
+          googleNest
+          kasa
+          uiprotect
+          aiosolaredge
+          pylitterbot
+          getmac
+          teslaWallConnector
+        ];
     config = {
       homeassistant = {
         name = "Home";

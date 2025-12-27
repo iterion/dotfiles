@@ -94,6 +94,10 @@ in {
     #coolercontrol.enable = true;
   };
 
+  manual.json.enable = false;
+  manual.html.enable = false;
+  manual.manpages.enable = false;
+
   fonts.fontconfig.enable = desktopEnabled;
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
