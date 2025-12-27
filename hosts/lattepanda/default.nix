@@ -19,6 +19,12 @@
     openFirewall = true;
     extraComponents = [
       "google"
+      "unifiprotect"
+      "tesla_wall_connector"
+      "tplink"
+      "nest"
+      "solaredge"
+      "litterrobot"
     ];
     extraPackages = pythonPackages:
       let
@@ -29,6 +35,7 @@
         pylitterbot = pythonPackages."pylitterbot" or null;
         getmac = pythonPackages."getmac" or null;
         teslaWallConnector = pythonPackages."tesla-wall-connector" or null;
+        samsungctl = pythonPackages."samsungctl" or null;
       in
         builtins.filter (p: p != null) [
           googleNest
@@ -38,6 +45,7 @@
           pylitterbot
           getmac
           teslaWallConnector
+          samsungctl
         ];
     config = {
       homeassistant = {
@@ -52,6 +60,16 @@
   # Home Assistant Bluetooth needs BlueZ running
   hardware.bluetooth.enable = true;
   services.dbus.packages = [ pkgs.bluez ];
+  systemd.services.home-assistant = {
+    serviceConfig = {
+      AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
+      CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
+      SupplementaryGroups = [ "bluetooth" "netdev" ];
+    };
+  };
+  systemd.tmpfiles.rules = [
+    "d /var/lib/hass/blueprints 0755 hass hass - -"
+  ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
