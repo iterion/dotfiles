@@ -26,6 +26,9 @@
       "solaredge"
       "litterrobot"
       "caldav"
+      "hue"
+      "aladdin_connect"
+      "tesla_fleet"
     ];
     extraPackages = pythonPackages:
       let
@@ -40,6 +43,8 @@
         samsungtvws = pythonPackages."samsungtvws" or null;
         caldav = pythonPackages."caldav" or null;
         gtts = pythonPackages."gtts" or null;
+        aladdin = pythonPackages."pyaladdinconnect" or null;
+        teslaFleet = pythonPackages."tesla-fleet-api" or null;
       in
         builtins.filter (p: p != null) [
           googleNest
@@ -53,6 +58,8 @@
           samsungtvws
           caldav
           gtts
+          aladdin
+          teslaFleet
         ];
     config = {
       homeassistant = {
