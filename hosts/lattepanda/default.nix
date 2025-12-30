@@ -1,4 +1,8 @@
-{config, pkgs, ...}: {
+{
+  config,
+  pkgs,
+  ...
+}: {
   imports = [
     ../base
     ./hardware-configuration.nix
@@ -30,38 +34,38 @@
       "aladdin_connect"
       "tesla_fleet"
       "esphome"
+      "python_script"
     ];
-    extraPackages = pythonPackages:
-      let
-        googleNest = pythonPackages."google-nest-sdm" or null;
-        kasa = pythonPackages.python-kasa or (pythonPackages."python-kasa" or null);
-        uiprotect = pythonPackages."pyunifiprotect" or null;
-        aiosolaredge = pythonPackages."aiosolaredge" or null;
-        pylitterbot = pythonPackages."pylitterbot" or null;
-        getmac = pythonPackages."getmac" or null;
-        teslaWallConnector = pythonPackages."tesla-wall-connector" or null;
-        samsungctl = pythonPackages."samsungctl" or null;
-        samsungtvws = pythonPackages."samsungtvws" or null;
-        caldav = pythonPackages."caldav" or null;
-        gtts = pythonPackages."gtts" or null;
-        aladdin = pythonPackages."pyaladdinconnect" or null;
-        teslaFleet = pythonPackages."tesla-fleet-api" or null;
-      in
-        builtins.filter (p: p != null) [
-          googleNest
-          kasa
-          uiprotect
-          aiosolaredge
-          pylitterbot
-          getmac
-          teslaWallConnector
-          samsungctl
-          samsungtvws
-          caldav
-          gtts
-          aladdin
-          teslaFleet
-        ];
+    extraPackages = pythonPackages: let
+      googleNest = pythonPackages."google-nest-sdm" or null;
+      kasa = pythonPackages.python-kasa or (pythonPackages."python-kasa" or null);
+      uiprotect = pythonPackages."pyunifiprotect" or null;
+      aiosolaredge = pythonPackages."aiosolaredge" or null;
+      pylitterbot = pythonPackages."pylitterbot" or null;
+      getmac = pythonPackages."getmac" or null;
+      teslaWallConnector = pythonPackages."tesla-wall-connector" or null;
+      samsungctl = pythonPackages."samsungctl" or null;
+      samsungtvws = pythonPackages."samsungtvws" or null;
+      caldav = pythonPackages."caldav" or null;
+      gtts = pythonPackages."gtts" or null;
+      aladdin = pythonPackages."pyaladdinconnect" or null;
+      teslaFleet = pythonPackages."tesla-fleet-api" or null;
+    in
+      builtins.filter (p: p != null) [
+        googleNest
+        kasa
+        uiprotect
+        aiosolaredge
+        pylitterbot
+        getmac
+        teslaWallConnector
+        samsungctl
+        samsungtvws
+        caldav
+        gtts
+        aladdin
+        teslaFleet
+      ];
     config = {
       homeassistant = {
         name = "Home";
@@ -69,17 +73,79 @@
         unit_system = "us_customary";
       };
       default_config = {};
+      python_script = {};
+      input_boolean = {
+        disable_deep_sleep = {
+          name = "Disable Deep Sleep";
+          icon = "mdi:sleep-off";
+        };
+      };
+      template = [
+        {
+          binary_sensor = [
+            {
+              name = "ESP Calendar Data Update During Deep Sleep";
+              state = ''
+                {{ states.sensor.esp_calendar_data.last_updated > states.sensor.epaper_calendar_last_display_update.last_updated }}
+              '';
+            }
+          ];
+          trigger = [
+            {
+              platform = "time_pattern";
+              minutes = "*";
+              action = [
+                {
+                  service = "calendar.get_events";
+                  data = {
+                    duration.days = 28;
+                  };
+                  target.entity_id = [
+                    "calendar.home"
+                  ];
+                  response_variable = "calendar_response";
+                }
+                {
+                  service = "python_script.esp_calendar_data_conversion";
+                  data = {
+                    calendar = "{{ calendar_response }}";
+                    now = "{{ now().date() }}";
+                  };
+                  response_variable = "calendar_converted";
+                }
+              ];
+              sensor = [
+                {
+                  name = "ESP Calendar Data";
+                  state = "OK";
+                  attributes = {
+                    todays_day_name = ''
+                      {{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}
+                    '';
+                    todays_date_month_year = ''
+                      {% set months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] %}
+                      {{ months[now().month-1] }} {{  now().strftime('%Y') }}
+                    '';
+                    closest_end_time = "{{ as_timestamp(calendar_converted.closest_end_time, default=0) }}";
+                    entries = "{{ calendar_converted.entries }}";
+                  };
+                }
+              ];
+            }
+          ];
+        }
+      ];
     };
   };
 
   # Home Assistant Bluetooth needs BlueZ running
   hardware.bluetooth.enable = true;
-  services.dbus.packages = [ pkgs.bluez ];
+  services.dbus.packages = [pkgs.bluez];
   users.groups.home-assistant = {};
   users.users."home-assistant" = {
     isSystemUser = true;
     group = "home-assistant";
-    extraGroups = [ "bluetooth" "netdev" ];
+    extraGroups = ["bluetooth" "netdev"];
   };
   users.groups.esphome = {};
   users.users.esphome = {
@@ -106,11 +172,12 @@
     ];
   };
   systemd.services.home-assistant.serviceConfig = {
-    AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
-    CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
+    AmbientCapabilities = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
+    CapabilityBoundingSet = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
   };
   systemd.tmpfiles.rules = [
     "d /var/lib/hass/blueprints 0755 hass hass - -"
+    "C /var/lib/hass/python_scripts/esp_calendar_data_conversion.py 0640 hass hass - ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py}"
     "d /var/lib/esphome/.cache 0755 esphome esphome - -"
     "d /var/lib/esphome/.cache/uv 0755 esphome esphome - -"
     "d /var/lib/esphome/.platformio 0755 esphome esphome - -"
