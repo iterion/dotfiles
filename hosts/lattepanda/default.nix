@@ -88,10 +88,12 @@
     openFirewall = true;
     # Bind to all interfaces for remote access
     address = "0.0.0.0";
-    extraEnvironment = {
-      UV_CACHE_DIR = "/var/lib/esphome/.cache/uv";
-      XDG_CACHE_HOME = "/var/lib/esphome/.cache";
-    };
+  };
+  systemd.services.esphome.serviceConfig = {
+    Environment = [
+      "UV_CACHE_DIR=/var/lib/esphome/.cache/uv"
+      "XDG_CACHE_HOME=/var/lib/esphome/.cache"
+    ];
   };
   systemd.services.home-assistant.serviceConfig = {
     AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
