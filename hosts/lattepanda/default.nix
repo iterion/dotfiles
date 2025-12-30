@@ -86,6 +86,7 @@
   services.esphome = {
     enable = true;
     openFirewall = true;
+    listenAddress = "0.0.0.0";
   };
   systemd.services.home-assistant.serviceConfig = {
     AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
