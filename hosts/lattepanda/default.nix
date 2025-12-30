@@ -95,6 +95,9 @@
       "XDG_CACHE_HOME=/var/lib/esphome/.cache"
     ];
   };
+  systemd.services.esphome.preStart = ''
+    chown -R esphome:esphome /var/lib/esphome
+  '';
   systemd.services.home-assistant.serviceConfig = {
     AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
     CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
@@ -103,6 +106,9 @@
     "d /var/lib/hass/blueprints 0755 hass hass - -"
     "d /var/lib/esphome/.cache 0755 esphome esphome - -"
     "d /var/lib/esphome/.cache/uv 0755 esphome esphome - -"
+    "d /var/lib/esphome/.platformio 0755 esphome esphome - -"
+    "d /var/lib/esphome/.platformio/penv 0755 esphome esphome - -"
+    "d /var/lib/esphome/.platformio/penv/bin 0755 esphome esphome - -"
   ];
 
   # This value determines the NixOS release from which the default
