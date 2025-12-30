@@ -86,7 +86,12 @@
   services.esphome = {
     enable = true;
     openFirewall = true;
-    listenAddress = "0.0.0.0";
+    # Bind to all interfaces for remote access
+    address = "0.0.0.0";
+    extraEnvironment = {
+      UV_CACHE_DIR = "/var/lib/esphome/.cache/uv";
+      XDG_CACHE_HOME = "/var/lib/esphome/.cache";
+    };
   };
   systemd.services.home-assistant.serviceConfig = {
     AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
@@ -94,6 +99,8 @@
   };
   systemd.tmpfiles.rules = [
     "d /var/lib/hass/blueprints 0755 hass hass - -"
+    "d /var/lib/esphome/.cache 0755 esphome esphome - -"
+    "d /var/lib/esphome/.cache/uv 0755 esphome esphome - -"
   ];
 
   # This value determines the NixOS release from which the default
