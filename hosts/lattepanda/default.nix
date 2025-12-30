@@ -90,47 +90,49 @@
               '';
             }
           ];
+        }
+        {
           trigger = [
             {
               platform = "time_pattern";
               minutes = "*";
-              action = [
-                {
-                  service = "calendar.get_events";
-                  data = {
-                    duration.days = 28;
-                  };
-                  target.entity_id = [
-                    "calendar.home"
-                  ];
-                  response_variable = "calendar_response";
-                }
-                {
-                  service = "python_script.esp_calendar_data_conversion";
-                  data = {
-                    calendar = "{{ calendar_response }}";
-                    now = "{{ now().date() }}";
-                  };
-                  response_variable = "calendar_converted";
-                }
+            }
+          ];
+          action = [
+            {
+              service = "calendar.get_events";
+              data = {
+                duration.days = 28;
+              };
+              target.entity_id = [
+                "calendar.home"
               ];
-              sensor = [
-                {
-                  name = "ESP Calendar Data";
-                  state = "OK";
-                  attributes = {
-                    todays_day_name = ''
-                      {{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}
-                    '';
-                    todays_date_month_year = ''
-                      {% set months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] %}
-                      {{ months[now().month-1] }} {{  now().strftime('%Y') }}
-                    '';
-                    closest_end_time = "{{ as_timestamp(calendar_converted.closest_end_time, default=0) }}";
-                    entries = "{{ calendar_converted.entries }}";
-                  };
-                }
-              ];
+              response_variable = "calendar_response";
+            }
+            {
+              service = "python_script.esp_calendar_data_conversion";
+              data = {
+                calendar = "{{ calendar_response }}";
+                now = "{{ now().date() }}";
+              };
+              response_variable = "calendar_converted";
+            }
+          ];
+          sensor = [
+            {
+              name = "ESP Calendar Data";
+              state = "OK";
+              attributes = {
+                todays_day_name = ''
+                  {{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}
+                '';
+                todays_date_month_year = ''
+                  {% set months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] %}
+                  {{ months[now().month-1] }} {{  now().strftime('%Y') }}
+                '';
+                closest_end_time = "{{ as_timestamp(calendar_converted.closest_end_time, default=0) }}";
+                entries = "{{ calendar_converted.entries }}";
+              };
             }
           ];
         }
@@ -177,6 +179,7 @@
   };
   systemd.tmpfiles.rules = [
     "d /var/lib/hass/blueprints 0755 hass hass - -"
+    "d /var/lib/hass/python_scripts 0755 hass hass - -"
     "C /var/lib/hass/python_scripts/esp_calendar_data_conversion.py 0640 hass hass - ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py}"
     "d /var/lib/esphome/.cache 0755 esphome esphome - -"
     "d /var/lib/esphome/.cache/uv 0755 esphome esphome - -"
