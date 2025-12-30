@@ -1,4 +1,4 @@
-# Dictionary to map calendar keys to their corresponding names
+# Dictionary to map calendar keys to their corresponding names.
 # One word calendars don't need to be added; calendar.jobs would map to Jobs by default.
 # calendar.hello_world should be added.
 CALENDAR_NAMES = {"calendar.home": "Home"}
@@ -7,20 +7,43 @@ DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 # Max entries to send to the ESPHome device.
 MAX_ENTRIES = 8
 
-from datetime import datetime
+
+def iso_key(val, fallback="9999-12-31T23:59:59"):
+    """Return a lexicographic key for ISO timestamps without importing datetime."""
+    if val is None:
+        return fallback
+    v = str(val)
+    return v.replace("Z", "+00:00")
 
 
-def parse_dt(value):
-    """Parse ISO timestamps, handling trailing Z."""
-    if value is None:
-        return None
-    val = str(value)
-    if val.endswith("Z"):
-        val = val.replace("Z", "+00:00")
+def day_from_date(date_str):
     try:
-        return datetime.fromisoformat(val)
+        return int(str(date_str).split("-")[2])
     except Exception:
-        return None
+        return 0
+
+
+def weekday_from_date(date_str):
+    """
+    Calculate weekday (0=Mon) using Zeller-like arithmetic without imports.
+    Assumes date_str like YYYY-MM-DD.
+    """
+    try:
+        parts = str(date_str).split("-")
+        y = int(parts[0])
+        m = int(parts[1])
+        d = int(parts[2])
+        if m < 3:
+            m += 12
+            y -= 1
+        # Zeller congruence: h = (d + 13(m+1)//5 + K + K//4 + J//4 + 5J) % 7
+        K = y % 100
+        J = y // 100
+        h = (d + (13 * (m + 1)) // 5 + K + K // 4 + J // 4 + 5 * J) % 7
+        # Convert to 0=Monday mapping
+        return (h + 5) % 7
+    except Exception:
+        return 0
 
 
 def convert_calendar_format(data, today):
@@ -75,19 +98,19 @@ def convert_calendar_format(data, today):
 
         if other_events and date == today:
             closest_end_time = sorted(
-                other_events, key=lambda item: parse_dt(item.get("end")) or datetime.max, reverse=False
+                other_events, key=lambda item: iso_key(item.get("end")), reverse=False
             )[0].get("end")
 
         if all_day_events or other_events:
             other_events.sort(
-                key=lambda item: parse_dt(item.get("start")) or datetime.max, reverse=False
+                key=lambda item: iso_key(item.get("start")), reverse=False
             )
             day_item = {
                 "date": date,
-                "day": (parse_dt(date) or datetime.now()).day,
+                "day": day_from_date(date),
                 # Cast to int because bools upset some ESPHome configs
-                "is_today": int(date == datetime.now().isoformat().split("T")[0]),
-                "day_name": DAY_NAMES[(parse_dt(date) or datetime.now()).weekday()],
+                "is_today": int(date == today),
+                "day_name": DAY_NAMES[weekday_from_date(date)],
                 "all_day": all_day_events,
                 "other": other_events,
             }
