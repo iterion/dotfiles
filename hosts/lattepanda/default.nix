@@ -179,6 +179,9 @@
     AmbientCapabilities = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
     CapabilityBoundingSet = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
   };
+  systemd.services.home-assistant.preStart = ''
+    install -m 0640 -o hass -g hass ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py} /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
+  '';
   systemd.tmpfiles.rules = [
     "d /var/lib/hass/blueprints 0755 hass hass - -"
     "d /var/lib/hass/python_scripts 0755 hass hass - -"
