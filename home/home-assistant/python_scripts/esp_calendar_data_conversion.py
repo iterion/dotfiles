@@ -1,5 +1,3 @@
-from homeassistant.util import dt as dt_util
-
 # Dictionary to map calendar keys to their corresponding names
 # One word calendars don't need to be added; calendar.jobs would map to Jobs by default.
 # calendar.hello_world should be added.
@@ -8,6 +6,22 @@ CALENDAR_NAMES = {"calendar.home": "Home"}
 DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 # Max entries to send to the ESPHome device.
 MAX_ENTRIES = 8
+
+from datetime import datetime
+
+
+def parse_dt(value):
+    """Parse ISO timestamps, handling trailing Z."""
+    if value is None:
+        return None
+    val = str(value)
+    if val.endswith("Z"):
+        val = val.replace("Z", "+00:00")
+    try:
+        return datetime.fromisoformat(val)
+    except Exception:
+        return None
+
 
 def convert_calendar_format(data, today):
     # Group events by date and count entries
@@ -61,19 +75,19 @@ def convert_calendar_format(data, today):
 
         if other_events and date == today:
             closest_end_time = sorted(
-                other_events, key=lambda item: dt_util.parse_datetime(item["end"]), reverse=False
-            )[0]["end"]
+                other_events, key=lambda item: parse_dt(item.get("end")) or datetime.max, reverse=False
+            )[0].get("end")
 
         if all_day_events or other_events:
             other_events.sort(
-                key=lambda item: dt_util.parse_datetime(item["start"]), reverse=False
+                key=lambda item: parse_dt(item.get("start")) or datetime.max, reverse=False
             )
             day_item = {
                 "date": date,
-                "day": dt_util.parse_datetime(date).day,
+                "day": (parse_dt(date) or datetime.now()).day,
                 # Cast to int because bools upset some ESPHome configs
-                "is_today": int(date == dt_util.now().isoformat().split("T")[0]),
-                "day_name": DAY_NAMES[dt_util.parse_datetime(date).weekday()],
+                "is_today": int(date == datetime.now().isoformat().split("T")[0]),
+                "day_name": DAY_NAMES[(parse_dt(date) or datetime.now()).weekday()],
                 "all_day": all_day_events,
                 "other": other_events,
             }
