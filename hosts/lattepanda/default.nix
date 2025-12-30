@@ -86,7 +86,9 @@
             {
               name = "ESP Calendar Data Update During Deep Sleep";
               state = ''
-                {{ states.sensor.esp_calendar_data.last_updated > states.sensor.epaper_calendar_last_display_update.last_updated }}
+                {% set cal = states.sensor.esp_calendar_data %}
+                {% set disp = states.sensor.epaper_calendar_last_display_update %}
+                {{ cal is not none and disp is not none and cal.last_updated > disp.last_updated }}
               '';
             }
           ];
@@ -180,7 +182,7 @@
   systemd.tmpfiles.rules = [
     "d /var/lib/hass/blueprints 0755 hass hass - -"
     "d /var/lib/hass/python_scripts 0755 hass hass - -"
-    "C /var/lib/hass/python_scripts/esp_calendar_data_conversion.py 0640 hass hass - ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py}"
+    "C! /var/lib/hass/python_scripts/esp_calendar_data_conversion.py 0640 hass hass - ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py}"
     "d /var/lib/esphome/.cache 0755 esphome esphome - -"
     "d /var/lib/esphome/.cache/uv 0755 esphome esphome - -"
     "d /var/lib/esphome/.platformio 0755 esphome esphome - -"
