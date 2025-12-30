@@ -128,17 +128,17 @@
                 todays_day_name = ''
                   {{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}
                 '';
-                todays_date_month_year = ''
-                  {% set months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] %}
-                  {{ months[now().month-1] }} {{  now().strftime('%Y') }}
-                '';
-                closest_end_time = "{{ as_timestamp(calendar_converted.closest_end_time, default=0) }}";
-                entries = "{{ calendar_converted.entries }}";
-              };
+                    todays_date_month_year = ''
+                      {% set months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] %}
+                      {{ months[now().month-1] }} {{  now().strftime('%Y') }}
+                    '';
+                    closest_end_time = "{{ as_timestamp(calendar_converted.closest_end_time, default=0) }}";
+                    entries = "{{ calendar_converted.entries | tojson }}";
+                  };
+                }
+              ];
             }
           ];
-        }
-      ];
     };
   };
 
@@ -191,7 +191,9 @@
   ];
 
   system.activationScripts.esphomeCalendarScript = ''
-    install -Dm0640 ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py} /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
+    mkdir -p /var/lib/hass/python_scripts
+    rm -f /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
+    install -m0640 ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py} /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
     chown hass:hass /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
   '';
 
