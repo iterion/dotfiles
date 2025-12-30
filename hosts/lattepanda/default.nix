@@ -29,6 +29,7 @@
       "hue"
       "aladdin_connect"
       "tesla_fleet"
+      "esphome"
     ];
     extraPackages = pythonPackages:
       let
