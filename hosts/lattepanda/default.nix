@@ -179,9 +179,6 @@
     AmbientCapabilities = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
     CapabilityBoundingSet = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
   };
-  systemd.services.home-assistant.preStart = ''
-    install -m 0640 -o hass -g hass ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py} /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
-  '';
   systemd.tmpfiles.rules = [
     "d /var/lib/hass/blueprints 0755 hass hass - -"
     "d /var/lib/hass/python_scripts 0755 hass hass - -"
@@ -192,6 +189,11 @@
     "d /var/lib/esphome/.platformio/penv 0755 esphome esphome - -"
     "d /var/lib/esphome/.platformio/penv/bin 0755 esphome esphome - -"
   ];
+
+  system.activationScripts.esphomeCalendarScript = ''
+    install -Dm0640 ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py} /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
+    chown hass:hass /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
+  '';
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
