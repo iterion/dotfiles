@@ -81,6 +81,12 @@
     group = "home-assistant";
     extraGroups = [ "bluetooth" "netdev" ];
   };
+  users.groups.esphome = {};
+  users.users.esphome = {
+    isSystemUser = true;
+    group = "esphome";
+    home = "/var/lib/esphome";
+  };
 
   # Standalone ESPHome dashboard (add-on alternative)
   services.esphome = {
@@ -90,14 +96,15 @@
     address = "0.0.0.0";
   };
   systemd.services.esphome.serviceConfig = {
+    User = "esphome";
+    Group = "esphome";
+    StateDirectory = "esphome";
+    StateDirectoryMode = "0750";
     Environment = [
       "UV_CACHE_DIR=/var/lib/esphome/.cache/uv"
       "XDG_CACHE_HOME=/var/lib/esphome/.cache"
     ];
   };
-  systemd.services.esphome.preStart = ''
-    chown -R esphome:esphome /var/lib/esphome
-  '';
   systemd.services.home-assistant.serviceConfig = {
     AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
     CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
