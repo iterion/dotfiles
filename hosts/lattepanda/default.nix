@@ -81,6 +81,12 @@
     group = "home-assistant";
     extraGroups = [ "bluetooth" "netdev" ];
   };
+
+  # Standalone ESPHome dashboard (add-on alternative)
+  services.esphome = {
+    enable = true;
+    openFirewall = true;
+  };
   systemd.services.home-assistant.serviceConfig = {
     AmbientCapabilities = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
     CapabilityBoundingSet = [ "CAP_NET_ADMIN" "CAP_NET_RAW" ];
