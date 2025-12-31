@@ -23,6 +23,8 @@ esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
+  platformio_options:
+    platform: espressif32@6.6.0
 
 logger:
   level: DEBUG
@@ -116,10 +118,12 @@ display:
     busy_pin:
       number: GPIO13
       inverted: true
+    invert_colors: false
     update_interval: 300s
     lambda: |-
       using namespace esphome;
       ESP_LOGD("calendar", "Render start");
+      // Force white background with black text
       it.fill(Color::WHITE);
       // Header + poop status
       it.printf(6, 6, id(font_title), Color::BLACK, "Poop in the Hut:");
