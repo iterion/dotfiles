@@ -179,7 +179,13 @@
     AmbientCapabilities = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
     CapabilityBoundingSet = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
   };
-  systemd.tmpfiles.rules = [
+  systemd.tmpfiles.rules = let
+    mdiWebfont = pkgs.fetchzip {
+      url = "https://github.com/Templarian/MaterialDesign-Webfont/archive/refs/tags/v7.4.47.zip";
+      hash = "sha256-xVhKiAJy/2JaP6HEatzpuDwCbFSvPiIhdhM2csMDFbI=";
+      stripRoot = true;
+    };
+  in [
     "d /var/lib/hass/blueprints 0755 hass hass - -"
     "d /var/lib/hass/python_scripts 0755 hass hass - -"
     "C! /var/lib/hass/python_scripts/esp_calendar_data_conversion.py 0640 hass hass - ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py}"
@@ -188,6 +194,8 @@
     "d /var/lib/esphome/.platformio 0755 esphome esphome - -"
     "d /var/lib/esphome/.platformio/penv 0755 esphome esphome - -"
     "d /var/lib/esphome/.platformio/penv/bin 0755 esphome esphome - -"
+    "d /var/lib/esphome/fonts 0755 esphome esphome - -"
+    "L+ /var/lib/esphome/fonts/materialdesignicons-webfont.ttf - - - - ${mdiWebfont}/fonts/materialdesignicons-webfont.ttf"
   ];
 
   system.activationScripts.esphomeCalendarScript = ''

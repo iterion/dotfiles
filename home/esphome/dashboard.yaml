@@ -55,11 +55,26 @@ output:
     pin: GPIO21
     id: bsp_battery_enable
 
+globals:
+  - id: battery_glyph
+    type: std::string
+    restore_value: no
+    initial_value: "\"\\U000F0079\"" # default full battery
+
 sensor:
   - platform: homeassistant
     entity_id: sensor.poop_hut_waste_drawer
     id: poopHutBin
-    internal: false
+    internal: true
+
+  # display has onboard temp & humidity
+  - platform: sht4x
+    temperature:
+      name: "Temperature"
+      id: temp_sensor
+    humidity:
+      name: "Relative Humidity"
+      id: hum_sensor
 
   # Battery Monitoring
   - platform: adc
@@ -70,6 +85,47 @@ sensor:
     attenuation: 12db
     filters:
       - multiply: 2.0 # Voltage divider compensation
+
+  - platform: template
+    name: "Battery Level"
+    id: battery_level
+    unit_of_measurement: "%"
+    icon: "mdi:battery"
+    device_class: battery
+    state_class: measurement
+    lambda: "return id(battery_voltage).state;"
+    update_interval: 60s
+    on_value:
+      then:
+        - lambda: |-
+            int pct = int(x);
+            if (pct <= 10)      id(battery_glyph) = "\U000F007A";
+            else if (pct <= 20) id(battery_glyph) = "\U000F007B";
+            else if (pct <= 30) id(battery_glyph) = "\U000F007C";
+            else if (pct <= 40) id(battery_glyph) = "\U000F007D";
+            else if (pct <= 50) id(battery_glyph) = "\U000F007E";
+            else if (pct <= 60) id(battery_glyph) = "\U000F007F";
+            else if (pct <= 70) id(battery_glyph) = "\U000F0080";
+            else if (pct <= 80) id(battery_glyph) = "\U000F0081";
+            else if (pct <= 90) id(battery_glyph) = "\U000F0082";
+            else                id(battery_glyph) = "\U000F0079";
+    filters:
+      - calibrate_linear:
+          - 4.15 -> 100.0
+          - 3.96 -> 90.0
+          - 3.91 -> 80.0
+          - 3.85 -> 70.0
+          - 3.80 -> 60.0
+          - 3.75 -> 50.0
+          - 3.68 -> 40.0
+          - 3.58 -> 30.0
+          - 3.49 -> 20.0
+          - 3.41 -> 10.0
+          - 3.30 -> 5.0
+          - 3.27 -> 0.0
+      - clamp:
+          min_value: 0
+          max_value: 100
 
 text_sensor:
   # Calendar payload from HA template sensor (attr: entries)
@@ -89,6 +145,19 @@ text_sensor:
     id: calendar_date
     internal: true
 
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO4
+      mode: INPUT_PULLUP
+      inverted: true
+    id: primary_button
+    name: "Primary Button"
+    on_press:
+      then:
+        - lambda: |-
+            id(epaper_display).update();
+
 json:
 
 font:
@@ -101,6 +170,24 @@ font:
   - file: "gfonts://Inter@500"
     id: font_small
     size: 16
+  - file: "fonts/materialdesignicons-webfont.ttf"
+    id: font_bat_icon
+    size: 24
+    glyphs:
+      - "\U000F007A" # mdi-battery-10
+      - "\U000F007B" # mdi-battery-20
+      - "\U000F007C" # mdi-battery-30
+      - "\U000F007D" # mdi-battery-40
+      - "\U000F007E" # mdi-battery-50
+      - "\U000F007F" # mdi-battery-60
+      - "\U000F0080" # mdi-battery-70
+      - "\U000F0081" # mdi-battery-80
+      - "\U000F0082" # mdi-battery-90
+      - "\U000F0079" # mdi-battery
+
+time:
+  - platform: homeassistant
+    id: ha_time
 
 spi:
   clk_pin: GPIO7
@@ -118,8 +205,7 @@ display:
     busy_pin:
       number: GPIO13
       inverted: true
-    invert_colors: false
-    update_interval: 300s
+    update_interval: never
     lambda: |-
       using namespace esphome;
       ESP_LOGD("calendar", "Render start");
