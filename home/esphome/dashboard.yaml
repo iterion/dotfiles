@@ -18,13 +18,13 @@ esphome:
     priority: 600
     then:
       - output.turn_on: bsp_battery_enable
+      - delay: 200ms
+      - script.execute: boot_sequence
 
 esp32:
   board: esp32-s3-devkitc-1
   framework:
     type: esp-idf
-  platformio_options:
-    platform: espressif32@6.6.0
 
 logger:
   level: DEBUG
@@ -47,6 +47,18 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   use_address: 192.168.1.192
+  fast_connect: true
+  ap:
+    ssid: "Dashboard Fallback"
+    password: "fallbackpass"
+
+deep_sleep:
+  id: deep_sleep_1
+  sleep_duration: 30min
+  wakeup_pin:
+    number: GPIO4
+    allow_other_uses: true
+  wakeup_pin_mode: INVERT_WAKEUP
 
 captive_portal:
 
@@ -54,18 +66,53 @@ output:
   - platform: gpio
     pin: GPIO21
     id: bsp_battery_enable
+  - platform: gpio
+    pin: GPIO6
+    id: led_output
+    inverted: true
 
 globals:
   - id: battery_glyph
     type: std::string
     restore_value: no
     initial_value: "\"\\U000F0079\"" # default full battery
+  - id: last_render_sig
+    type: std::string
+    restore_value: no
+    initial_value: '""'
+  - id: data_ready
+    type: bool
+    restore_value: no
+    initial_value: "false"
+  - id: boot_complete
+    type: bool
+    restore_value: no
+    initial_value: "false"
+  - id: display_refreshes
+    type: int
+    restore_value: yes
+    initial_value: "0"
+  - id: last_display_update_ts
+    type: float
+    restore_value: yes
+    initial_value: "0.0"
 
 sensor:
   - platform: homeassistant
     entity_id: sensor.poop_hut_waste_drawer
     id: poopHutBin
     internal: true
+    on_value:
+      then:
+        - script.execute: render_with_debounce
+
+  - platform: homeassistant
+    entity_id: sensor.poop_hut_litter_level
+    id: poopHutLitter
+    internal: true
+    on_value:
+      then:
+        - script.execute: render_with_debounce
 
   # display has onboard temp & humidity
   - platform: sht4x
@@ -127,6 +174,40 @@ sensor:
           min_value: 0
           max_value: 100
 
+  - platform: template
+    name: "Last Wake Up"
+    device_class: timestamp
+    entity_category: "diagnostic"
+    id: last_wake_up
+
+  - platform: template
+    name: "Display Refreshes"
+    id: display_refreshes_sensor
+    accuracy_decimals: 0
+    unit_of_measurement: "refreshes"
+    state_class: total_increasing
+    entity_category: "diagnostic"
+    lambda: "return id(display_refreshes);"
+
+  - platform: template
+    name: "Last Display Update"
+    device_class: timestamp
+    entity_category: "diagnostic"
+    id: last_display_update
+    lambda: "return id(last_display_update_ts);"
+
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_signal_sensor
+    entity_category: "diagnostic"
+
+  - platform: template
+    name: "Last Wake Up Cause"
+    id: last_wake_up_cause
+    entity_category: "diagnostic"
+    accuracy_decimals: 0
+    lambda: return esp_sleep_get_wakeup_cause();
+
 text_sensor:
   # Calendar payload from HA template sensor (attr: entries)
   - platform: homeassistant
@@ -134,29 +215,58 @@ text_sensor:
     attribute: entries
     id: calendar_entries_raw
     internal: true
+    on_value:
+      then:
+        - lambda: |-
+            if (!x.empty()) id(data_ready) = true;
+        - script.execute: render_with_debounce
   - platform: homeassistant
     entity_id: sensor.esp_calendar_data
     attribute: todays_day_name
     id: calendar_day_name
     internal: true
+    on_value:
+      then:
+        - lambda: |-
+            if (!x.empty()) id(data_ready) = true;
+        - script.execute: render_with_debounce
   - platform: homeassistant
     entity_id: sensor.esp_calendar_data
     attribute: todays_date_month_year
     id: calendar_date
     internal: true
+    on_value:
+      then:
+        - lambda: |-
+            if (!x.empty()) id(data_ready) = true;
+        - script.execute: render_with_debounce
 
 binary_sensor:
   - platform: gpio
     pin:
       number: GPIO4
+      allow_other_uses: true
       mode: INPUT_PULLUP
       inverted: true
     id: primary_button
     name: "Primary Button"
     on_press:
       then:
-        - lambda: |-
-            id(epaper_display).update();
+        - script.execute: boot_sequence
+  - platform: homeassistant
+    id: disable_deep_sleep
+    entity_id: input_boolean.disable_deep_sleep
+    on_state:
+      then:
+        - if:
+            condition:
+              binary_sensor.is_off: disable_deep_sleep
+            then:
+              - logger.log: "Deep sleep re-enabled; entering if idle"
+              - script.execute: go_to_sleep_soon
+            else:
+              - logger.log: "Deep sleep disabled; staying awake"
+              - component.suspend: battery_voltage
 
 json:
 
@@ -170,6 +280,12 @@ font:
   - file: "gfonts://Inter@500"
     id: font_small
     size: 16
+  - file: "fonts/materialdesignicons-webfont.ttf"
+    id: cat_emojis
+    size: 26
+    glyphs:
+      - "\U000F011B" # cat
+      - "\U000F01F7" # poop
   - file: "fonts/materialdesignicons-webfont.ttf"
     id: font_bat_icon
     size: 24
@@ -189,9 +305,127 @@ time:
   - platform: homeassistant
     id: ha_time
 
+light:
+  - platform: binary
+    name: "Onboard LED"
+    output: led_output
+    id: onboard_led
+
+script:
+  - id: boot_sequence
+    mode: restart
+    then:
+      - logger.log: "Boot sequence start"
+      - component.update: battery_voltage
+      - component.update: battery_level
+      - lambda: |-
+          if (!id(ha_time).now().is_valid()) {
+            ESP_LOGW("boot", "Proceeding without valid time");
+          } else {
+            auto now = id(ha_time).now();
+            id(last_wake_up).publish_state(now.timestamp);
+            id(last_wake_up_cause).publish_state(esp_sleep_get_wakeup_cause());
+          }
+      - lambda: |-
+          id(boot_complete) = true;
+          id(onboard_led).turn_on();
+      - script.execute: render_with_debounce
+
+  - id: go_to_sleep_soon
+    mode: restart
+    then:
+      - if:
+          condition:
+            or:
+              - binary_sensor.is_on: disable_deep_sleep
+              - not:
+                  lambda: return id(disable_deep_sleep).has_state();
+          then:
+            - logger.log: "Deep sleep disabled or HA state missing; skipping sleep"
+          else:
+            - if:
+                condition:
+                  lambda: |-
+                    return wifi::global_wifi_component->is_connected() && api::global_api_server->is_connected();
+                then:
+                  - lambda: |-
+                      if (millis() < 300000) {
+                        ESP_LOGI("sleep", "Skipping sleep due to short uptime (grace period)");
+                        return;
+                      }
+                      uint32_t sleep_ms = 30 * 60 * 1000;  // default 30 min
+                      auto now = id(ha_time).now();
+                      if (now.is_valid()) {
+                        if (now.hour >= 22 || now.hour < 6) {
+                          sleep_ms = 4 * 60 * 60 * 1000; // 4 hours at night
+                        }
+                      }
+                      id(deep_sleep_1).set_sleep_duration(sleep_ms);
+                      ESP_LOGI("sleep", "Next sleep duration: %.1f minutes", sleep_ms / 60000.0f);
+                      id(onboard_led).turn_off();
+                  - delay: 5s
+                  - deep_sleep.enter:
+                      id: deep_sleep_1
+                else:
+                  - logger.log: "Skipping sleep because Wi-Fi/API not connected"
+
+  - id: maybe_update_display
+    mode: restart
+    then:
+      - lambda: |-
+          if (isnan(id(battery_level).state)) {
+            id(battery_voltage).update();
+            id(battery_level).update();
+          }
+          bool have_data = id(data_ready);
+          if (!have_data) {
+            ESP_LOGI("display", "Updating without HA data (waiting state)");
+          }
+          ESP_LOGI("display", "Updating display with drawer=%.1f litter=%.1f battery=%.0f%%", id(poopHutBin).state, id(poopHutLitter).state, id(battery_level).state);
+          char buf[160];
+          float drawer = id(poopHutBin).state;
+          float litter = id(poopHutLitter).state;
+          float battery = id(battery_level).state;
+          snprintf(buf, sizeof(buf), "D:%.1f L:%.1f B:%.0f", drawer, litter, battery);
+          std::string sig = id(calendar_day_name).state + "|" +
+                            id(calendar_date).state + "|" +
+                            id(calendar_entries_raw).state + "|" + buf;
+          if (sig != id(last_render_sig)) {
+            ESP_LOGI("display", "Content changed; updating e-paper");
+            id(last_render_sig) = sig;
+            id(display_refreshes) += 1;
+            id(display_refreshes_sensor).publish_state(id(display_refreshes));
+            if (id(ha_time).now().is_valid()) {
+              id(last_display_update_ts) = id(ha_time).now().timestamp;
+              id(last_display_update).publish_state(id(last_display_update_ts));
+            }
+            id(epaper_display).update();
+            if (have_data && wifi::global_wifi_component->is_connected() && api::global_api_server->is_connected() && id(disable_deep_sleep).has_state() && !id(disable_deep_sleep).state) {
+              id(go_to_sleep_soon).execute();
+            } else {
+              ESP_LOGI("display", "Skipping sleep (missing data/connection or sleep disabled/pending HA state)");
+            }
+          } else {
+            ESP_LOGI("display", "Content unchanged; skip update");
+          }
+
+  - id: render_with_debounce
+    mode: restart
+    then:
+      - delay: 3s
+      - script.execute: maybe_update_display
+
 spi:
   clk_pin: GPIO7
   mosi_pin: GPIO9
+i2c:
+  scl: GPIO20
+  sda: GPIO19
+
+interval:
+  - interval: 30s
+    then:
+      - script.execute: render_with_debounce
 
 display:
   - platform: waveshare_epaper
@@ -208,84 +442,124 @@ display:
     update_interval: never
     lambda: |-
       using namespace esphome;
-      ESP_LOGD("calendar", "Render start");
-      // Force white background with black text
-      it.fill(Color::WHITE);
-      // Header + poop status
-      it.printf(6, 6, id(font_title), Color::BLACK, "Poop in the Hut:");
-      if (!isnan(id(poopHutBin).state)) {
-        it.printf(6, 38, id(font_title), Color::BLACK, "%.0f%%", id(poopHutBin).state);
-      } else {
-        it.printf(6, 38, id(font_title), Color::BLACK, "--");
-      }
+      const int scr_w = 800;
+      const int scr_h = 480;
+      const int pad = 16;
+      const int gutter = 12;
+      const int right_w = 220;
+      const int left_w = scr_w - right_w - pad * 2 - gutter;
+      const int left_x = pad;
+      const int right_x = left_x + left_w + gutter;
+      const int divider_x = right_x - gutter / 2;
 
-      int y = 78;
+      const Color bg = Color::BLACK;
+      const Color fg = Color::WHITE;
+
+      it.fill(bg);
+
       // Calendar heading
+      int y = pad;
       if (!id(calendar_day_name).state.empty() && !id(calendar_date).state.empty()) {
-        it.printf(6, y, id(font_body), Color::BLACK, "%s, %s",
-                  id(calendar_day_name).state.c_str(),
-                  id(calendar_date).state.c_str());
-        y += 22;
+        it.printf(left_x, y, id(font_title), fg, "%s", id(calendar_day_name).state.c_str());
+        it.printf(left_x, y + 28, id(font_body), fg, "%s", id(calendar_date).state.c_str());
       } else {
-        it.printf(6, y, id(font_body), Color::BLACK, "Calendar");
-        y += 22;
+        it.printf(left_x, y, id(font_title), fg, "Calendar");
       }
+      y += 60;
 
       // Parse calendar entries JSON
       auto json_str = id(calendar_entries_raw).state;
       if (json_str.empty()) {
-        it.printf(6, y, id(font_small), Color::BLACK, "No calendar data");
+        it.printf(left_x, y, id(font_small), fg, "No calendar data");
         ESP_LOGW("calendar", "No calendar data; raw string empty");
-        return;
-      }
+      } else {
+        ESP_LOGW("calendar", "Calendar JSON len=%d", (int)json_str.size());
+        ESP_LOGD("calendar", "Calendar JSON preview: %s", json_str.substr(0, 200).c_str());
 
-      ESP_LOGW("calendar", "Calendar JSON len=%d", (int)json_str.size());
-      ESP_LOGD("calendar", "Calendar JSON preview: %s", json_str.substr(0, 200).c_str());
-      ESP_LOGI("calendar", "Calendar JSON full: %s", json_str.c_str());
+        auto doc = json::parse_json(json_str);
+        if (!doc.is<JsonArray>() && !doc.is<JsonObject>()) {
+          it.printf(left_x, y, id(font_small), fg, "Bad calendar data");
+          ESP_LOGW("calendar", "Failed to parse calendar JSON");
+        } else {
+          JsonArray days = doc.as<JsonArray>();
+          if (days.isNull()) {
+            ESP_LOGW("calendar", "Root is not an array");
+            it.printf(left_x, y, id(font_small), fg, "Bad calendar data");
+          } else {
+            ESP_LOGW("calendar", "Days count: %u", days.size());
+            const int max_events = 10;
+            int shown = 0;
+            int day_idx = 0;
+            for (JsonObject day : days) {
+              if (shown >= max_events || y > scr_h - pad - 20) break;
+              const char *day_name = day["day_name"] | "";
+              int day_num = day["day"] | 0;
+              ESP_LOGW("calendar", "Day[%d] %s %d", day_idx, day_name, day_num);
+              it.printf(left_x, y, id(font_body), fg, "%s %d", day_name, day_num);
+              y += 20;
 
-      auto doc = json::parse_json(json_str);
-      if (!doc.is<JsonArray>() && !doc.is<JsonObject>()) {
-        it.printf(6, y, id(font_small), Color::BLACK, "Bad calendar data");
-        ESP_LOGW("calendar", "Failed to parse calendar JSON");
-        return;
-      }
-
-      JsonArray days = doc.as<JsonArray>();
-      if (days.isNull()) {
-        ESP_LOGW("calendar", "Root is not an array");
-        it.printf(6, y, id(font_small), Color::BLACK, "Bad calendar data");
-        return;
-      }
-      ESP_LOGW("calendar", "Days count: %u", days.size());
-
-      int shown = 0;
-      int ly = y;
-      int day_idx = 0;
-      for (JsonObject day : days) {
-        if (shown >= 5) break;
-        const char *day_name = day["day_name"] | "";
-        int day_num = day["day"] | 0;
-        ESP_LOGW("calendar", "Day[%d] %s %d", day_idx, day_name, day_num);
-        it.printf(6, ly, id(font_small), Color::BLACK, "%s %d", day_name, day_num);
-        ly += 16;
-
-        JsonArray other = day["other"];
-        ESP_LOGD("calendar", "Day[%d] has %u events", day_idx, other.size());
-        for (JsonObject ev : other) {
-          if (shown >= 5) break;
-          const char *title = ev["summary"] | ev["description"] | "";
-          std::string start = ev["start"] | "";
-          auto tpos = start.find('T');
-          if (tpos != std::string::npos && start.size() >= tpos + 5) {
-            start = start.substr(tpos + 1, 5);
+              JsonArray other = day["other"];
+              ESP_LOGD("calendar", "Day[%d] has %u events", day_idx, other.size());
+              for (JsonObject ev : other) {
+                if (shown >= max_events || y > scr_h - pad - 20) break;
+                const char *title = ev["summary"] | ev["description"] | "";
+                std::string start = ev["start"] | "";
+                auto tpos = start.find('T');
+                if (tpos != std::string::npos && start.size() >= tpos + 5) {
+                  start = start.substr(tpos + 1, 5);
+                }
+                std::string time_str = start.empty() ? "--:--" : start;
+                ESP_LOGW("calendar", "Event %s %s", time_str.c_str(), title);
+                it.printf(left_x + 4, y, id(font_small), fg, "%s", time_str.c_str());
+                it.printf(left_x + 70, y, id(font_small), fg, "%s", title);
+                y += 18;
+                shown++;
+              }
+              day_idx++;
+              y += 10;  // gap between days
+            }
           }
-          ESP_LOGW("calendar", "Event %s %s", start.c_str(), title);
-          it.printf(10, ly, id(font_small), Color::BLACK, "%s", start.c_str());
-          ly += 14;
-          it.printf(10, ly, id(font_small), Color::BLACK, "%s", title);
-          ly += 14;
-          shown++;
         }
-        day_idx++;
-        ly += 6; // small gap between days
+      }
+
+      // Divider between calendar and status column
+      it.filled_rectangle(divider_x, pad, 2, scr_h - pad * 2, fg);
+
+      // Litter-Robot status on the right
+      int ry = pad;
+      it.printf(right_x, ry, id(cat_emojis), fg, "\U000F011B\U000F01F7");
+      ry += 28;
+
+      auto draw_bar = [&](const char *label, float value) {
+        it.printf(right_x, ry, id(font_small), fg, "%s", label);
+        ry += 17;
+        const int bar_w = right_w - 20;
+        const int bar_h = 10;
+        const int bar_x = right_x;
+        const int bar_y = ry;
+        it.rectangle(bar_x, bar_y, bar_w, bar_h, fg);
+        if (!isnan(value)) {
+          float clamped = value;
+          if (clamped < 0) clamped = 0;
+          if (clamped > 100) clamped = 100;
+          int fill_w = (int)((clamped / 100.0f) * (float)(bar_w - 2));
+          it.filled_rectangle(bar_x + 1, bar_y + 1, fill_w, bar_h - 2, fg);
+          it.printf(bar_x + bar_w + 6, bar_y - 2, id(font_small), fg, "%.0f%%", value);
+        } else {
+          it.printf(bar_x + bar_w + 6, bar_y - 2, id(font_small), fg, "--");
+        }
+        ry += bar_h + 10;
+      };
+
+      draw_bar("Drawer", id(poopHutBin).state);
+      draw_bar("Litter", id(poopHutLitter).state);
+
+      ry += 8;
+      it.printf(right_x, ry, id(font_body), fg, "Battery");
+      ry += 22;
+      it.printf(right_x, ry, id(font_bat_icon), fg, "%s", id(battery_glyph).c_str());
+      if (!isnan(id(battery_level).state)) {
+        it.printf(right_x + 50, ry + 2, id(font_body), fg, "%.0f%%", id(battery_level).state);
+      } else {
+        it.printf(right_x + 50, ry + 2, id(font_body), fg, "--");
       }
