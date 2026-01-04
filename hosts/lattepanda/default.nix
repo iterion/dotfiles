@@ -73,6 +73,12 @@
         unit_system = "us_customary";
       };
       default_config = {};
+      mqtt = {
+        broker = "127.0.0.1";
+        discovery = true;
+        username = "homeassistant";
+        password = "!secret mqtt_password";
+      };
       python_script = {};
       input_boolean = {
         disable_deep_sleep = {
@@ -142,6 +148,20 @@
     };
   };
 
+  services.mosquitto = {
+    enable = true;
+    listeners = [
+      {
+        address = "0.0.0.0";
+        port = 1883;
+      }
+    ];
+    allowAnonymous = false;
+    passwordFile = "/var/lib/mosquitto/passwd";
+  };
+
+  networking.firewall.allowedTCPPorts = (config.networking.firewall.allowedTCPPorts or []) ++ [1883];
+
   # Home Assistant Bluetooth needs BlueZ running
   hardware.bluetooth.enable = true;
   services.dbus.packages = [pkgs.bluez];
@@ -196,6 +216,7 @@
     "d /var/lib/esphome/.platformio/penv/bin 0755 esphome esphome - -"
     "d /var/lib/esphome/fonts 0755 esphome esphome - -"
     "L+ /var/lib/esphome/fonts/materialdesignicons-webfont.ttf - - - - ${mdiWebfont}/fonts/materialdesignicons-webfont.ttf"
+    "d /var/lib/mosquitto 0750 mosquitto mosquitto - -"
   ];
 
   system.activationScripts.esphomeCalendarScript = ''
