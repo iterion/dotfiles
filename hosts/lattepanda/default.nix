@@ -156,7 +156,7 @@
         port = 1883;
       }
     ];
-    extraConf = ''
+    extraConfig = ''
       allow_anonymous false
       password_file /var/lib/mosquitto/passwd
     '';
