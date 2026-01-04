@@ -156,8 +156,10 @@
         port = 1883;
       }
     ];
-    allowAnonymous = false;
-    passwordFile = "/var/lib/mosquitto/passwd";
+    extraConf = ''
+      allow_anonymous false
+      password_file /var/lib/mosquitto/passwd
+    '';
   };
 
   networking.firewall.allowedTCPPorts = (config.networking.firewall.allowedTCPPorts or []) ++ [1883];
