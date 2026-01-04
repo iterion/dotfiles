@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }: {
   imports = [
@@ -164,7 +165,7 @@
     ];
   };
 
-  networking.firewall.allowedTCPPorts = (config.networking.firewall.allowedTCPPorts or []) ++ [1883];
+  networking.firewall.allowedTCPPorts = lib.mkAfter [1883];
 
   # Home Assistant Bluetooth needs BlueZ running
   hardware.bluetooth.enable = true;
