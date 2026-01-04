@@ -154,12 +154,14 @@
       {
         address = "0.0.0.0";
         port = 1883;
+        users = {
+          homeassistant = {
+            passwordFile = "/var/lib/mosquitto/passwd";
+            acl = ["topic readwrite #"];
+          };
+        };
       }
     ];
-    extraConfig = ''
-      allow_anonymous false
-      password_file /var/lib/mosquitto/passwd
-    '';
   };
 
   networking.firewall.allowedTCPPorts = (config.networking.firewall.allowedTCPPorts or []) ++ [1883];
