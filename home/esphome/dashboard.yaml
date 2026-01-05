@@ -473,6 +473,18 @@ display:
         it.printf(left_x, y, id(font_small), fg, "No calendar data");
         ESP_LOGW("calendar", "No calendar data; raw string empty");
       } else {
+        auto to_ampm = [](const std::string &hhmm) -> std::string {
+          if (hhmm.size() < 4) return hhmm;
+          int hour = 0;
+          int minute = 0;
+          if (sscanf(hhmm.c_str(), "%d:%d", &hour, &minute) != 2) return hhmm;
+          const char *meridiem = hour >= 12 ? "PM" : "AM";
+          hour = hour % 12;
+          if (hour == 0) hour = 12;
+          char buf[8];
+          snprintf(buf, sizeof(buf), "%d:%02d%s", hour, minute, meridiem);
+          return std::string(buf);
+        };
         ESP_LOGW("calendar", "Calendar JSON len=%d", (int)json_str.size());
         ESP_LOGD("calendar", "Calendar JSON preview: %s", json_str.substr(0, 200).c_str());
 
@@ -508,7 +520,7 @@ display:
                 if (tpos != std::string::npos && start.size() >= tpos + 5) {
                   start = start.substr(tpos + 1, 5);
                 }
-                std::string time_str = start.empty() ? "--:--" : start;
+                std::string time_str = start.empty() ? "--:--" : to_ampm(start);
                 ESP_LOGW("calendar", "Event %s %s", time_str.c_str(), title);
                 it.printf(left_x + 4, y, id(font_small), fg, "%s", time_str.c_str());
                 it.printf(left_x + 70, y, id(font_small), fg, "%s", title);

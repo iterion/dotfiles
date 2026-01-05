@@ -11,7 +11,9 @@
 
   networking.hostName = "lattepanda-nixos";
 
-  environment.systemPackages = [];
+  environment.systemPackages = [
+    pkgs.mosquitto
+  ];
 
   # use systemd boot as we don't need grub
   boot.loader.systemd-boot.enable = true;
@@ -27,6 +29,7 @@
       "unifiprotect"
       "tesla_wall_connector"
       "tplink"
+      "mqtt"
       "nest"
       "solaredge"
       "litterrobot"
@@ -51,6 +54,7 @@
       gtts = pythonPackages."gtts" or null;
       aladdin = pythonPackages."pyaladdinconnect" or null;
       teslaFleet = pythonPackages."tesla-fleet-api" or null;
+      caseta = pythonPackages."pylutron-caseta";
     in
       builtins.filter (p: p != null) [
         googleNest
@@ -66,6 +70,7 @@
         gtts
         aladdin
         teslaFleet
+        caseta
       ];
     config = {
       homeassistant = {
@@ -74,12 +79,6 @@
         unit_system = "us_customary";
       };
       default_config = {};
-      mqtt = {
-        broker = "127.0.0.1";
-        discovery = true;
-        username = "homeassistant";
-        password = "!secret mqtt_password";
-      };
       python_script = {};
       input_boolean = {
         disable_deep_sleep = {
@@ -96,6 +95,14 @@
                 {% set cal = states.sensor.esp_calendar_data %}
                 {% set disp = states.sensor.epaper_calendar_last_display_update %}
                 {{ cal is not none and disp is not none and cal.last_updated > disp.last_updated }}
+              '';
+            }
+            {
+              name = "Office Presence Detection - combined";
+              state = ''
+                {% set ld2450 = states.binary_sensor.apollo_r_pro_1_ld2450_presence %}
+                {% set ld2412 = states.binary_sensor.apollo_r_pro_1_ld2412_presence %}
+                {{ ld2450 or ld2412 }}
               '';
             }
           ];
@@ -135,17 +142,21 @@
                 todays_day_name = ''
                   {{ ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][now().weekday()] }}
                 '';
-                    todays_date_month_year = ''
-                      {% set months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] %}
-                      {{ months[now().month-1] }} {{  now().strftime('%Y') }}
-                    '';
-                    closest_end_time = "{{ as_timestamp(calendar_converted.closest_end_time, default=0) }}";
-                    entries = "{{ calendar_converted.entries | tojson }}";
-                  };
-                }
-              ];
+                todays_date_month_year = ''
+                  {% set months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] %}
+                  {{ months[now().month-1] }} {{  now().strftime('%Y') }}
+                '';
+                closest_end_time = "{{ as_timestamp(calendar_converted.closest_end_time, default=0) }}";
+                entries = "{{ calendar_converted.entries | tojson }}";
+              };
             }
           ];
+        }
+      ];
+    };
+    config = {
+      "automation nixos" = [];
+      "automation ui" = "!include automations.yaml";
     };
   };
 
@@ -155,10 +166,13 @@
       {
         address = "0.0.0.0";
         port = 1883;
+        settings = {
+          allow_anonymous = false;
+        };
         users = {
           homeassistant = {
-            passwordFile = "/var/lib/mosquitto/passwd";
-            acl = ["topic readwrite #"];
+            hashedPasswordFile = "/var/lib/mosquitto/homeassistant.hash";
+            acl = ["readwrite #"];
           };
         };
       }
