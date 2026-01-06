@@ -180,7 +180,15 @@
     ];
   };
 
-  networking.firewall.allowedTCPPorts = lib.mkAfter [1883];
+  services.music-assistant = {
+    enable = true;
+    providers = [
+      "applemusic"
+      "spotify"
+    ];
+  };
+
+  networking.firewall.allowedTCPPorts = lib.mkAfter [1883 8095];
 
   # Home Assistant Bluetooth needs BlueZ running
   hardware.bluetooth.enable = true;

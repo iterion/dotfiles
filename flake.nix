@@ -60,7 +60,9 @@
       sops-nix,
       ...
     }@inputs:
-    {
+    let
+      forAllSystems = systems: f: nixpkgs.lib.genAttrs systems (system: f system);
+    in {
       nixosConfigurations = {
         iterion-nixos = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -158,5 +160,20 @@
           ];
         };
       };
+      devShells =
+        forAllSystems [ "aarch64-darwin" "x86_64-darwin" ] (system:
+          let
+            pkgs = import nixpkgs { inherit system; };
+          in {
+            default = pkgs.mkShell {
+              packages = with pkgs; [
+                nixos-rebuild
+                git
+                openssh
+                sops
+                nixpkgs-fmt
+              ];
+            };
+          });
     };
 }
