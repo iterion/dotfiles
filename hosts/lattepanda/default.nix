@@ -100,8 +100,8 @@
             {
               name = "Office Presence Detection - combined";
               state = ''
-                {% set ld2450 = states.binary_sensor.apollo_r_pro_1_ld2450_presence %}
-                {% set ld2412 = states.binary_sensor.apollo_r_pro_1_ld2412_presence %}
+                {% set ld2450 = is_state('binary_sensor.apollo_r_pro_1_ld2450_presence','on') %}
+                {% set ld2412 = is_state('binary_sensor.apollo_r_pro_1_ld2412_presence','on') %}
                 {{ ld2450 or ld2412 }}
               '';
             }
