@@ -99,6 +99,7 @@
             }
             {
               name = "Office Presence Detection - combined";
+              device_class = "occupancy";
               state = ''
                 {% set ld2450 = is_state('binary_sensor.apollo_r_pro_1_ld2450_presence','on') %}
                 {% set ld2412 = is_state('binary_sensor.apollo_r_pro_1_ld2412_presence','on') %}
