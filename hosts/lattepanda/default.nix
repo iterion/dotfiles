@@ -40,6 +40,7 @@
       "tesla_wall_connector"
       "tplink"
       "unifiprotect"
+      "zha"
     ];
     extraPackages = pythonPackages: let
       googleNest = pythonPackages."google-nest-sdm" or null;
@@ -203,6 +204,9 @@
       };
       serial = {
         port = "/dev/serial/by-id/usb-Nabu_Casa_ZBT-2_DCB4D912E904-if00";
+        adapter = "ember";
+        baudrate = 460800;
+        rtscts = true;
       };
       frontend = {
         port = 8080;
@@ -212,6 +216,7 @@
   };
 
   networking.firewall.allowedTCPPorts = lib.mkAfter [1883 8095 8080];
+  systemd.services.zigbee2mqtt.serviceConfig.SupplementaryGroups = ["dialout"];
 
   # Home Assistant Bluetooth needs BlueZ running
   hardware.bluetooth.enable = true;
