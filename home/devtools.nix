@@ -85,6 +85,9 @@
 in {
   home.packages = with pkgs;
     [
+      # agentic tools
+      opencode
+
       # secret scanning
       trufflehog
 

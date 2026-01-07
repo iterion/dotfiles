@@ -25,20 +25,21 @@
     enable = true;
     openFirewall = true;
     extraComponents = [
+      "aladdin_connect"
+      "caldav"
+      "esphome"
       "google"
-      "unifiprotect"
+      "hue"
+      "litterrobot"
+      "mqtt"
+      "music_assistant"
+      "nest"
+      "python_script"
+      "solaredge"
+      "tesla_fleet"
       "tesla_wall_connector"
       "tplink"
-      "mqtt"
-      "nest"
-      "solaredge"
-      "litterrobot"
-      "caldav"
-      "hue"
-      "aladdin_connect"
-      "tesla_fleet"
-      "esphome"
-      "python_script"
+      "unifiprotect"
     ];
     extraPackages = pythonPackages: let
       googleNest = pythonPackages."google-nest-sdm" or null;
@@ -183,12 +184,34 @@
   services.music-assistant = {
     enable = true;
     providers = [
-      "applemusic"
+      "apple_music"
+      "chromecast"
       "spotify"
+      "tidal"
     ];
   };
 
-  networking.firewall.allowedTCPPorts = lib.mkAfter [1883 8095];
+  services.zigbee2mqtt = {
+    enable = true;
+    settings = {
+      homeassistant.enable = true;
+      permit_join = false;
+      mqtt = {
+        server = "mqtt://127.0.0.1:1883";
+        user = "homeassistant";
+        password = "!secret mqtt_password";
+      };
+      serial = {
+        port = "/dev/serial/by-id/usb-Nabu_Casa_ZBT-2_DCB4D912E904-if00";
+      };
+      frontend = {
+        port = 8080;
+      };
+      advanced.log_level = "info";
+    };
+  };
+
+  networking.firewall.allowedTCPPorts = lib.mkAfter [1883 8095 8080];
 
   # Home Assistant Bluetooth needs BlueZ running
   hardware.bluetooth.enable = true;
