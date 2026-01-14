@@ -3,7 +3,20 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+let
+  mdiWebfont = pkgs.fetchzip {
+    url = "https://github.com/Templarian/MaterialDesign-Webfont/archive/refs/tags/v7.4.47.zip";
+    hash = "sha256-xVhKiAJy/2JaP6HEatzpuDwCbFSvPiIhdhM2csMDFbI=";
+    stripRoot = true;
+  };
+  openaiStt = pkgs.fetchFromGitHub {
+    owner = "einToast";
+    repo = "openai_stt_ha";
+    rev = "v1.2.0";
+    hash = "sha256-1c7n341304dii6xq9bh594jpqfffcmm6c2hdwb7v5iifbmbz124l";
+  };
+in {
   imports = [
     ../base
     ./hardware-configuration.nix
@@ -20,6 +33,9 @@
 
   # What is my purpose? You tell children to go to bed. Oh my god.
   services.lightsout.enable = true;
+
+  # Keep system time in sync for HA/automation accuracy
+  services.timesyncd.enable = true;
 
   services.home-assistant = {
     enable = true;
@@ -160,6 +176,14 @@
     config = {
       "automation nixos" = [];
       "automation ui" = "!include automations.yaml";
+      bluetooth = {};
+      stt = [
+        {
+          platform = "openai_stt";
+          api_key = "!secret openai_api_key";
+          model = "gpt-4o-mini-transcribe";
+        }
+      ];
     };
   };
 
@@ -216,6 +240,19 @@
   };
 
   networking.firewall.allowedTCPPorts = lib.mkAfter [1883 8095 8080];
+  networking.firewall.allowedTCPPortRanges = lib.mkAfter [
+    {
+      from = 4953;
+      to = 5153;
+    }
+  ];
+  networking.firewall.allowedUDPPortRanges = lib.mkAfter [
+    {
+      from = 4953;
+      to = 5153;
+    }
+  ];
+  networking.firewall.allowedUDPPorts = lib.mkAfter [5353];
   systemd.services.zigbee2mqtt.serviceConfig.SupplementaryGroups = ["dialout"];
 
   # Home Assistant Bluetooth needs BlueZ running
@@ -255,15 +292,19 @@
     AmbientCapabilities = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
     CapabilityBoundingSet = ["CAP_NET_ADMIN" "CAP_NET_RAW"];
   };
-  systemd.tmpfiles.rules = let
-    mdiWebfont = pkgs.fetchzip {
-      url = "https://github.com/Templarian/MaterialDesign-Webfont/archive/refs/tags/v7.4.47.zip";
-      hash = "sha256-xVhKiAJy/2JaP6HEatzpuDwCbFSvPiIhdhM2csMDFbI=";
-      stripRoot = true;
+  # Avahi for mDNS/Snapcast discovery
+  services.avahi = {
+    daemon = {
+      enable = true;
+      publish.enable = true;
+      publish.userServices = true;
     };
-  in [
+  };
+  systemd.tmpfiles.rules = [
     "d /var/lib/hass/blueprints 0755 hass hass - -"
     "d /var/lib/hass/python_scripts 0755 hass hass - -"
+    "d /var/lib/hass/custom_components 0755 hass hass - -"
+    "d /var/lib/hass/custom_components/openai_stt 0755 hass hass - -"
     "C! /var/lib/hass/python_scripts/esp_calendar_data_conversion.py 0640 hass hass - ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py}"
     "d /var/lib/esphome/.cache 0755 esphome esphome - -"
     "d /var/lib/esphome/.cache/uv 0755 esphome esphome - -"
@@ -280,6 +321,9 @@
     rm -f /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
     install -m0640 ${../../home/home-assistant/python_scripts/esp_calendar_data_conversion.py} /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
     chown hass:hass /var/lib/hass/python_scripts/esp_calendar_data_conversion.py
+    rm -rf /var/lib/hass/custom_components/openai_stt
+    cp -R ${openaiStt}/custom_components/openai_stt /var/lib/hass/custom_components/
+    chown -R hass:hass /var/lib/hass/custom_components/openai_stt
   '';
 
   # This value determines the NixOS release from which the default
