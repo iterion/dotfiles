@@ -251,6 +251,7 @@ in {
           ];
           paginate = "never";
         };
+        "remotes.origin.auto-track-bookmarks" = true;
       };
     };
     git = {

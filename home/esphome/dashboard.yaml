@@ -114,6 +114,22 @@ sensor:
       then:
         - script.execute: render_with_debounce
 
+  - platform: homeassistant
+    entity_id: sensor.poop_chateau_waste_drawer
+    id: poopChateauBin
+    internal: true
+    on_value:
+      then:
+        - script.execute: render_with_debounce
+
+  - platform: homeassistant
+    entity_id: sensor.poop_chateau_litter_level
+    id: poopChateauLitter
+    internal: true
+    on_value:
+      then:
+        - script.execute: render_with_debounce
+
   # display has onboard temp & humidity
   - platform: sht4x
     temperature:
@@ -512,6 +528,23 @@ display:
 
               JsonArray other = day["other"];
               ESP_LOGD("calendar", "Day[%d] has %u events", day_idx, other.size());
+              JsonArray all_day = day["all_day"];
+              // Render all-day events first
+              for (JsonObject ev : all_day) {
+                if (shown >= max_events || y > scr_h - pad - 20) break;
+                const char *title = ev["summary"] | ev["description"] | "";
+                std::string subtitle = ev["calendar_name"] | "";
+                ESP_LOGW("calendar", "All-day event %s", title);
+                it.printf(left_x + 4, y, id(font_small), fg, "All day");
+                y += 18;
+                it.printf(left_x + 70, y, id(font_small), fg, "%s", title);
+                y += 18;
+                if (!subtitle.empty()) {
+                  it.printf(left_x + 70, y, id(font_small), fg, "%s", subtitle.c_str());
+                  y += 16;
+                }
+                shown++;
+              }
               for (JsonObject ev : other) {
                 if (shown >= max_events || y > scr_h - pad - 20) break;
                 const char *title = ev["summary"] | ev["description"] | "";
@@ -539,13 +572,10 @@ display:
 
       // Litter-Robot status on the right
       int ry = pad;
-      it.printf(right_x, ry, id(cat_emojis), fg, "\U000F011B\U000F01F7");
-      ry += 28;
-
       auto draw_bar = [&](const char *label, float value) {
         it.printf(right_x, ry, id(font_small), fg, "%s", label);
-        ry += 17;
-        const int bar_w = right_w - 20;
+        ry += 15;
+        const int bar_w = right_w - 32;
         const int bar_h = 10;
         const int bar_x = right_x;
         const int bar_y = ry;
@@ -556,15 +586,24 @@ display:
           if (clamped > 100) clamped = 100;
           int fill_w = (int)((clamped / 100.0f) * (float)(bar_w - 2));
           it.filled_rectangle(bar_x + 1, bar_y + 1, fill_w, bar_h - 2, fg);
-          it.printf(bar_x + bar_w + 6, bar_y - 2, id(font_small), fg, "%.0f%%", value);
+          it.printf(bar_x + bar_w + 6, bar_y - 1, id(font_small), fg, "%.0f%%", value);
         } else {
-          it.printf(bar_x + bar_w + 6, bar_y - 2, id(font_small), fg, "--");
+          it.printf(bar_x + bar_w + 6, bar_y - 1, id(font_small), fg, "--");
         }
         ry += bar_h + 10;
       };
 
-      draw_bar("Drawer", id(poopHutBin).state);
-      draw_bar("Litter", id(poopHutLitter).state);
+      auto draw_section = [&](const char *title, const char *icon, float drawer_val, float litter_val) {
+        it.printf(right_x, ry, id(cat_emojis), fg, "%s", icon);
+        it.printf(right_x + 26, ry, id(font_small), fg, "%s", title);
+        ry += 16;
+        draw_bar("Drawer", drawer_val);
+        draw_bar("Litter", litter_val);
+        ry += 6;
+      };
+
+      draw_section("Hut", "\U000F011B\U000F01F7", id(poopHutBin).state, id(poopHutLitter).state);
+      draw_section("Chateau", "\U000F011B", id(poopChateauBin).state, id(poopChateauLitter).state);
 
       ry += 8;
       it.printf(right_x, ry, id(font_body), fg, "Battery");
