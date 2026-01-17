@@ -44,10 +44,6 @@
       url = "github:sahaj-b/ghostty-cursor-shaders";
       flake = false;
     };
-
-    ghostty = {
-      url = "github:ghostty-org/ghostty";
-    };
   };
 
   outputs =

@@ -43,7 +43,7 @@
     ];
     profiles."iterion-default" = {
       approval_policy = "on-request";
-      model = "gpt-5.2-codex";
+      model = "gpt-5.3-codex";
       model_reasoning_effort = "high";
       sandbox_mode = "workspace-write";
     };
@@ -121,7 +121,10 @@ in {
   };
   home.file = lib.mkMerge [
     {
-      ".codex/config.toml".text = codexToml;
+      ".codex/config.toml" = {
+        text = codexToml;
+        force = true;
+      };
       ".codex/notify" = {
         source = ./codex/notify.py;
         executable = true;

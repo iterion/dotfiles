@@ -9,7 +9,6 @@
   system = pkgs.stdenv.hostPlatform.system;
   desktopEnabled = config.iterion.desktop.enable;
   workEnabled = config.iterion.work.enable;
-  ghosttyPackage = inputs.ghostty.packages.${system}.default;
 in {
   imports = [
     # inputs.anyrun.homeManagerModules.anyrun
@@ -63,9 +62,7 @@ in {
   ++ lib.optionals workEnabled (with pkgs; [
     vault
   ])
-  ++ lib.optionals (pkgs.stdenv.isDarwin || (pkgs.stdenv.isLinux && desktopEnabled)) [
-    ghosttyPackage
-  ];
+  ++ lib.optionals (pkgs.stdenv.isLinux && desktopEnabled) [ pkgs.ghostty ];
 
   programs = {
     btop = {

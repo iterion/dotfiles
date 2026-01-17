@@ -42,6 +42,7 @@
     enable = true;
     casks = [
       "1password-cli"
+      "codex"
       "github"
       "slack"
       "zoom"
@@ -49,6 +50,7 @@
       "gpg-suite"
       "spotify"
       "xquartz"
+      "ghostty"
     ];
   };
 
@@ -79,7 +81,6 @@
       tailscale
       fleetctl
       alejandra
-      codex
     ];
     pathsToLink = ["/share/zsh"];
     shells = with pkgs; [
