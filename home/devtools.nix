@@ -43,7 +43,7 @@
     ];
     profiles."iterion-default" = {
       approval_policy = "on-request";
-      model = "gpt-5.3-codex";
+      model = "gpt-5.4";
       model_reasoning_effort = "high";
       sandbox_mode = "workspace-write";
     };
@@ -63,7 +63,7 @@
     };
     web_search_request = true;
   };
-  codexToml = builtins.readFile (tomlFormat.generate "codex-config" codexConfig);
+  codexTomlFile = tomlFormat.generate "codex-config" codexConfig;
   secretsFilePath = "${inputs.self}/secrets/codex.yaml";
   havePushoverSecrets = builtins.pathExists secretsFilePath;
   ageKeyFile = "${homeDir}/.config/sops/age/keys.txt";
@@ -122,7 +122,7 @@ in {
   home.file = lib.mkMerge [
     {
       ".codex/config.toml" = {
-        text = codexToml;
+        source = codexTomlFile;
         force = true;
       };
       ".codex/notify" = {

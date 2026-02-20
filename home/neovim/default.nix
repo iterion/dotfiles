@@ -1,4 +1,25 @@
-{pkgs, ...}: {
+{pkgs, ...}: let
+  treesitterGrammars = grammars: with grammars; [
+    bash
+    hcl
+    javascript
+    json
+    lua
+    markdown
+    markdown_inline
+    nix
+    query
+    regex
+    rust
+    toml
+    tsx
+    typescript
+    vim
+    vimdoc
+    yaml
+    zig
+  ];
+in {
   home.packages = with pkgs; [
     biome
     nil
@@ -15,18 +36,20 @@
     vimAlias = true;
     vimdiffAlias = true;
     defaultEditor = true;
+    withNodeJs = false;
+    withPython3 = false;
+    withRuby = false;
     plugins = with pkgs.vimPlugins; [
       fzf-vim
-      luasnip
       nvim-dap
       nvim-dap-virtual-text
       nvim-lspconfig
-      nvim-treesitter.withAllGrammars
+      (nvim-treesitter.withPlugins treesitterGrammars)
       plenary-nvim
       rustaceanvim
       telescope-nvim
       typescript-tools-nvim
     ];
-    extraLuaConfig = builtins.readFile ./config.lua;
+    initLua = builtins.readFile ./config.lua;
   };
 }

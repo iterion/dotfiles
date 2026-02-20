@@ -3,7 +3,7 @@
 in {
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
-      helvum
+      crosspipe
       coppwr
     ];
     programs.waybar = {

@@ -4,6 +4,10 @@
   inputs = {
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    # jj = {
+    #   url = "github:iterion/jj/submodules";
+    #   flake = false;
+    # };
 
     home-manager = {
       url = "github:nix-community/home-manager";

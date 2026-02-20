@@ -1,10 +1,13 @@
 vim.g.mapleader = ","
+vim.g.maplocalleader = ","
 vim.opt.relativenumber = false
 vim.opt.number = true
 vim.opt.spell = true
 vim.opt.signcolumn = "auto"
 vim.opt.clipboard = "unnamedplus"
 vim.opt.wrap = false
+vim.opt.winborder = "rounded"
+vim.opt.pumborder = "rounded"
 vim.opt.completeopt = "menuone,fuzzy,noinsert,popup"
 
 -- use alejandra
@@ -19,7 +22,7 @@ vim.lsp.config('nil_ls', {
 
 vim.lsp.config('biome', {
   cmd = { 'biome', 'lsp-proxy' },
-  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'json', 'jsonc' },
   root_markers = { 'biome.json', 'biome.jsonc', 'package.json', '.git' },
 })
 
@@ -37,11 +40,18 @@ local function on_attach(client, bufnr)
   if client:supports_method('textDocument/completion') then
     pcall(vim.lsp.completion.enable, true, client.id, bufnr, { autotrigger = true })
   end
+
+  local opts = { buffer = bufnr, silent = true }
+  vim.keymap.set({ "n", "x" }, "<F3>", function() vim.lsp.buf.format({ async = true }) end, opts)
 end
 
 local function is_js_like(ft)
   return ft == "javascript" or ft == "javascriptreact"
     or ft == "typescript" or ft == "typescriptreact"
+end
+
+local function prefers_biome(ft)
+  return is_js_like(ft) or ft == "json" or ft == "jsonc"
 end
 
 local fmt_group = vim.api.nvim_create_augroup("LspAutoFormat", { clear = true })
@@ -66,7 +76,7 @@ vim.api.nvim_create_autocmd("BufWritePre", {
           return client.name == "nil_ls"
         end
         -- Prefer biome for JS/TS, avoid tsserver formatting
-        if is_js_like(ft) then
+        if prefers_biome(ft) then
           return client.name == "biome"
         end
         -- Never treat eslint as a formatter for other filetypes
@@ -96,9 +106,6 @@ vim.g.rustaceanvim = {
   },
   server = {
     on_attach = function(client, bufnr)
-      -- Reuse your global LSP on_attach features (inlay hints, completion, etc.)
-      if type(on_attach) == "function" then on_attach(client, bufnr) end
-
       local opts = { buffer = bufnr, silent = true }
       -- Rough equivalents to your rust-tools mappings:
       vim.keymap.set("n", "<C-space>", function() vim.cmd.RustLsp("hover", "actions") end, opts)
@@ -123,7 +130,6 @@ require("typescript-tools").setup({
   on_attach = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = false
     client.server_capabilities.documentRangeFormattingProvider = false
-    if type(on_attach) == "function" then on_attach(client, bufnr) end
   end,
 })
 
@@ -132,32 +138,6 @@ vim.diagnostic.config({
   virtual_text = { spacing = 2, prefix = "●" },
   severity_sort = true,
   float = { border = "rounded", source = "if_many" },
-})
-
-vim.lsp.handlers["textDocument/hover"] =
-  vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-vim.lsp.handlers["textDocument/signatureHelp"] =
-  vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
-
--- Handy LSP keymaps on attach
-vim.api.nvim_create_autocmd("LspAttach", {
-  callback = function(ev)
-    local bufnr = ev.buf
-    local opts = { buffer = bufnr, silent = true }
---     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
---     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
---     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
---     vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
---     vim.keymap.set("n", "go", vim.lsp.buf.type_definition, opts)
---     vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
---     vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
---     vim.keymap.set("n", "<F2>", vim.lsp.buf.rename, opts)
-    vim.keymap.set({ "n", "x" }, "<F3>", function() vim.lsp.buf.format({ async = true }) end, opts)
---     vim.keymap.set("n", "<F4>", vim.lsp.buf.code_action, opts)
---     vim.keymap.set("n", "gl", vim.diagnostic.open_float, opts)
---     vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
---     vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-  end,
 })
 
 vim.o.updatetime = 250

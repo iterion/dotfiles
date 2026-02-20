@@ -225,14 +225,16 @@ in {
     };
     resolved = {
       enable = true;
-      dnssec = "true";
-      domains = ["~."];
-      fallbackDns = [
-        "192.168.1.1"
-        "1.1.1.1#one.one.one.one"
-        "1.0.0.1#one.one.one.one"
-      ];
-      dnsovertls = "true";
+      settings.Resolve = {
+        DNSSEC = true;
+        Domains = ["~."];
+        FallbackDNS = [
+          "192.168.1.1"
+          "1.1.1.1#one.one.one.one"
+          "1.0.0.1#one.one.one.one"
+        ];
+        DNSOverTLS = true;
+      };
     };
 
     tailscale.enable = true;
