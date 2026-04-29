@@ -43,19 +43,21 @@
     ];
     profiles."iterion-default" = {
       approval_policy = "on-request";
-      model = "gpt-5.4";
+      model = "gpt-5.5";
       model_reasoning_effort = "high";
       sandbox_mode = "workspace-write";
     };
     projects = {
       "${homeDir}/dotfiles" = {trust_level = "trusted";};
+      "${homeDir}/Development/api" = {trust_level = "trusted";};
+      "${homeDir}/Development/api-codex" = {trust_level = "trusted";};
+      "${homeDir}/Development/cli" = {trust_level = "trusted";};
+      "${homeDir}/Development/deploy-bot" = {trust_level = "trusted";};
+      "${homeDir}/Development/dockerfelines" = {trust_level = "trusted";};
+      "${homeDir}/Development/infra" = {trust_level = "trusted";};
+      "${homeDir}/Development/modeling-app" = {trust_level = "trusted";};
       "${homeDir}/Development/offshape" = {trust_level = "trusted";};
       "${homeDir}/Development/websocket.zig" = {trust_level = "trusted";};
-      "${homeDir}/Development/deploy-bot" = {trust_level = "trusted";};
-      "${homeDir}/Development/infra" = {trust_level = "trusted";};
-      "${homeDir}/Development/api" = {trust_level = "trusted";};
-      "${homeDir}/Development/common" = {trust_level = "trusted";};
-      "${homeDir}/Development/dockerfelines" = {trust_level = "trusted";};
     };
     sandbox_workspace_write = {
       network_access = true;
