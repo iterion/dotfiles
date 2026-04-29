@@ -126,10 +126,6 @@ in {
         cursor = {
           no_hardware_cursors = true;
         };
-        env = [
-          "GBM_BACKEND,nvidia-drm"
-          #"AQ_DRM_DEVICES,/dev/dri/by-path/pci-0000:01:00.0-card"
-        ];
         exec-once = [
           "${pkgs.mako}/bin/mako"
           "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
