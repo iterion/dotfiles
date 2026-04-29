@@ -95,9 +95,6 @@ in {
   };
 
   nix = {
-    # Determinate also assigns nix.package. Force the same package here so
-    # host-specific modules can't create a duplicate-definition conflict.
-    package = lib.mkForce inputs.determinate.inputs.nix.packages."${pkgs.stdenv.system}".default;
     gc = {
       automatic = true;
       dates = "weekly";

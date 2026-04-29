@@ -12,7 +12,7 @@
   # Configure console keymap
   #console.keyMap = "dvorak";
 
-  # Disable for determinate nix install
+  # Keep the installer-managed Nix outside nix-darwin's control.
   nix = {
     enable = false;
     # gc = {

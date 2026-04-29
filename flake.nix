@@ -2,7 +2,6 @@
   description = "flake for nix base";
 
   inputs = {
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     # jj = {
     #   url = "github:iterion/jj/submodules";
@@ -56,7 +55,6 @@
       nixpkgs,
       home-manager,
       nix-darwin,
-      determinate,
       sops-nix,
       ...
     }@inputs:
@@ -68,7 +66,6 @@
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [
-            determinate.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             ./hosts/corsair
             home-manager.nixosModules.home-manager
@@ -87,7 +84,6 @@
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [
-            determinate.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             ./hosts/gaming
             home-manager.nixosModules.home-manager
@@ -106,7 +102,6 @@
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [
-            determinate.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             ./hosts/system76
             home-manager.nixosModules.home-manager
@@ -125,7 +120,6 @@
           system = "x86_64-linux";
           specialArgs = { inherit inputs; };
           modules = [
-            determinate.nixosModules.default
             inputs.sops-nix.nixosModules.sops
             ./hosts/lattepanda
             home-manager.nixosModules.home-manager
