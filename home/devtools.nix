@@ -44,7 +44,8 @@
     profiles."iterion-default" = {
       approval_policy = "on-request";
       model = "gpt-5.5";
-      model_reasoning_effort = "high";
+      model_reasoning_effort = "xhigh";
+      service_tier = "fast";
       sandbox_mode = "workspace-write";
     };
     projects = {
