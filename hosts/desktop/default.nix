@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   ...
@@ -14,7 +15,7 @@
       themePackages = with pkgs; [
         # By default we would install all themes
         (adi1090x-plymouth-themes.override {
-          selected_themes = [ "rings" ];
+          selected_themes = ["rings"];
         })
       ];
     };
@@ -61,14 +62,20 @@
     xfconf.enable = true;
     thunar = {
       enable = true;
-      plugins = with pkgs.xfce; [
+      plugins = with pkgs; [
         thunar-archive-plugin
         thunar-volman
       ];
     };
     hyprland = {
       enable = true;
+      withUWSM = true;
       xwayland.enable = true;
+    };
+    uwsm.waylandCompositors.hyprland = {
+      prettyName = "Hyprland";
+      comment = "Hyprland compositor managed by UWSM";
+      binPath = "/run/current-system/sw/share/wayland-sessions/hyprland.desktop";
     };
   };
   security.rtkit.enable = true;
@@ -86,8 +93,8 @@
       settings = {
         default_session = {
           command = ''
-            ${ lib.makeBinPath [ pkgs.tuigreet ] }/tuigreet -r --asterisks --time \
-              --cmd "${pkgs.hyprland}/bin/Hyprland";
+            ${pkgs.tuigreet}/bin/tuigreet -r --asterisks --time \
+              --cmd "${lib.getExe config.programs.uwsm.package} start -F -- /run/current-system/sw/share/wayland-sessions/hyprland.desktop";
           '';
         };
       };

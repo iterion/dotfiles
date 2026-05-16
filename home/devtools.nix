@@ -120,6 +120,9 @@ in {
     ]
     ++ lib.optionals pkgs.stdenv.isDarwin [
       terminal-notifier
+    ]
+    ++ lib.optionals pkgs.stdenv.isLinux [
+      codex
     ];
   xdg.configFile."ghostty/config".text = ghosttyConfigText;
   xdg.configFile."ghostty/shaders" = {
@@ -165,6 +168,8 @@ in {
         };
       };
     });
+  systemd.user.services.sops-nix.Unit.ConditionPathExists =
+    lib.mkIf havePushoverSecrets ageKeyFile;
   programs = {
     direnv = {
       enable = true;
@@ -174,6 +179,7 @@ in {
     };
     zsh = {
       enable = true;
+      dotDir = config.home.homeDirectory;
       oh-my-zsh = {
         enable = true;
         plugins = [
@@ -266,6 +272,7 @@ in {
     };
     git = {
       enable = true;
+      signing.format = "openpgp";
       lfs = {
         enable = true;
       };
@@ -402,6 +409,7 @@ in {
 
     yazi = {
       enable = true;
+      shellWrapperName = "yy";
       enableZshIntegration = true;
       enableNushellIntegration = false;
     };

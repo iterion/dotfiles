@@ -3,8 +3,7 @@
   pkgs,
   lib,
   ...
-}:
-let
+}: let
   mdiWebfont = pkgs.fetchzip {
     url = "https://github.com/Templarian/MaterialDesign-Webfont/archive/refs/tags/v7.4.47.zip";
     hash = "sha256-xVhKiAJy/2JaP6HEatzpuDwCbFSvPiIhdhM2csMDFbI=";
@@ -14,7 +13,7 @@ let
     owner = "einToast";
     repo = "openai_stt_ha";
     rev = "v1.2.0";
-    hash = "sha256-1c7n341304dii6xq9bh594jpqfffcmm6c2hdwb7v5iifbmbz124l";
+    hash = "sha256-lIjwV10uxrLP4g0KZmplzjl8JUkFroS7ibERMAIZ9rA=";
   };
 in {
   imports = [
@@ -294,11 +293,9 @@ in {
   };
   # Avahi for mDNS/Snapcast discovery
   services.avahi = {
-    daemon = {
-      enable = true;
-      publish.enable = true;
-      publish.userServices = true;
-    };
+    enable = true;
+    publish.enable = true;
+    publish.userServices = true;
   };
   systemd.tmpfiles.rules = [
     "d /var/lib/hass/blueprints 0755 hass hass - -"

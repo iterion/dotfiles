@@ -38,6 +38,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
+
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -130,6 +132,24 @@
               home-manager.users.iterion.imports = [
                 ./home
                 ./hosts/lattepanda/home.nix
+              ];
+            }
+          ];
+        };
+        framework-16 = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          specialArgs = { inherit inputs; };
+          modules = [
+            inputs.sops-nix.nixosModules.sops
+            ./hosts/framework-16
+            home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit inputs; };
+              home-manager.users.iterion.imports = [
+                ./home
+                ./hosts/framework-16/home.nix
               ];
             }
           ];

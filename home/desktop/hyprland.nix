@@ -1,7 +1,14 @@
-{config, pkgs, lib, inputs, ...}: let
-  wallpapers = (pkgs.callPackage ../../wallpapers { inherit pkgs; });
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}: let
+  wallpapers = pkgs.callPackage ../../wallpapers {inherit pkgs;};
   cfg = config.iterion.desktop;
   system = pkgs.stdenv.hostPlatform.system;
+  uwsm = "${pkgs.uwsm}/bin/uwsm";
 in {
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
@@ -32,6 +39,7 @@ in {
     };
     gtk = {
       enable = true;
+      gtk4.theme = config.gtk.theme;
       iconTheme = {
         name = "Pop";
         package = pkgs.pop-icon-theme;
@@ -107,11 +115,9 @@ in {
     wayland.windowManager.hyprland = {
       enable = true;
       package = pkgs.hyprland;
+      configType = "hyprlang";
       xwayland.enable = true;
-      systemd = {
-        enable = true;
-        variables = ["--all"];
-      };
+      systemd.enable = false;
       settings = {
         "$mod" = "SUPER";
         "debug:disable_logs" = false;
@@ -127,9 +133,9 @@ in {
           no_hardware_cursors = true;
         };
         exec-once = [
-          "${pkgs.mako}/bin/mako"
-          "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
-          "${pkgs.waybar}/bin/waybar"
+          "${uwsm} app -- ${pkgs.mako}/bin/mako"
+          "${uwsm} app -- ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
+          "${uwsm} app -- ${pkgs.waybar}/bin/waybar"
         ];
         layerrule = [];
         bind =
@@ -140,13 +146,13 @@ in {
             "$mod, C, sendshortcut, CTRL_SHIFT, C, class:(Alacritty)"
             "$mod, V, sendshortcut, CTRL_SHIFT, V, class:(Alacritty)"
             "$mod, X, sendshortcut, CTRL_SHIFT, X, class:(Alacritty)"
-            "$mod, F, exec, ${pkgs.firefox}/bin/firefox"
-            "$mod, Return, exec, gtk-launch com.mitchellh.ghostty.desktop"
-            "$mod, D, exec, ${inputs.anyrun.packages.${system}.anyrun}/bin/anyrun"
+            "$mod, F, exec, ${uwsm} app -- ${pkgs.firefox}/bin/firefox"
+            "$mod, Return, exec, ${uwsm} app -- com.mitchellh.ghostty.desktop"
+            "$mod, D, exec, ${uwsm} app -- ${pkgs.fuzzel}/bin/fuzzel"
             "$mod, Left, movewindow, l"
             "$mod, Right, movewindow, r"
             "$mod SHIFT, Apostrophe, killactive,"
-            "$mod SHIFT, S, exec, ${pkgs.flameshot}/bin/flameshot gui"
+            "$mod SHIFT, S, exec, ${uwsm} app -- ${pkgs.flameshot}/bin/flameshot gui"
           ]
           ++ (
             # workspaces
