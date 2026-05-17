@@ -41,6 +41,10 @@
     notify = [
       "${homeDir}/.codex/notify"
     ];
+    features = {
+      goals = true;
+      remote_control = true;
+    };
     profiles."iterion-default" = {
       approval_policy = "on-request";
       model = "gpt-5.5";
