@@ -35,22 +35,39 @@
     baseWritableRoots
     ++ lib.optionals pkgs.stdenv.isDarwin darwinWritableRoots
     ++ lib.optionals pkgs.stdenv.isLinux linuxWritableRoots;
+  codexCloudResourceSafety = ''
+    # Cloud Resource Safety
+
+    - Never run `terraform apply`, `terraform destroy`, or any Terraform command that writes state or mutates infrastructure.
+    - Never create, update, delete, patch, apply, scale, restart, drain, cordon, uncordon, or roll out cloud or Kubernetes resources.
+    - Treat AWS, Kubernetes, Helm, Terraform, Pulumi, CDK, CloudFormation, and similar infrastructure tooling as read-only unless I explicitly run the command myself.
+    - If a task requires a cloud or infrastructure mutation, stop before execution and give me the exact command or runbook to execute manually.
+    - Do not request approval to bypass this rule. The restriction is about Codex behavior, not the approval policy.
+  '';
+  codexGlobalInstructions =
+    ''
+      # Personal Preferences
+
+      - Use Jujutsu (`jj`) for version control operations by default.
+      - Prefer `jj` commands (`jj status`, `jj diff`, `jj log`, `jj bookmark`, `jj resolve`, etc.) over Git commands.
+      - Only use `git` when I explicitly ask for `git`.
+      - When translating examples, provide `jj` equivalents first.
+
+    ''
+    + codexCloudResourceSafety;
   tomlFormat = pkgs.formats.toml {};
   codexConfig = {
-    profile = "iterion-default";
+    approval_policy = "on-request";
+    developer_instructions = codexCloudResourceSafety;
+    model = "gpt-5.5";
+    model_reasoning_effort = "xhigh";
     notify = [
       "${homeDir}/.codex/notify"
     ];
+    sandbox_mode = "workspace-write";
+    service_tier = "fast";
     features = {
       goals = true;
-      remote_control = true;
-    };
-    profiles."iterion-default" = {
-      approval_policy = "on-request";
-      model = "gpt-5.5";
-      model_reasoning_effort = "xhigh";
-      service_tier = "fast";
-      sandbox_mode = "workspace-write";
     };
     projects = {
       "${homeDir}/dotfiles" = {trust_level = "trusted";};
@@ -68,7 +85,7 @@
       network_access = true;
       writable_roots = writableRoots;
     };
-    web_search_request = true;
+    web_search_mode = "enabled";
   };
   codexTomlFile = tomlFormat.generate "codex-config" codexConfig;
   secretsFilePath = "${inputs.self}/secrets/codex.yaml";
@@ -134,6 +151,10 @@ in {
     {
       ".codex/config.toml" = {
         source = codexTomlFile;
+        force = true;
+      };
+      ".codex/AGENTS.md" = {
+        text = codexGlobalInstructions;
         force = true;
       };
       ".codex/notify" = {
