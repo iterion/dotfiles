@@ -38,6 +38,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    ashell.url = "github:MalpenZibo/ashell/0.9.0";
+
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
     sops-nix = {
@@ -52,17 +54,17 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      home-manager,
-      nix-darwin,
-      sops-nix,
-      ...
+    { self
+    , nixpkgs
+    , home-manager
+    , nix-darwin
+    , sops-nix
+    , ...
     }@inputs:
     let
       forAllSystems = systems: f: nixpkgs.lib.genAttrs systems (system: f system);
-    in {
+    in
+    {
       nixosConfigurations = {
         iterion-nixos = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
@@ -178,7 +180,8 @@
         forAllSystems [ "aarch64-darwin" "x86_64-darwin" ] (system:
           let
             pkgs = import nixpkgs { inherit system; };
-          in {
+          in
+          {
             default = pkgs.mkShell {
               packages = with pkgs; [
                 nixos-rebuild

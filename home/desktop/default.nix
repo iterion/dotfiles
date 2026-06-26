@@ -1,15 +1,16 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
+{ config
+, lib
+, pkgs
+, ...
 }:
 with lib; let
   cfg = config.iterion.desktop;
-in {
+in
+{
   imports = [
     ./alacritty.nix
-    ./waybar.nix
+    ./ashell.nix
+    ./niri.nix
     ./hyprland.nix
   ];
 
@@ -56,6 +57,7 @@ in {
         egl-wayland
         vulkan-tools
         google-chrome
+        xwayland-satellite
       ]
       ++ optionals cfg.awsWorkspaces.enable [
         pkgs.aws-workspaces

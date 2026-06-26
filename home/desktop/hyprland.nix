@@ -1,21 +1,20 @@
-{
-  config,
-  pkgs,
-  lib,
-  inputs,
-  ...
-}: let
-  wallpapers = pkgs.callPackage ../../wallpapers {inherit pkgs;};
+{ config
+, pkgs
+, lib
+, inputs
+, ...
+}:
+let
+  wallpapers = pkgs.callPackage ../../wallpapers { inherit pkgs; };
   cfg = config.iterion.desktop;
   system = pkgs.stdenv.hostPlatform.system;
   uwsm = "${pkgs.uwsm}/bin/uwsm";
-in {
+  ashell = "${inputs.ashell.packages.${system}.default}/bin/ashell";
+in
+{
   config = lib.mkIf cfg.enable {
     home.packages = with pkgs; [
       wallpapers
-
-      # toolbar
-      waybar
 
       # some desktop libs & utils
       wlr-randr
@@ -50,13 +49,6 @@ in {
       };
     };
 
-    # notifications
-    services.mako = {
-      enable = true;
-      # settings = ''
-      #   on-button-right=dismiss-all
-      # '';
-    };
     services.hyprpaper = {
       enable = true;
       package = inputs.hyprpaper.packages.${system}.hyprpaper;
@@ -64,11 +56,12 @@ in {
         ipc = "on";
         splash = false;
 
-        preload = ["${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png"];
+        preload = [ "${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png" ];
 
-        wallpaper = [",${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png"];
+        wallpaper = [ ",${wallpapers}/share/wallpapers/nix-wallpaper-binary-black.png" ];
       };
     };
+    systemd.user.services.hyprpaper.Install.WantedBy = lib.mkForce [ ];
     services.hypridle = {
       enable = true;
       settings = {
@@ -88,6 +81,7 @@ in {
         ];
       };
     };
+    systemd.user.services.hypridle.Install.WantedBy = lib.mkForce [ ];
     programs.hyprlock = {
       enable = true;
       settings = {
@@ -133,11 +127,16 @@ in {
           no_hardware_cursors = true;
         };
         exec-once = [
-          "${uwsm} app -- ${pkgs.mako}/bin/mako"
+          "${pkgs.systemd}/bin/systemctl --user start hyprpaper.service"
+          "${pkgs.systemd}/bin/systemctl --user start hypridle.service"
           "${uwsm} app -- ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
-          "${uwsm} app -- ${pkgs.waybar}/bin/waybar"
         ];
-        layerrule = [];
+        layerrule = [
+          "blur on, match:namespace ashell-menu-layer"
+          "blur on, match:namespace ashell-toast-layer"
+          "ignore_alpha 0.01, match:namespace ashell-menu-layer"
+          "ignore_alpha 0.01, match:namespace ashell-toast-layer"
+        ];
         bind =
           [
             "$mod, C, sendshortcut, CTRL, C, class:(google-chrome)"
@@ -149,6 +148,7 @@ in {
             "$mod, F, exec, ${uwsm} app -- ${pkgs.firefox}/bin/firefox"
             "$mod, Return, exec, ${uwsm} app -- com.mitchellh.ghostty.desktop"
             "$mod, D, exec, ${uwsm} app -- ${pkgs.fuzzel}/bin/fuzzel"
+            "$mod, B, exec, ${ashell} msg toggle-visibility"
             "$mod, Left, movewindow, l"
             "$mod, Right, movewindow, r"
             "$mod SHIFT, Apostrophe, killactive,"
@@ -157,19 +157,37 @@ in {
           ++ (
             # workspaces
             # binds $mod + [shift +] {1..10} to [move to] workspace {1..10}
-            builtins.concatLists (builtins.genList (
-                x: let
-                  ws = let
-                    c = (x + 1) / 10;
-                  in
+            builtins.concatLists (builtins.genList
+              (
+                x:
+                let
+                  ws =
+                    let
+                      c = (x + 1) / 10;
+                    in
                     builtins.toString (x + 1 - (c * 10));
-                in [
+                in
+                [
                   "$mod, ${ws}, workspace, ${toString (x + 1)}"
                   "$mod SHIFT, ${ws}, movetoworkspace, ${toString (x + 1)}"
                 ]
               )
               10)
           );
+        bindel = [
+          ", XF86AudioRaiseVolume, exec, ${ashell} msg volume-up"
+          ", XF86AudioLowerVolume, exec, ${ashell} msg volume-down"
+          ", XF86MonBrightnessUp, exec, ${ashell} msg brightness-up"
+          ", XF86MonBrightnessDown, exec, ${ashell} msg brightness-down"
+        ];
+        bindl = [
+          ", XF86AudioMute, exec, ${ashell} msg volume-toggle-mute"
+          ", XF86AudioMicMute, exec, ${ashell} msg microphone-toggle-mute"
+          ", XF86AudioPlay, exec, ${pkgs.playerctl}/bin/playerctl play-pause"
+          ", XF86AudioStop, exec, ${pkgs.playerctl}/bin/playerctl stop"
+          ", XF86AudioPrev, exec, ${pkgs.playerctl}/bin/playerctl previous"
+          ", XF86AudioNext, exec, ${pkgs.playerctl}/bin/playerctl next"
+        ];
       };
     };
   };

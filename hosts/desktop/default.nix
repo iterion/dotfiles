@@ -1,8 +1,7 @@
-{
-  config,
-  pkgs,
-  lib,
-  ...
+{ config
+, pkgs
+, lib
+, ...
 }: {
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
@@ -15,7 +14,7 @@
       themePackages = with pkgs; [
         # By default we would install all themes
         (adi1090x-plymouth-themes.override {
-          selected_themes = ["rings"];
+          selected_themes = [ "rings" ];
         })
       ];
     };
@@ -56,7 +55,7 @@
     _1password.enable = true;
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = ["iterion"];
+      polkitPolicyOwners = [ "iterion" ];
     };
     # file picker
     xfconf.enable = true;
@@ -72,6 +71,10 @@
       withUWSM = true;
       xwayland.enable = true;
     };
+    niri = {
+      enable = true;
+      useNautilus = false;
+    };
     uwsm.waylandCompositors.hyprland = {
       prettyName = "Hyprland";
       comment = "Hyprland compositor managed by UWSM";
@@ -86,7 +89,7 @@
     blueman.enable = true;
     dbus = {
       enable = true;
-      packages = [pkgs.seahorse];
+      packages = [ pkgs.seahorse ];
     };
     greetd = {
       enable = true;
@@ -94,6 +97,8 @@
         default_session = {
           command = ''
             ${pkgs.tuigreet}/bin/tuigreet -r --asterisks --time \
+              --remember-user-session \
+              --sessions /run/current-system/sw/share/wayland-sessions \
               --cmd "${lib.getExe config.programs.uwsm.package} start -F -- /run/current-system/sw/share/wayland-sessions/hyprland.desktop";
           '';
         };
