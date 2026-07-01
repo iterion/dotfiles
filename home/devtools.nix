@@ -122,6 +122,7 @@ in {
       terminal-notifier
     ]
     ++ lib.optionals pkgs.stdenv.isLinux [
+      claude-code
       codex
     ];
   xdg.configFile."ghostty/config".text = ghosttyConfigText;

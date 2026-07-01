@@ -43,6 +43,7 @@
     casks = [
       "1password-cli"
       "codex"
+      "claude-code"
       "github"
       "slack"
       "zoom"
