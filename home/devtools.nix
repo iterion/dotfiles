@@ -35,6 +35,102 @@
     baseWritableRoots
     ++ lib.optionals pkgs.stdenv.isDarwin darwinWritableRoots
     ++ lib.optionals pkgs.stdenv.isLinux linuxWritableRoots;
+  developmentProjectDirs = [
+    "OrcaSlicer"
+    "admin-dashboard"
+    "advent-of-code"
+    "api"
+    "api-codex"
+    "argocd-templates"
+    "aws-service-quota-bot"
+    "backstage"
+    "bad-bson"
+    "boot2image"
+    "bottlerocket-kernel-kit"
+    "cio"
+    "cli"
+    "configs"
+    "dagster-etl"
+    "db"
+    "deploy-bot"
+    "diff-viewer-extension"
+    "discord-bots"
+    "discourse-deploy"
+    "dockerfelines"
+    "documentation"
+    "dropshot"
+    "dropshot-template"
+    "dropshot-upstream"
+    "engi-meow-ring"
+    "engine"
+    "engine-deux"
+    "engine-manager"
+    "executor"
+    "factory-gnome"
+    "format"
+    "gha-actions-public"
+    "git-secrets"
+    "gltf"
+    "gltf-validator"
+    "go"
+    "hoops"
+    "infra"
+    "ingress-nginx"
+    "jj"
+    "kcl-book"
+    "kcl-corpus"
+    "kcl-llm-finetuning"
+    "kerb2d"
+    "kittycad.go"
+    "kittycad.py"
+    "kittycad.rs"
+    "kittycad.ts"
+    "litterbox"
+    "llm-inference"
+    "mcmc-dataset"
+    "ml-litterbox"
+    "ml-research"
+    "modeling-api"
+    "modeling-app"
+    "node_modules"
+    "notes"
+    "offshape"
+    "otel-collector-local"
+    "otel-instrument"
+    "patch-goblin"
+    "pet-store"
+    "proprietary-to-kcl"
+    "roadrunner"
+    "ruststep"
+    "stunner"
+    "stunner-gateway-operator"
+    "stunner-helm"
+    "test"
+    "test-analysis-bot"
+    "text-to-cad"
+    "text-to-cad-backroom"
+    "text-to-cad-discord-bot-deploy"
+    "text-to-cad-ui"
+    "third-party-api-clients"
+    "ts-actions"
+    "twenty-twenty"
+    "viewer"
+    "viewer-deployment"
+    "vitess"
+    "vpx-encode"
+    "web-view"
+    "webrtc"
+    "website"
+    "websocket.zig"
+    "zoo-mcp"
+  ];
+  trustedDevelopmentProjects =
+    builtins.listToAttrs
+    (map (dir: {
+        name = "${homeDir}/Development/${dir}";
+        value = {trust_level = "trusted";};
+      })
+      developmentProjectDirs);
   codexCloudResourceSafety = ''
     # Cloud Resource Safety
 
@@ -59,7 +155,7 @@
   codexConfig = {
     approval_policy = "on-request";
     developer_instructions = codexCloudResourceSafety;
-    model = "gpt-5.5";
+    model = "gpt-5.6-sol";
     model_reasoning_effort = "xhigh";
     notify = [
       "${homeDir}/.codex/notify"
@@ -69,18 +165,11 @@
     features = {
       goals = true;
     };
-    projects = {
-      "${homeDir}/dotfiles" = {trust_level = "trusted";};
-      "${homeDir}/Development/api" = {trust_level = "trusted";};
-      "${homeDir}/Development/api-codex" = {trust_level = "trusted";};
-      "${homeDir}/Development/cli" = {trust_level = "trusted";};
-      "${homeDir}/Development/deploy-bot" = {trust_level = "trusted";};
-      "${homeDir}/Development/dockerfelines" = {trust_level = "trusted";};
-      "${homeDir}/Development/infra" = {trust_level = "trusted";};
-      "${homeDir}/Development/modeling-app" = {trust_level = "trusted";};
-      "${homeDir}/Development/offshape" = {trust_level = "trusted";};
-      "${homeDir}/Development/websocket.zig" = {trust_level = "trusted";};
-    };
+    projects =
+      {
+        "${homeDir}/dotfiles" = {trust_level = "trusted";};
+      }
+      // trustedDevelopmentProjects;
     sandbox_workspace_write = {
       network_access = true;
       writable_roots = writableRoots;
@@ -106,11 +195,71 @@
     keybind = ctrl+alt+comma=new_split:down
     keybind = super+alt+c=close_surface
   '';
+  rampCli = let
+    version = "0.2.5";
+    assets = {
+      aarch64-darwin = {
+        os = "darwin";
+        arch = "arm64";
+        hash = "sha256-t3S5fncgmv3LaeK/gXLVg/flVw8RQJt6oj83S9Vvcpk=";
+      };
+      x86_64-darwin = {
+        os = "darwin";
+        arch = "amd64";
+        hash = "sha256-z5oaG6oj7Amc8tI8wSepU1aAx93HqYwk0om2St/Oe0E=";
+      };
+      x86_64-linux = {
+        os = "linux";
+        arch = "amd64";
+        hash = "sha256-QDRt9LMEmqjq3YgVPM/kl9bn2V6iGhBCCFIqWuGV9SA=";
+      };
+      aarch64-linux = {
+        os = "linux";
+        arch = "arm64";
+        hash = "sha256-J3hqGu8TuWH31VvDU9s/hD7zYWfQM3Xpy+Woa6Rnw9U=";
+      };
+    };
+    asset =
+      assets.${pkgs.stdenv.hostPlatform.system}
+      or (throw "Unsupported system for Ramp CLI: ${pkgs.stdenv.hostPlatform.system}");
+    binary = "ramp-${asset.os}-${asset.arch}";
+  in
+    pkgs.stdenv.mkDerivation {
+      pname = "ramp-cli";
+      inherit version;
+
+      src = pkgs.fetchurl {
+        url = "https://github.com/ramp-public/ramp-cli/releases/download/v${version}/${binary}.tar.gz";
+        inherit (asset) hash;
+      };
+
+      dontFixup = true;
+
+      installPhase = ''
+        runHook preInstall
+
+        mkdir -p "$out/lib/ramp-cli" "$out/bin"
+        cp -R . "$out/lib/ramp-cli"
+        chmod +x "$out/lib/ramp-cli/${binary}"
+        ln -s "$out/lib/ramp-cli/${binary}" "$out/bin/ramp"
+
+        runHook postInstall
+      '';
+
+      meta = {
+        description = "Ramp CLI for terminal finance workflows and AI agents";
+        homepage = "https://github.com/ramp-public/ramp-cli";
+        license = lib.licenses.mit;
+        mainProgram = "ramp";
+        platforms = builtins.attrNames assets;
+      };
+    };
 in {
   home.packages = with pkgs;
     [
       # agentic tools
       opencode
+      rampCli
 
       # secret scanning
       trufflehog
