@@ -92,6 +92,7 @@
     "ml-research"
     "modeling-api"
     "modeling-app"
+    "nexecutor"
     "node_modules"
     "notes"
     "offshape"
@@ -154,6 +155,7 @@
   tomlFormat = pkgs.formats.toml {};
   codexConfig = {
     approval_policy = "on-request";
+    approvals_reviewer = "auto_review";
     developer_instructions = codexCloudResourceSafety;
     model = "gpt-5.6-sol";
     model_reasoning_effort = "xhigh";
@@ -423,6 +425,12 @@ in {
     };
     jujutsu = {
       enable = true;
+      package =
+        (inputs.jj.packages.${pkgs.stdenv.hostPlatform.system}.jujutsu-quick.override {
+          rustPlatform = pkgs.rustPlatform;
+        }).overrideAttrs {
+          doCheck = false;
+        };
       settings = {
         user = {
           email = "iterion@gmail.com";
@@ -438,6 +446,7 @@ in {
           ];
           paginate = "never";
         };
+        templates.git_push_bookmark = ''"iterion/" ++ change_id.short()'';
         "remotes.origin.auto-track-bookmarks" = true;
       };
     };
@@ -503,6 +512,16 @@ in {
       matchBlocks = {
         "*" = {
           addKeysToAgent = "yes";
+        };
+        "framework framework-16" = {
+          hostname = "framework-16.hawk-dinosaur.ts.net";
+          user = "iterion";
+          identityFile = "~/.ssh/id_ed25519";
+          identitiesOnly = true;
+          forwardAgent = false;
+          serverAliveInterval = 30;
+          serverAliveCountMax = 3;
+          extraOptions.StrictHostKeyChecking = "accept-new";
         };
         "zookeeper" = {
           user = "zoo";

@@ -40,11 +40,25 @@
   services = {
     hardware.bolt.enable = true;
 
+    openssh = {
+      openFirewall = false;
+      settings = {
+        AllowAgentForwarding = false;
+        AllowUsers = ["iterion"];
+        AuthenticationMethods = "publickey";
+        MaxAuthTries = 3;
+        PermitRootLogin = "no";
+        PubkeyAuthentication = true;
+      };
+    };
+
     udev.extraRules = ''
       SUBSYSTEM=="drm", KERNEL=="card[0-9]*", KERNELS=="0000:c2:00.0", SYMLINK+="dri/framework-amd-card"
       SUBSYSTEM=="drm", KERNEL=="card[0-9]*", KERNELS=="0000:c1:00.0", SYMLINK+="dri/framework-nvidia-card"
     '';
   };
+
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [22];
 
   environment.systemPackages = with pkgs; [
     lm_sensors

@@ -3,10 +3,10 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    # jj = {
-    #   url = "github:iterion/jj/submodules";
-    #   flake = false;
-    # };
+    jj = {
+      url = "github:iterion/jj/submodules";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     home-manager = {
       url = "github:nix-community/home-manager";
