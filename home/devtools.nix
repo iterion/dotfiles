@@ -6,7 +6,7 @@
   ...
 }: let
   homeDir =
-    if pkgs.stdenv.isDarwin
+    if pkgs.stdenv.hostPlatform.isDarwin
     then "/Users/iterion"
     else "/home/iterion";
   baseWritableRoots = [
@@ -33,8 +33,8 @@
   ];
   writableRoots =
     baseWritableRoots
-    ++ lib.optionals pkgs.stdenv.isDarwin darwinWritableRoots
-    ++ lib.optionals pkgs.stdenv.isLinux linuxWritableRoots;
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin darwinWritableRoots
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux linuxWritableRoots;
   developmentProjectDirs = [
     "OrcaSlicer"
     "admin-dashboard"
@@ -157,16 +157,13 @@
     approval_policy = "on-request";
     approvals_reviewer = "auto_review";
     developer_instructions = codexCloudResourceSafety;
-    model = "gpt-5.6-sol";
+    model = "gpt-6-astra";
     model_reasoning_effort = "xhigh";
     notify = [
       "${homeDir}/.codex/notify"
     ];
     sandbox_mode = "workspace-write";
     service_tier = "fast";
-    features = {
-      goals = true;
-    };
     projects =
       {
         "${homeDir}/dotfiles" = {trust_level = "trusted";};
@@ -176,7 +173,6 @@
       network_access = true;
       writable_roots = writableRoots;
     };
-    web_search_mode = "enabled";
   };
   codexTomlFile = tomlFormat.generate "codex-config" codexConfig;
   secretsFilePath = "${inputs.self}/secrets/codex.yaml";
@@ -286,10 +282,10 @@ in {
       # Better nix devenvs
       devenv
     ]
-    ++ lib.optionals pkgs.stdenv.isDarwin [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       terminal-notifier
     ]
-    ++ lib.optionals pkgs.stdenv.isLinux [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
       claude-code
       codex
     ];
@@ -313,7 +309,7 @@ in {
         executable = true;
       };
     }
-    (lib.optionalAttrs pkgs.stdenv.isDarwin {
+    (lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
       "Library/Application Support/com.mitchellh.ghostty/config".text =
         ghosttyConfigText;
       "Library/Application Support/com.mitchellh.ghostty/shaders" = {
@@ -489,7 +485,7 @@ in {
         };
         #commit.gpgsign = true;
         credential.helper =
-          if pkgs.stdenv.isDarwin
+          if pkgs.stdenv.hostPlatform.isDarwin
           then "osxkeychain"
           else "libsecret";
         init = {

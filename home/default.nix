@@ -5,10 +5,11 @@
   inputs,
   ...
 }: let 
-  homeDir = if pkgs.stdenv.isLinux then "/home/iterion" else "/Users/iterion";
+  homeDir = if pkgs.stdenv.hostPlatform.isLinux then "/home/iterion" else "/Users/iterion";
   system = pkgs.stdenv.hostPlatform.system;
   desktopEnabled = config.iterion.desktop.enable;
   workEnabled = config.iterion.work.enable;
+  axiomCli = pkgs.callPackage ./packages/axiom-cli.nix {};
 in {
   imports = [
     # inputs.anyrun.homeManagerModules.anyrun
@@ -48,12 +49,13 @@ in {
     killall
     sops
     age
+    axiomCli
 
     # for convenience put this in every shell
     kubectl
     kubectx
 
-  ] ++ lib.optionals pkgs.stdenv.isLinux (with pkgs; [
+  ] ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux (with pkgs; [
     # usb debugging
     hidviz
     lsof
@@ -62,7 +64,7 @@ in {
   ++ lib.optionals workEnabled (with pkgs; [
     vault
   ])
-  ++ lib.optionals (pkgs.stdenv.isLinux && desktopEnabled) [ pkgs.ghostty ];
+  ++ lib.optionals (pkgs.stdenv.hostPlatform.isLinux && desktopEnabled) [ pkgs.ghostty ];
 
   programs = {
     btop = {
@@ -79,7 +81,7 @@ in {
       settings = {
         pane_frames = false;
         default_layout = "compact";
-        copy_command = if pkgs.stdenv.isLinux then "wl-copy" else "pbcopy";
+        copy_command = if pkgs.stdenv.hostPlatform.isLinux then "wl-copy" else "pbcopy";
         copy_on_select = true;
       };
     };

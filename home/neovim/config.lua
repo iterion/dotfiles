@@ -105,17 +105,17 @@ vim.g.rustaceanvim = {
     hover_actions = { auto_focus = false },
   },
   server = {
-    on_attach = function(client, bufnr)
-      local opts = { buffer = bufnr, silent = true }
-      -- Rough equivalents to your rust-tools mappings:
-      vim.keymap.set("n", "<C-space>", function() vim.cmd.RustLsp("hover", "actions") end, opts)
-      vim.keymap.set("n", "<Leader>a", function() vim.cmd.RustLsp("codeAction") end, opts)
-      vim.keymap.set("n", "<Leader>em", function() vim.cmd.RustLsp("expandMacro") end, opts)
-
-      -- Optional quality-of-life:
-      -- vim.keymap.set("n", "<Leader>rd", function() vim.cmd.RustLsp("openDocs") end, opts)
-      -- vim.keymap.set("n", "<Leader>rt", function() vim.cmd.RustLsp("runnables") end, opts)
-    end,
+    -- on_attach = function(client, bufnr)
+    --   local opts = { buffer = bufnr, silent = true }
+    --   -- Rough equivalents to your rust-tools mappings:
+    --   vim.keymap.set("n", "<C-space>", function() vim.cmd.RustLsp("hover", "actions") end, opts)
+    --   vim.keymap.set("n", "<Leader>a", function() vim.cmd.RustLsp("codeAction") end, opts)
+    --   vim.keymap.set("n", "<Leader>em", function() vim.cmd.RustLsp("expandMacro") end, opts)
+    --
+    --   -- Optional quality-of-life:
+    --   -- vim.keymap.set("n", "<Leader>rd", function() vim.cmd.RustLsp("openDocs") end, opts)
+    --   -- vim.keymap.set("n", "<Leader>rt", function() vim.cmd.RustLsp("runnables") end, opts)
+    -- end,
     default_settings = {
       ["rust-analyzer"] = {
         cargo = { allFeatures = true },
