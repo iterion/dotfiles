@@ -87,6 +87,7 @@
     "kittycad.ts"
     "litterbox"
     "llm-inference"
+    "llmpuffin"
     "mcmc-dataset"
     "ml-litterbox"
     "ml-research"
@@ -157,7 +158,7 @@
     approval_policy = "on-request";
     approvals_reviewer = "auto_review";
     developer_instructions = codexCloudResourceSafety;
-    model = "gpt-6-astra";
+    model = "gpt-6.1-sol";
     model_reasoning_effort = "xhigh";
     notify = [
       "${homeDir}/.codex/notify"
