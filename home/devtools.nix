@@ -506,43 +506,43 @@ in {
     ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks = {
+      settings = {
         "*" = {
-          addKeysToAgent = "yes";
+          AddKeysToAgent = "yes";
         };
         "framework framework-16" = {
-          hostname = "framework-16.hawk-dinosaur.ts.net";
-          user = "iterion";
-          identityFile = "~/.ssh/id_ed25519";
-          identitiesOnly = true;
-          forwardAgent = false;
-          serverAliveInterval = 30;
-          serverAliveCountMax = 3;
-          extraOptions.StrictHostKeyChecking = "accept-new";
+          HostName = "framework-16.hawk-dinosaur.ts.net";
+          User = "iterion";
+          IdentityFile = "~/.ssh/id_ed25519";
+          IdentitiesOnly = true;
+          ForwardAgent = false;
+          ServerAliveInterval = 30;
+          ServerAliveCountMax = 3;
+          StrictHostKeyChecking = "accept-new";
         };
         "zookeeper" = {
-          user = "zoo";
-          hostname = "192.168.2.2";
-          proxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
-          forwardAgent = true;
+          User = "zoo";
+          HostName = "192.168.2.2";
+          ProxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
+          ForwardAgent = true;
         };
         "mgmt1" = {
-          user = "root";
-          hostname = "192.168.2.13";
-          proxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
-          forwardAgent = true;
+          User = "root";
+          HostName = "192.168.2.13";
+          ProxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
+          ForwardAgent = true;
         };
         "mgmt2" = {
-          user = "root";
-          hostname = "192.168.2.14";
-          proxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
-          forwardAgent = true;
+          User = "root";
+          HostName = "192.168.2.14";
+          ProxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
+          ForwardAgent = true;
         };
         "compute1" = {
-          user = "root";
-          hostname = "192.168.2.15";
-          proxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
-          forwardAgent = true;
+          User = "root";
+          HostName = "192.168.2.15";
+          ProxyCommand = "bash /home/iterion/Development/infra/scripts/k8s-on-prem-proxy.sh %h %p";
+          ForwardAgent = true;
         };
       };
     };

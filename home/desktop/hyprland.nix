@@ -19,7 +19,7 @@ in
       # some desktop libs & utils
       wlr-randr
       qt6.qtwayland
-      libsForQt5.qt5.qtwayland
+      qt5.qtwayland
       gtk3
       gtk4
 
@@ -28,6 +28,7 @@ in
     ];
 
     home.pointerCursor = {
+      enable = true;
       package = pkgs.vanilla-dmz;
       name = "Vanilla-DMZ";
       size = 48;
@@ -44,8 +45,8 @@ in
         package = pkgs.pop-icon-theme;
       };
       theme = {
-        name = "Pop";
-        package = pkgs.pop-gtk-theme;
+        name = "adw-gtk3";
+        package = pkgs.adw-gtk3;
       };
     };
 

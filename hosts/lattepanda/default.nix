@@ -38,7 +38,6 @@ in {
 
   services.home-assistant = {
     enable = true;
-    openFirewall = true;
     extraComponents = [
       "aladdin_connect"
       "caldav"
@@ -238,7 +237,7 @@ in {
     };
   };
 
-  networking.firewall.allowedTCPPorts = lib.mkAfter [1883 8095 8080];
+  networking.firewall.allowedTCPPorts = lib.mkAfter [1883 8095 8080 8123];
   networking.firewall.allowedTCPPortRanges = lib.mkAfter [
     {
       from = 4953;
