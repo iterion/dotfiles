@@ -72,6 +72,8 @@ in {
   users.users.iterion = {
     isNormalUser = true;
     description = "Adam Sunderland";
+    # Keep the Home Manager Rex service running between logins.
+    linger = true;
     extraGroups = [
       "audio"
       "docker"
@@ -104,6 +106,8 @@ in {
       automatic = true;
     };
     settings = {
+      # The Rex tester token lives outside the Nix store.
+      netrc-file = "/etc/nix/netrc";
       extra-substituters = [
         "https://devenv.cachix.org"
       ];
@@ -167,6 +171,11 @@ in {
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment = {
+    interactiveShellInit = ''
+      if [ -n "$REX_BIN_DIR" ]; then
+        export PATH="$REX_BIN_DIR:$PATH"
+      fi
+    '';
     systemPackages = with pkgs;
       [
         wget

@@ -13,6 +13,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    rex = {
+      url = "https://pkgs.superlogical.com/rex/nix/snapshot.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     hyprland-contrib = {
       url = "github:hyprwm/contrib";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -79,6 +84,7 @@
               home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.iterion.imports = [
                 ./home
+                ./home/rex.nix
                 ./hosts/corsair/home.nix
               ];
             }
@@ -97,6 +103,7 @@
               home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.iterion.imports = [
                 ./home
+                ./home/rex.nix
                 ./hosts/gaming/home.nix
               ];
             }
@@ -115,6 +122,7 @@
               home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.iterion.imports = [
                 ./home
+                ./home/rex.nix
                 ./hosts/system76/home.nix
               ];
             }
@@ -133,6 +141,7 @@
               home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.iterion.imports = [
                 ./home
+                ./home/rex.nix
                 ./hosts/lattepanda/home.nix
               ];
             }
@@ -151,6 +160,7 @@
               home-manager.extraSpecialArgs = { inherit inputs; };
               home-manager.users.iterion.imports = [
                 ./home
+                ./home/rex.nix
                 ./hosts/framework-16/home.nix
               ];
             }
