@@ -1,7 +1,8 @@
-{ config
-, pkgs
-, lib
-, ...
+{
+  config,
+  pkgs,
+  lib,
+  ...
 }: {
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
@@ -14,14 +15,13 @@
       themePackages = with pkgs; [
         # By default we would install all themes
         (adi1090x-plymouth-themes.override {
-          selected_themes = [ "rings" ];
+          selected_themes = ["rings"];
         })
       ];
     };
 
     # Enable "Silent boot"
     consoleLogLevel = 3;
-    initrd.verbose = false;
     kernelParams = [
       "quiet"
       "splash"
@@ -55,7 +55,7 @@
     _1password.enable = true;
     _1password-gui = {
       enable = true;
-      polkitPolicyOwners = [ "iterion" ];
+      polkitPolicyOwners = ["iterion"];
     };
     # file picker
     xfconf.enable = true;
@@ -89,7 +89,7 @@
     blueman.enable = true;
     dbus = {
       enable = true;
-      packages = [ pkgs.seahorse ];
+      packages = [pkgs.seahorse];
     };
     greetd = {
       enable = true;

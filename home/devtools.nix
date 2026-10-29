@@ -103,6 +103,7 @@
     "pet-store"
     "proprietary-to-kcl"
     "roadrunner"
+    "rurbs"
     "ruststep"
     "stunner"
     "stunner-gateway-operator"
